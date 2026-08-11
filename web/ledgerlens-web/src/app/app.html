@@ -1,0 +1,21 @@
+<main class="shell">
+  <header>
+    <p class="eyebrow">LedgerLens · Distributed Foundation</p>
+    <h1>Resource connectivity</h1>
+    <p class="lede">Technical readiness only. No portfolio or ledger business data exists in this milestone.</p>
+  </header>
+
+  <section class="status-grid" aria-label="Service connectivity">
+    @for (service of services(); track service.endpoint) {
+      <article class="status-card">
+        <span class="indicator" [attr.data-state]="service.state" aria-hidden="true"></span>
+        <div>
+          <h2>{{ service.name }}</h2>
+          <p>{{ service.state }}</p>
+        </div>
+      </article>
+    }
+  </section>
+
+  <button type="button" (click)="refresh()">Check again</button>
+</main>

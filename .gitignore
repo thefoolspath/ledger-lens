@@ -1,0 +1,50 @@
+# Project-local toolchains and downloaded artifacts
+.dotnet/
+.tools/
+.a/
+.cache/
+
+# .NET and Aspire generated state
+.aspire/
+**/.aspire/
+artifacts/
+bin/
+obj/
+*.user
+TestResults/
+*.trx
+
+# JavaScript and Angular generated state
+node_modules/
+.angular/
+dist/
+coverage/
+.npm/
+
+# Runtime data, secrets, and local configuration
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+appsettings.Local.json
+secrets/
+data/
+backups/
+imports/
+exports/
+*.pfx
+*.p12
+*.key
+*.pem
+*.dump
+*.bak
+*.log
+
+# Editors and operating systems
+.vs/
+.vscode/
+.idea/
+*.suo
+.DS_Store
+Thumbs.db
+Desktop.ini

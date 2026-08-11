@@ -1,0 +1,64 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LedgerLens.AppHost/LedgerLens.AppHost.csproj" />
+    <Project Path="src/LedgerLens.Gateway/LedgerLens.Gateway.csproj" />
+    <Project Path="src/LedgerLens.IntegrationContracts/LedgerLens.IntegrationContracts.csproj" />
+    <Project Path="src/LedgerLens.ServiceDefaults/LedgerLens.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/MarketData/">
+    <Project Path="src/Services/MarketData/LedgerLens.MarketData.Api/LedgerLens.MarketData.Api.csproj" />
+    <Project Path="src/Services/MarketData/LedgerLens.MarketData.Application/LedgerLens.MarketData.Application.csproj" />
+    <Project Path="src/Services/MarketData/LedgerLens.MarketData.Domain/LedgerLens.MarketData.Domain.csproj" />
+    <Project Path="src/Services/MarketData/LedgerLens.MarketData.Infrastructure/LedgerLens.MarketData.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Operations/">
+    <Project Path="src/Services/Operations/LedgerLens.Operations.Api/LedgerLens.Operations.Api.csproj" />
+    <Project Path="src/Services/Operations/LedgerLens.Operations.Application/LedgerLens.Operations.Application.csproj" />
+    <Project Path="src/Services/Operations/LedgerLens.Operations.Infrastructure/LedgerLens.Operations.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/PortfolioCore/">
+    <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Api/LedgerLens.PortfolioCore.Api.csproj" />
+    <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Application/LedgerLens.PortfolioCore.Application.csproj" />
+    <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Domain/LedgerLens.PortfolioCore.Domain.csproj" />
+    <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Infrastructure/LedgerLens.PortfolioCore.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Research/">
+    <Project Path="src/Services/Research/LedgerLens.Research.Api/LedgerLens.Research.Api.csproj" />
+    <Project Path="src/Services/Research/LedgerLens.Research.Application/LedgerLens.Research.Application.csproj" />
+    <Project Path="src/Services/Research/LedgerLens.Research.Domain/LedgerLens.Research.Domain.csproj" />
+    <Project Path="src/Services/Research/LedgerLens.Research.Infrastructure/LedgerLens.Research.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/SlipImport/">
+    <Project Path="src/Services/SlipImport/LedgerLens.SlipImport.Api/LedgerLens.SlipImport.Api.csproj" />
+    <Project Path="src/Services/SlipImport/LedgerLens.SlipImport.Application/LedgerLens.SlipImport.Application.csproj" />
+    <Project Path="src/Services/SlipImport/LedgerLens.SlipImport.Domain/LedgerLens.SlipImport.Domain.csproj" />
+    <Project Path="src/Services/SlipImport/LedgerLens.SlipImport.Infrastructure/LedgerLens.SlipImport.Infrastructure.csproj" />
+    <Project Path="src/Services/SlipImport/LedgerLens.SlipImport.Worker/LedgerLens.SlipImport.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LedgerLens.ArchitectureTests/LedgerLens.ArchitectureTests.csproj" />
+    <Project Path="tests/LedgerLens.DistributedAppTests/LedgerLens.DistributedAppTests.csproj" />
+    <Project Path="tests/LedgerLens.Gateway.IntegrationTests/LedgerLens.Gateway.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/MarketData/">
+    <Project Path="tests/MarketData/LedgerLens.MarketData.IntegrationTests/LedgerLens.MarketData.IntegrationTests.csproj" />
+    <Project Path="tests/MarketData/LedgerLens.MarketData.UnitTests/LedgerLens.MarketData.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Operations/">
+    <Project Path="tests/Operations/LedgerLens.Operations.IntegrationTests/LedgerLens.Operations.IntegrationTests.csproj" />
+    <Project Path="tests/Operations/LedgerLens.Operations.UnitTests/LedgerLens.Operations.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/PortfolioCore/">
+    <Project Path="tests/PortfolioCore/LedgerLens.PortfolioCore.IntegrationTests/LedgerLens.PortfolioCore.IntegrationTests.csproj" />
+    <Project Path="tests/PortfolioCore/LedgerLens.PortfolioCore.UnitTests/LedgerLens.PortfolioCore.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Research/">
+    <Project Path="tests/Research/LedgerLens.Research.IntegrationTests/LedgerLens.Research.IntegrationTests.csproj" />
+    <Project Path="tests/Research/LedgerLens.Research.UnitTests/LedgerLens.Research.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/SlipImport/">
+    <Project Path="tests/SlipImport/LedgerLens.SlipImport.IntegrationTests/LedgerLens.SlipImport.IntegrationTests.csproj" />
+    <Project Path="tests/SlipImport/LedgerLens.SlipImport.UnitTests/LedgerLens.SlipImport.UnitTests.csproj" />
+  </Folder>
+</Solution>

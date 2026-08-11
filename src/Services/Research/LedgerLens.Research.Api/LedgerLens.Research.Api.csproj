@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LedgerLens.Research.Application\LedgerLens.Research.Application.csproj" />
+    <ProjectReference Include="..\LedgerLens.Research.Infrastructure\LedgerLens.Research.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\LedgerLens.ServiceDefaults\LedgerLens.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\LedgerLens.IntegrationContracts\LedgerLens.IntegrationContracts.csproj" />
+  </ItemGroup>
+</Project>

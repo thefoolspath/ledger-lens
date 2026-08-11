@@ -1,0 +1,4 @@
+interface:
+  display_name: "LedgerLens QA"
+  short_description: "Run evidence-based QA gates for LedgerLens"
+  default_prompt: "Use $ledgerlens-qa to test the current LedgerLens milestone and report verified results."

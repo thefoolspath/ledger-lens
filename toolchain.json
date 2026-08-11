@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "resolvedAt": "2026-08-11",
+  "dotnet": {
+    "version": "10.0.302",
+    "installScriptUrl": "https://dot.net/v1/dotnet-install.ps1",
+    "installScriptSha256": "e8b873e18a81e5c4cd8ab69d84dac8fead291d50b3c44633cd7fddad709a13d6"
+  },
+  "aspire": {
+    "packageId": "Aspire.Cli",
+    "version": "13.4.6",
+    "installDirectory": ".a",
+    "installNote": "Short project-local path required to keep Aspire managed executable below the Windows MAX_PATH boundary"
+  },
+  "node": {
+    "version": "24.19.0",
+    "npmVersion": "11.17.0",
+    "archiveUrl": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-win-x64.zip",
+    "archiveSha256": "57f71ab3652e797d84acddc79c81cc9ff1c6ddb2a1974cdb83f00fee9bff4c73"
+  },
+  "frontend": {
+    "framework": "Angular 22.x",
+    "styling": "Tailwind CSS",
+    "bootstrapUiAllowed": false,
+    "versionPolicy": "Pin the latest stable Angular-compatible Tailwind release when the frontend workspace is created"
+  },
+  "postgresql": {
+    "version": "18.4",
+    "image": "postgres:18.4"
+  }
+}

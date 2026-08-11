@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.4.6" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsAspireHost>true</IsAspireHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
+    <PackageReference Include="Aspire.Hosting.Nats" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LedgerLens.Gateway\LedgerLens.Gateway.csproj" />
+    <ProjectReference Include="..\Services\PortfolioCore\LedgerLens.PortfolioCore.Api\LedgerLens.PortfolioCore.Api.csproj" />
+    <ProjectReference Include="..\Services\MarketData\LedgerLens.MarketData.Api\LedgerLens.MarketData.Api.csproj" />
+    <ProjectReference Include="..\Services\SlipImport\LedgerLens.SlipImport.Api\LedgerLens.SlipImport.Api.csproj" />
+    <ProjectReference Include="..\Services\SlipImport\LedgerLens.SlipImport.Worker\LedgerLens.SlipImport.Worker.csproj" />
+    <ProjectReference Include="..\Services\Research\LedgerLens.Research.Api\LedgerLens.Research.Api.csproj" />
+    <ProjectReference Include="..\Services\Operations\LedgerLens.Operations.Api\LedgerLens.Operations.Api.csproj" />
+  </ItemGroup>
+
+</Project>

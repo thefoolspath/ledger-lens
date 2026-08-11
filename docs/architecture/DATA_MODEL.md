@@ -1,0 +1,38 @@
+# Data Model
+
+Status: Proposed business model; no business tables are implemented in the distributed foundation.
+
+## Core relationships
+
+```text
+UserProfile 1--* Portfolio 1--* InvestmentAccount 1--* LedgerEntry
+LedgerEntry 1--* EntryAmount
+LedgerEntry 1--0..1 Trade
+Trade 1--* TradeLot / LotAllocation
+InvestmentAccount 1--* SlipDocument 1--* SlipExtraction 1--* ImportReview
+SlipDocument *--* LedgerEntry (through SourceLink)
+Instrument 1--* MarketQuote / PriceCandle
+CurrencyPair 1--* ExchangeRate
+Portfolio 1--* Watchlist / ResearchNote / PortfolioSnapshot
+```
+
+## Proposed storage rules
+
+- Portfolio Core, Market Data, Slip Import, Research, and Operations each own a separate PostgreSQL database, `DbContext`, migrations history, and credentials. Cross-service foreign keys, joins, migrations, and direct database access are prohibited.
+- `UserProfile.Id` is the internal relational identity and `Portfolio.OwnerUserId` is required. Email is normalized profile data, never a primary/foreign key or a future OIDC identity key. Descendants inherit ownership through Portfolio rather than duplicating `UserId` in every table.
+- UUIDv7 identifiers; UTC instants in `timestamptz`; exchange-local trade date and IANA zone retained where relevant.
+- ISO 4217 currency codes and provider-specific instrument identifiers behind a canonical instrument record.
+- PostgreSQL `numeric`: quantities `numeric(28,12)`, money/prices `numeric(28,10)`, FX rates `numeric(28,12)`, calculated percentages `numeric(28,12)`. Revisit with provider samples before migration acceptance.
+- Never use binary floating point for canonical financial values.
+- Unique constraints for document content hash, broker reference within account, and provider/time-series natural keys.
+- Index ledger by account/effective instant/id, lots by instrument/acquisition instant, and quotes by provider/instrument/as-of.
+- Original documents live outside PostgreSQL; database stores relative application-data identity, hash, size, media type, and lifecycle state.
+
+Raw provider payload retention is off by default. Enable a bounded diagnostic copy only when terms allow it and redaction/retention are specified.
+
+Each service schema is generated and evolved only through its reviewed EF Core Code First migrations. `Database.EnsureCreated` is not used, and personal bootstrap values are never embedded in migrations. The foundation supplies migration infrastructure but creates no business tables.
+
+## Evidence
+
+- [PostgreSQL exact numeric and data types](https://www.postgresql.org/docs/current/datatype.htm)
+- [PostgreSQL date/time and IANA time-zone behaviour](https://www.postgresql.org/docs/current/datatype-datetime.html)
