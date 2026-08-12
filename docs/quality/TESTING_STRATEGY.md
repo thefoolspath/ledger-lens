@@ -5,7 +5,7 @@ Status: Accepted foundation gates; business test layers activate with their mile
 ## Foundation layers
 
 - **Architecture:** per-service Domain/Application/Infrastructure/API direction; no cross-service internals or common domain project.
-- **Distributed application:** start AppHost, wait for resource readiness, resolve dynamic endpoints, and exercise Gateway-to-service routes.
+- **Distributed application:** start AppHost, wait for every named resource, resolve dynamic endpoints, exercise Gateway-to-service routes, and call a backend through the Angular development proxy. Automated distributed tests disable persistent volumes; a separate local stop/start check verifies named-volume credential continuity.
 - **Gateway integration:** route mapping, path transforms, ProblemDetails, timeout/cancellation, Host/Origin policy, and unavailable backend behaviour.
 - **Infrastructure connectivity:** each service reaches only its named PostgreSQL database and NATS; no `EnsureCreated`, cross-database access, or business tables.
 - **Frontend component:** Angular connectivity shell calls Gateway only and renders healthy/degraded/error states accessibly.

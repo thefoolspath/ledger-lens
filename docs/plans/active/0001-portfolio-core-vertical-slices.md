@@ -1,6 +1,6 @@
 # Distributed Foundation and Portfolio Core Vertical Slices
 
-Last reviewed: 2026-08-11. Status: In implementation.
+Last reviewed: 2026-08-12. Status: In implementation.
 
 ## Goal
 
@@ -10,7 +10,7 @@ First prove the complete Aspire-distributed project graph without business logic
 
 **Tasks:** pin and restore project-local .NET 10, Aspire 13.4, Node/npm, PostgreSQL image and dependency versions; verify Docker client/server; accept ADR-0015 and synthetic calculation fixtures.  
 **Acceptance:** wrappers resolve only the pinned local toolchain; bootstrap is idempotent; Docker daemon and Compose are healthy; all direct dependencies have approved free-use licenses.  
-**State:** local .NET/Aspire/Node/npm are restored; Docker daemon verification remains.
+**State:** local .NET/Aspire/Node/npm are restored; Docker Desktop, Compose, and WSL are verified healthy. The remaining Milestone 0 item is owner approval of direct-dependency free-use licenses.
 
 ## Milestone 1 — complete distributed project foundation (no business logic)
 
@@ -18,7 +18,7 @@ First prove the complete Aspire-distributed project graph without business logic
 **Acceptance:** one command starts the complete graph; every resource becomes healthy; Gateway reaches every API through logical service discovery; Angular calls Gateway only; each service receives only its database and NATS reference; dynamic ports work; Aspire Dashboard displays logs/traces/metrics; nullable/analyzers/build/tests/privacy scans pass; no business type/table/event exists; no `EnsureCreated`, cross-service project/database reference, mediator, mapper, validation, generic-repository, or extra unit-of-work framework exists.  
 **Security/performance:** only Angular/Gateway are browser-facing on loopback; benchmark cold/warm startup and local memory; runtime volumes stay outside the repository.
 
-**State:** source topology, pinned dependencies, builds, architecture/Gateway tests, Angular shell/tests, and privacy scan are implemented. Runtime acceptance remains open because Docker Desktop could not acquire a named pipe owned by another Windows user/session on 2026-08-11. Milestone 2 remains blocked by design.
+**State:** source topology, pinned dependencies, builds, tests, privacy scan, all-resource health, dynamic Gateway routing, Angular-through-Gateway connectivity, JetStream, and PostgreSQL/NATS named-volume restart persistence are verified. Persistent PostgreSQL credentials are stored outside Git in AppHost .NET User Secrets; distributed tests use ephemeral credentials and no named volumes. Direct Dashboard trace/log/metric confirmation and cold/warm startup plus local-memory measurements remain open. Milestone 2 remains blocked by design.
 
 ## Milestone 2 — fixed user, portfolio and auditable ledger
 

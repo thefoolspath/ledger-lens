@@ -1,8 +1,18 @@
-var builder = DistributedApplication.CreateBuilder(args);
+using Aspire.Hosting.ApplicationModel;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
 
-var postgres = builder.AddPostgres("postgres")
-    .WithImage("postgres", "18.4")
-    .WithDataVolume("ledgerlens-postgres-data");
+var builder = DistributedApplication.CreateBuilder(args);
+builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true);
+
+var usePersistentVolumes = !bool.TryParse(
+    builder.Configuration["LedgerLens:Runtime:UsePersistentVolumes"],
+    out var configuredUsePersistentVolumes) || configuredUsePersistentVolumes;
+var postgresPassword = usePersistentVolumes
+    ? builder.AddParameter("postgres-password", secret: true)
+    : builder.AddParameter("postgres-password", new GenerateParameterDefault(), secret: true);
+var postgres = builder.AddPostgres("postgres", password: postgresPassword)
+    .WithImage("postgres", "18.4");
 
 var portfolioDatabase = postgres.AddDatabase("portfolio-db", "ledgerlens_portfolio");
 var marketDatabase = postgres.AddDatabase("market-db", "ledgerlens_market");
@@ -11,8 +21,13 @@ var researchDatabase = postgres.AddDatabase("research-db", "ledgerlens_research"
 var operationsDatabase = postgres.AddDatabase("operations-db", "ledgerlens_operations");
 
 var messaging = builder.AddNats("messaging")
-    .WithJetStream()
-    .WithDataVolume("ledgerlens-nats-data");
+    .WithJetStream();
+
+if (usePersistentVolumes)
+{
+    postgres.WithDataVolume("ledgerlens-postgres-data");
+    messaging.WithDataVolume("ledgerlens-nats-data");
+}
 
 var portfolio = builder.AddProject<Projects.LedgerLens_PortfolioCore_Api>("portfolio-api")
     .WithReference(portfolioDatabase).WithReference(messaging)
@@ -47,6 +62,7 @@ var gateway = builder.AddProject<Projects.LedgerLens_Gateway>("gateway")
     .WithHttpHealthCheck("/health");
 
 builder.AddJavaScriptApp("web", "../../web/ledgerlens-web")
+    .WithRunScript("start")
     .WithHttpEndpoint(targetPort: 4200, name: "http")
     .WithReference(gateway)
     .WaitFor(gateway)

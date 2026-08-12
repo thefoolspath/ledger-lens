@@ -5,6 +5,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>ledgerlens-apphost-development</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
