@@ -5,10 +5,10 @@ Last reviewed: 2026-08-12.
 ## Current state
 
 - The distributed foundation source is implemented: AppHost, ServiceDefaults, IntegrationContracts, YARP Gateway, five coarse-grained service skeletons, Slip Import worker, five service-owned `DbContext` types, Angular connectivity shell, PostgreSQL/NATS topology, and foundation tests.
-- The complete .NET solution builds with zero warnings/errors; four architecture tests and two Gateway tests pass, including Gateway-to-five-ephemeral-services routing on dynamic ports; Angular production build and two component tests pass; privacy/business-table scans pass.
+- The complete .NET solution builds with zero warnings/errors; four architecture tests, two Gateway tests, and two explicitly enabled distributed-app tests pass, including a clean 15-resource runtime graph and Gateway-to-five-service routing; Angular production build and two component tests pass; privacy/business-table scans pass.
 - Docker Desktop and WSL are healthy. The complete 15-resource graph becomes healthy; Gateway reaches all five APIs on dynamic ports; Angular reaches those APIs through its Gateway proxy; PostgreSQL 18.4 and NATS JetStream use named volumes outside the repository; and a stop/start cycle reuses those volumes without PostgreSQL authentication failures.
 - Persistent local runs require `Parameters:postgres-password` in the AppHost .NET User Secrets store (`UserSecretsId` `ledgerlens-apphost-development`). Distributed tests disable named volumes and use a generated ephemeral password so parallel/repeated tests cannot collide with developer data.
-- The runtime foundation gate remains open only for direct Aspire Dashboard confirmation of correlated logs/traces/metrics and the documented cold/warm startup and local-memory measurements. No business milestone has started.
+- Milestone 1 is complete. Direct Aspire Dashboard inspection verified the 16-resource view, five connected Angular service cards, Gateway-to-backend distributed traces, trace-linked structured logs, and Gateway request metrics. The recorded process-start observations were at most 26.743 seconds for the first measured start and 32.178 seconds for one warm restart; attributed steady-state local working set was approximately 973.5 MiB including PostgreSQL and NATS. The warm sample is above the proposed 30-second target and remains an investigation data point, not a p95 result. No business milestone has started.
 - Product scope, proposed architecture, research evidence, ADRs, quality gates, risks, and the first implementation plan are documented.
 - The source planning context remains at `../LedgerLens_Codex_Planning_Context.md` relative to the LedgerLens folder.
 
@@ -32,4 +32,4 @@ Last reviewed: 2026-08-12.
 
 ## Next work
 
-Verify one correlated Angular-to-Gateway-to-backend request in Aspire Dashboard logs/traces/metrics, record cold/warm startup and local-memory measurements, and rerun the final build/test/privacy gates. Do not begin Milestone 2 until those remaining Milestone 1 acceptance checks pass.
+Obtain owner approval of the direct-dependency free-use licenses to close the remaining Milestone 0 gate. After that approval, begin Milestone 2 with the fixed current-user boundary, `UserProfile`, required Portfolio ownership, and the smallest auditable-ledger vertical slice. Keep the 32.178-second warm-start observation visible while collecting enough repeat runs to estimate p95.

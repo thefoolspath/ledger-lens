@@ -1,8 +1,8 @@
 # Local Development Tooling
 
-Last reviewed: 2026-08-11. Status: Implemented; Docker runtime verification remains pending.
+Last reviewed: 2026-08-12. Status: Implemented and runtime-verified.
 
-This document records the inspected Windows environment, the supported target toolchain, and the boundary between project-local and system-level dependencies. The project-local bootstrap and development wrappers are implemented; Docker runtime verification remains pending.
+This document records the inspected Windows environment, the supported target toolchain, and the boundary between project-local and system-level dependencies. The project-local bootstrap and development wrappers are implemented, and Docker runtime verification passed on 2026-08-12.
 
 ## Machine audit
 
@@ -17,8 +17,8 @@ This document records the inspected Windows environment, the supported target to
 | Aspire CLI | Not found | Required for the implementation foundation |
 | Angular CLI | Not found globally | Expected as a project-local npm development dependency |
 | `dotnet-ef` | Global 9.0.7 | Must not be used for the EF Core 10 project; use a pinned local tool |
-| Docker Desktop | 4.27.1 installed; 4.86.0 update offered | Update and client/server verification pending |
-| Docker daemon | Started successfully during inspection | Reverify after the Docker update |
+| Docker Desktop | 4.86.0; client/server 29.7.2 | Verified healthy on 2026-08-12 |
+| Docker daemon | Desktop Linux context; Engine 29.7.2 | Verified by the repository doctor and distributed runtime tests |
 | PostgreSQL CLI | `psql` and `pg_dump` not found | Not required on Windows when PostgreSQL is container-managed |
 | Gitleaks | Not found | Required before the first public commit/push |
 | Tesseract and PaddleOCR | Not found | Deferred to the Dime extraction evidence milestone |

@@ -126,6 +126,7 @@ switch ($Command) {
     'test' {
         Assert-Tool $dotnetExe '.NET SDK'
         Assert-Tool $npmCmd 'npm'
+        $env:LEDGERLENS_RUN_DISTRIBUTED_TESTS = '1'
         & $dotnetExe test (Join-Path $repoRoot 'LedgerLens.slnx') --no-restore
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         & $npmCmd test --prefix $webRoot -- --watch=false

@@ -12,6 +12,8 @@ Status: Accepted foundation gates; business test layers activate with their mile
 - **Observability:** one request produces correlated Gateway/backend logs and a distributed trace in Aspire Dashboard.
 - **Privacy/security:** loopback-only exposure, forbidden paths, secret/PII patterns, log redaction, and internal endpoint exposure checks.
 
+The repository `lg test` wrapper enables `LEDGERLENS_RUN_DISTRIBUTED_TESTS=1`, so its .NET pass exercises the complete ephemeral Aspire graph instead of reporting the guarded distributed test as passed without running its body. Stop any interactive `lg run` first because the Angular development server uses its local port while the distributed test is active. A direct run of `LedgerLens.DistributedAppTests.csproj` must set the same environment variable explicitly.
+
 ## Messaging gates for future business events
 
 Test transactional Outbox crash windows, duplicate and out-of-order delivery, Inbox idempotency, poison-message retry/dead-letter behaviour, schema-version compatibility, correlation/causation propagation, and safe replay. Never test or claim exactly-once delivery.
