@@ -35,10 +35,10 @@ function Invoke-LocalTool {
 
 if ($Command -in @('help', '--help', '-h')) {
     @'
-TheFools - LedgerLens development CLI
+LG - LedgerLens development CLI
 
 Usage:
-  thefools <command> [arguments]
+  lg <command> [arguments]
 
 Commands:
   bootstrap   Restore the pinned project-local toolchain
@@ -55,9 +55,9 @@ Commands:
   help        Show this help
 
 Examples:
-  thefools run
-  thefools test
-  thefools dotnet --version
+  lg run
+  lg test
+  lg dotnet --version
 '@ | Write-Host
     exit 0
 }

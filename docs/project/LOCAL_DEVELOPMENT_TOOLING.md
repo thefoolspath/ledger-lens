@@ -51,7 +51,7 @@ LedgerLens/
 |-- .a/                      # local Aspire CLI; short path avoids Windows MAX_PATH; ignored
 |-- global.json              # exact SDK version and local-only SDK search path
 |-- scripts/                 # bootstrap, development wrapper, and PowerShell command installer
-|-- thefools.cmd             # friendly development CLI entry point
+|-- lg.cmd                   # friendly development CLI entry point
 `-- web/ledgerlens-web/      # Angular workspace and pinned JavaScript tooling
 ```
 
@@ -64,7 +64,7 @@ The bootstrap and wrappers:
 5. Be idempotent, avoid permanent user/system `PATH` changes, and fail with a clear restore instruction when a required local tool is absent.
 6. Provide wrapper commands that contributors and CI use instead of unqualified global `dotnet`, `aspire`, `node`, or `ng` commands.
 
-`thefools.cmd` forwards commands to `scripts/dev.ps1`, which resolves only the pinned tools inside the repository. `scripts/install-powershell-cli.ps1` registers a `thefools` function in the current user's PowerShell profile without modifying the user or machine `PATH`. The function refuses to run unless the current directory is the LedgerLens repository or one of its subdirectories. The installer is idempotent and supports `-Uninstall`.
+`lg.cmd` forwards commands to `scripts/dev.ps1`, which resolves only the pinned tools inside the repository. `scripts/install-powershell-cli.ps1` registers an `lg` function in the current user's PowerShell profile without modifying the user or machine `PATH`. The function refuses to run unless the current directory is the LedgerLens repository or one of its subdirectories. The installer is idempotent, removes the former `thefools` profile block during migration, and supports `-Uninstall`.
 
 ## System-level exceptions
 

@@ -6,16 +6,16 @@ Install the repository-scoped PowerShell command once, then open a new PowerShel
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-powershell-cli.ps1
-thefools bootstrap
-thefools restore
-thefools build
-thefools test
-thefools run
+lg bootstrap
+lg restore
+lg build
+lg test
+lg run
 ```
 
 The installer registers a small PowerShell profile function and does not modify
 the user or machine `PATH`. The function accepts commands only while the current
-directory is this repository or one of its subdirectories. Run `thefools help`
+directory is this repository or one of its subdirectories. Run `lg help`
 to list every command. To remove it, run
 `.\scripts\install-powershell-cli.ps1 -Uninstall`.
 
