@@ -41,6 +41,8 @@ Each service has one scoped `DbContext` and design-time factory for its own data
 
 Future financial values use `decimal` and exact PostgreSQL `numeric`; queries use server-side filtering/projection, cancellation, bounded pagination, and one intentional materialization point.
 
+LedgerLens-owned domain and persistent identifiers use UUIDv7 exclusively. Create new values with `Guid.CreateVersion7()` and reject non-v7 UUID values at API boundaries where the contract identifies a LedgerLens-owned resource. Do not replace external provider identifiers or OpenTelemetry trace identifiers with application UUIDs.
+
 ## Fixed local user and future OIDC
 
 Identity remains business work for Phase 1. The foundation stores no personal email. Later, Gateway and services receive an `ICurrentUser` abstraction backed by fixed external configuration; Portfolio Core owns `UserProfile` and required Portfolio ownership. Future OIDC maps unique issuer/subject to the internal user rather than trusting email.
@@ -48,4 +50,3 @@ Identity remains business work for Phase 1. The foundation stores no personal em
 ## Free dependency policy
 
 Only dependencies with no fee for intended local and future production use may be admitted. Verify exact version, license, transitive/native components, maintenance, security, size, alternatives, and removal path. Trial, seat-based, metered, ambiguously dual-licensed, or source-available commercial packages are rejected by default.
-

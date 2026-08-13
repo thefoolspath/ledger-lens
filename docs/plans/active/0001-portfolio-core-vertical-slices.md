@@ -22,7 +22,7 @@ First prove the complete Aspire-distributed project graph without business logic
 
 ## Milestone 2 — fixed user, portfolio and auditable ledger
 
-Implement `ICurrentUser`, externally configured fixed user, `UserProfile`, required Portfolio ownership, deposits, withdrawals, buys, sells, fees, taxes, dividends, corrections, Code First migrations and minimal UI inside Portfolio Core. Preserve one local transaction for financial invariants.
+Implement `ICurrentUser`, externally configured fixed user, `UserProfile`, required Portfolio ownership, deposits, withdrawals, buys, sells, fees, taxes, dividends, corrections, Code First migrations and minimal UI inside Portfolio Core. Generate every LedgerLens-owned domain and persistent identifier as UUIDv7 with `Guid.CreateVersion7()` and reject non-v7 UUID resource identifiers at API boundaries. Preserve one local transaction for financial invariants.
 
 ## Milestone 3 — lots, holdings and dual cost views
 
