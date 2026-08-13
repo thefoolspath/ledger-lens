@@ -2,6 +2,19 @@
 
 Status: Needs Evidence. Research date: 2026-08-11.
 
+## Private sample observations
+
+Ten owner-supplied raster screenshots were inspected locally on 2026-08-12 and retained on the owner's machine under `%LOCALAPPDATA%\LedgerLens\private-samples\dime-slips\2026-08-13\`. The files and extracted personal or transaction values remain outside the repository; only the following structural observations are recorded:
+
+- At least four document families are present: English transfer, Thai transfer, FX exchange, and asset-order detail.
+- Transfer layouts contain amount, fee, sender, recipient, masked accounts, transaction date/time, slip identifier, and a QR verification block.
+- FX layouts contain status, source and destination amounts/currencies, account roles, exchange rate, order/submission/settlement dates, order identifier, and purpose. Direction can be either foreign-currency-to-THB or THB-to-foreign-currency.
+- Asset-order layouts add instrument, side, local and foreign values, unit price, quantity, fees/tax, order type, payment/receiving accounts, portfolio or order references, and completion state.
+- Thai and English labels, Buddhist Era dates in two- and four-digit forms, Latin identifiers, masked account text, long portrait images, decorative headers, faint backgrounds, and completed/pending states must be handled.
+- These samples are screenshots without an embedded PDF text layer, so they require OCR or an equivalent raster text-extraction path. Future PDF inputs must still attempt embedded-text extraction first.
+
+These observations expand the template classes but do not select an OCR engine or satisfy the accuracy gate. A sanitized, newly generated synthetic corpus with expected fields is still required before implementation acceptance.
+
 ## Facts
 
 - [Tesseract documentation](https://tesseract-ocr.github.io/tessdoc/) identifies Tesseract 5.x as the stable open-source OCR engine under Apache-2.0.
@@ -10,7 +23,7 @@ Status: Needs Evidence. Research date: 2026-08-11.
 
 ## Recommendation
 
-Use a deterministic layered pipeline: embedded PDF text, strict Dime anchor/template parser, OCR only when necessary, arithmetic validation, then human review. Benchmark Tesseract 5 and PaddleOCR 3.x/PP-OCRv5; do not select by generic benchmark claims.
+Use a deterministic layered pipeline: document-family and language classification, embedded PDF text when present, OCR for raster content, a strict versioned Dime anchor/template parser per document family, arithmetic and state validation, then human review. Benchmark Tesseract 5 and PaddleOCR 3.x/PP-OCRv5; do not select by generic benchmark claims.
 
 ## Private evaluation protocol
 

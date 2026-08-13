@@ -15,9 +15,10 @@ Additional terminal or exceptional states: Duplicate, Failed, Unsupported, Rejec
 2. Store original outside the repository and compute SHA-256.
 3. Prefer embedded PDF text.
 4. Render/OCR only pages that lack usable text.
-5. Apply a versioned Dime template parser using anchors and strict field formats.
-6. Validate arithmetic, dates, symbol, side, currency, and required fields.
-7. Require human confirmation before posting.
+5. Classify the document family and language before field extraction; the known private-sample classes include transfer, FX exchange, and asset-order layouts in Thai and English.
+6. Apply a versioned Dime template parser per document family using anchors and strict field formats.
+7. Validate status, arithmetic, dates, symbol, side, currency, account roles, and required fields.
+8. Require human confirmation before posting.
 
 No model may invent unreadable values. Missing and low-confidence fields remain explicit. Local vision is deferred and cannot become a silent fallback.
 
