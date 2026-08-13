@@ -32,6 +32,9 @@ data/
 backups/
 imports/
 exports/
+private-samples/
+samples/private/
+*.private-slip.*
 *.pfx
 *.p12
 *.key

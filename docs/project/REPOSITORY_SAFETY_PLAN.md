@@ -10,6 +10,8 @@ Local SDKs, CLIs, portable runtimes, installers, and package caches are reproduc
 
 Ignore patterns are not the primary boundary: runtime paths default outside the repository and startup must refuse a private-data root inside the working tree unless an explicit safe test mode uses synthetic data.
 
+Owner-supplied private OCR samples are stored outside the repository under `%LOCALAPPDATA%\LedgerLens\private-samples\`. The `.gitignore` entries for `private-samples/`, `samples/private/`, and `*.private-slip.*` are defense in depth only; they do not authorize placing real slips anywhere inside the working tree. Private sample filenames must be neutral and must not contain names, account references, order identifiers, or transaction values.
+
 ## Automated controls
 
 - Pre-commit and CI secret scanning, with Gitleaks as the initial candidate after license review.
