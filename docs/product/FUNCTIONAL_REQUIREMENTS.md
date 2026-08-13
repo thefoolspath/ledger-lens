@@ -7,7 +7,7 @@
 | FR-003 | Support fractional US stock and ETF quantities | Exact decimal quantities reconcile through partial sales |
 | FR-004 | Provide FIFO and average-cost report views | Both derive from the same confirmed ledger |
 | FR-005 | Calculate realized/unrealized P/L, fees, taxes, cash flow, value, and weight | Published synthetic examples match the engine |
-| FR-006 | Report in USD and THB | THB total equals stock effect plus FX effect |
+| FR-006 | Report in USD and THB with non-overlapping stock, USD-cash, and exchange attribution | Primary and BOT benchmark columns show source and signed difference; each column reconciles independently, and a closed cycle equals actual THB received minus actual THB paid |
 | FR-007 | Capture historical and latest FX with provenance | Source, as-of, retrieval time, and override history are visible |
 | FR-008 | Fetch market and FX data on demand | No always-running scheduler is required |
 | FR-009 | Label data freshness | Real-time, delayed, end-of-day, or latest-available is never ambiguous |

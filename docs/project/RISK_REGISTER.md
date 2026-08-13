@@ -1,6 +1,6 @@
 # Risk Register
 
-Last reviewed: 2026-08-11.
+Last reviewed: 2026-08-13.
 
 ## R-FOUNDATION-ANGULAR-CLI-ADVISORY
 
@@ -13,11 +13,11 @@ Last reviewed: 2026-08-11.
 | --- | --- | --- | --- | --- | --- |
 | R-001 | Real portfolio data or secret enters public Git | Medium | Critical | External runtime boundary, scanners, forbidden paths; any detection stops publication | Open |
 | R-002 | Unauthenticated localhost API is called by hostile origin | Medium | Critical | Loopback, Host/Origin/content-type controls and browser tests | Open |
-| R-003 | Incorrect lot/P&L/FX result | Medium | Critical | Exact arithmetic, reviewed fixtures, property and reconciliation tests | Open |
+| R-003 | Incorrect stock-lot, USD-cash-lot, P/L, or FX result | Medium | Critical | Exact arithmetic, versioned allocation corrections, reviewed fixtures, property tests, and closed-cycle reconciliation | Open |
 | R-004 | Average cost is mistaken for tax basis | Medium | High | Analytical label and no tax claims | Open |
 | R-005 | Provider terms prohibit desired display/cache | High | High | Terms gate, own-key model, swappable providers | Open |
 | R-006 | Free feed is incomplete or stale | High | Medium | Provider/feed/freshness display and no real-time claims | Open |
-| R-007 | Missing historical FX changes attribution | Medium | High | Precedence, explicit missing state, prior-day label, manual correction | Open |
+| R-007 | Missing historical FX or external-USD basis changes attribution | Medium | High | Rate-role separation, provenance, explicit incomplete state, prior-day label, evidence/manual/FIFO allocation, and versioned correction | Open |
 | R-008 | OCR misposts a financial transaction | Medium | Critical | Mandatory review, strict validation, no auto-post | Open |
 | R-009 | Real Dime sample leaks into fixtures/logs | Medium | Critical | Private inspection and newly created synthetic fixture policy | Open |
 | R-010 | Malformed document exhausts local resources | Medium | High | File/page/time/memory limits and process isolation gate | Open |

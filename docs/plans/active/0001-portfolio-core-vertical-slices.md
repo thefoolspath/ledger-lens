@@ -30,7 +30,7 @@ Implement lot creation/allocation, FIFO suggestion, average-cost projection, hol
 
 ## Milestone 4 — Market Data FX and THB attribution
 
-Implement Market Data FX/provider adapters, provenance/freshness, Outbox/Inbox, versioned NATS integration, Portfolio Core rate projection, and exact THB attribution.
+Implement Market Data FX/provider adapters, provenance/freshness, Outbox/Inbox, versioned NATS integration, Portfolio Core primary/BOT rate projections, USD cash lots with evidence/manual/FIFO allocation and versioned corrections, trade-date stock attribution, non-overlapping cash/stock/exchange THB bridge, and exact closed-cycle reconciliation. Preserve trade and settlement timestamps, carry basis through linked internal USD transfers, and expose incomplete state for missing rates, allocation, or external-USD basis.
 
 ## Milestone 5 — dashboard and coordinated backup/restore
 
