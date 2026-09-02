@@ -12,11 +12,15 @@ $dotnetDir = Join-Path $repoRoot '.dotnet'
 $toolsDir = Join-Path $repoRoot '.tools'
 $aspireDir = Join-Path $repoRoot ([string]$manifest.aspire.installDirectory)
 $nodeDir = Join-Path $toolsDir 'node'
+$efToolDir = Join-Path $repoRoot ([string]$manifest.entityFramework.installDirectory)
 
+$env:DOTNET_ROOT = $dotnetDir
 $env:DOTNET_CLI_HOME = Join-Path $repoRoot '.cache\dotnet-home'
+$env:NUGET_PACKAGES = Join-Path $repoRoot '.n'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 $env:DOTNET_NOLOGO = '1'
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
+$env:PATH = "$dotnetDir;$env:PATH"
 
 New-Item -ItemType Directory -Force -Path $cacheDir, $toolsDir | Out-Null
 
@@ -126,6 +130,24 @@ if ($resolvedDotnetVersion -ne [string]$manifest.dotnet.version) {
     throw "Expected .NET SDK $($manifest.dotnet.version), but local dotnet reported $resolvedDotnetVersion."
 }
 
+$efExe = Join-Path $efToolDir 'dotnet-ef.exe'
+$efReady = $false
+if (Test-Path -LiteralPath $efExe) {
+    $efVersionOutput = (& $efExe --version 2>&1 | Out-String).Trim()
+    $efReady = $efVersionOutput -match [regex]::Escape([string]$manifest.entityFramework.version)
+}
+
+if (-not $efReady) {
+    Reset-Directory -Path $efToolDir
+    Write-Host "Installing EF Core CLI $($manifest.entityFramework.version) into $efToolDir"
+    & $dotnetExe tool install $manifest.entityFramework.toolPackageId `
+        --version $manifest.entityFramework.version `
+        --tool-path $efToolDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "EF Core CLI installation failed with exit code $LASTEXITCODE."
+    }
+}
+
 $aspireExe = Join-Path $aspireDir 'aspire.cmd'
 $aspireReady = $false
 if (Test-Path -LiteralPath $aspireExe) {
@@ -204,6 +226,7 @@ Write-Host ''
 Write-Host 'LedgerLens project-local toolchain is ready:'
 Write-Host "  .NET   $resolvedDotnetVersion"
 Write-Host "  Aspire $((& $aspireExe --version 2>&1 | Out-String).Trim())"
+Write-Host "  EF CLI $((& $efExe --version 2>&1 | Select-Object -Last 1 | Out-String).Trim())"
 Write-Host "  Node   $resolvedNodeVersion"
 Write-Host "  npm    $resolvedNpmVersion"
 Write-Host 'Use .\scripts\dev.ps1 doctor to verify the environment.'

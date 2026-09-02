@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Domain\LedgerLens.PortfolioCore.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Application\LedgerLens.PortfolioCore.Application.csproj" />
+  </ItemGroup>
+
 </Project>

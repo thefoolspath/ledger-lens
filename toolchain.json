@@ -6,6 +6,11 @@
     "installScriptUrl": "https://dot.net/v1/dotnet-install.ps1",
     "installScriptSha256": "e8b873e18a81e5c4cd8ab69d84dac8fead291d50b3c44633cd7fddad709a13d6"
   },
+  "entityFramework": {
+    "toolPackageId": "dotnet-ef",
+    "version": "10.0.8",
+    "installDirectory": ".tools/dotnet-ef"
+  },
   "aspire": {
     "packageId": "Aspire.Cli",
     "version": "13.4.6",

@@ -1,6 +1,6 @@
 # Distributed Foundation and Portfolio Core Vertical Slices
 
-Last reviewed: 2026-08-12. Status: In implementation.
+Last reviewed: 2026-09-01. Status: In implementation.
 
 ## Goal
 
@@ -10,7 +10,7 @@ First prove the complete Aspire-distributed project graph without business logic
 
 **Tasks:** pin and restore project-local .NET 10, Aspire 13.4, Node/npm, PostgreSQL image and dependency versions; verify Docker client/server; accept ADR-0015 and synthetic calculation fixtures.  
 **Acceptance:** wrappers resolve only the pinned local toolchain; bootstrap is idempotent; Docker daemon and Compose are healthy; all direct dependencies have approved free-use licenses.  
-**State:** local .NET/Aspire/Node/npm are restored; Docker Desktop, Compose, and WSL are verified healthy. The remaining Milestone 0 item is owner approval of direct-dependency free-use licenses.
+**State:** Complete on 2026-08-26. Local .NET/Aspire/Node/npm are restored; Docker Desktop, Compose, and WSL are verified healthy. The owner approved the free-use licenses for the admitted direct application, development, and test dependency baseline. Candidate dependencies and provider/data terms still require separate admission.
 
 ## Milestone 1 — complete distributed project foundation (no business logic)
 
@@ -22,7 +22,9 @@ First prove the complete Aspire-distributed project graph without business logic
 
 ## Milestone 2 — fixed user, portfolio and auditable ledger
 
-Implement `ICurrentUser`, externally configured fixed user, `UserProfile`, required Portfolio ownership, deposits, withdrawals, buys, sells, fees, taxes, dividends, corrections, Code First migrations and minimal UI inside Portfolio Core. Generate every LedgerLens-owned domain and persistent identifier as UUIDv7 with `Guid.CreateVersion7()` and reject non-v7 UUID resource identifiers at API boundaries. Preserve one local transaction for financial invariants.
+Implement `ICurrentUser`, externally configured fixed user, `UserProfile`, required Portfolio ownership, deposits, withdrawals, buys, sells, fees, taxes, dividends, corrections, reviewed EF migrations and minimal UI inside Portfolio Core. Generate every LedgerLens-owned domain and persistent identifier as UUIDv7 with `Guid.CreateVersion7()` and reject non-v7 UUID resource identifiers at API boundaries. Preserve one local transaction for financial invariants.
+
+**State:** In implementation. The first verified slice now supplies externally configured `FixedLocalCurrentUser`, idempotent `UserProfile` bootstrap during portfolio creation, required owner-filtered Portfolio access, Investment Account creation, append-only Deposit and Withdrawal entries using `numeric(28,10)`, ledger-derived cash balance, UUIDv7 generation/API validation, an explicit Portfolio Core migration resource, loopback-origin mutation protection, and a minimal Angular workflow. Portfolio Core now pilots ADR-0016: generated persistence and `DbContext` are isolated in its service-owned Database project, migrations and snapshot are owned by the one-shot Migrations project, and guarded `lg db` commands support DB-first scaffold, migration generation, drift checking, and SQL review without automatic apply/history writes. The distributed acceptance test applies the migration to ephemeral PostgreSQL and reconciles synthetic `100.50 - 25.00 = 75.50` through Gateway. Buys, sells, fees, taxes, dividends, correction/reversal semantics, and their UI/tests remain before Milestone 2 can be complete.
 
 ## Milestone 3 — lots, holdings and dual cost views
 
@@ -38,7 +40,7 @@ Implement incomplete-state dashboard composition plus Operations-coordinated wri
 
 ## Milestone 6 — quotes, watchlist and performance
 
-Implement quotes/candles/provider quotas in Market Data and activate Research watchlists when required. Validate provider terms before acceptance.
+Implement quotes/candles/provider quotas in Market Data, deliver the isolated manual Simulation Account slices in [plan 0002](0002-simulation-portfolio.md), and activate Research watchlists when required. Validate provider terms before accepting an external adapter.
 
 ## Milestone 7 — Dime import
 

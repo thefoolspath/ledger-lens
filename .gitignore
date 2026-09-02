@@ -2,6 +2,7 @@
 .dotnet/
 .tools/
 .a/
+.n/
 .cache/
 
 # .NET and Aspire generated state

@@ -20,8 +20,10 @@
   <Folder Name="/src/Services/PortfolioCore/">
     <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Api/LedgerLens.PortfolioCore.Api.csproj" />
     <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Application/LedgerLens.PortfolioCore.Application.csproj" />
+    <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Database/LedgerLens.PortfolioCore.Database.csproj" />
     <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Domain/LedgerLens.PortfolioCore.Domain.csproj" />
     <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Infrastructure/LedgerLens.PortfolioCore.Infrastructure.csproj" />
+    <Project Path="src/Services/PortfolioCore/LedgerLens.PortfolioCore.Migrations/LedgerLens.PortfolioCore.Migrations.csproj" />
   </Folder>
   <Folder Name="/src/Services/Research/">
     <Project Path="src/Services/Research/LedgerLens.Research.Api/LedgerLens.Research.Api.csproj" />

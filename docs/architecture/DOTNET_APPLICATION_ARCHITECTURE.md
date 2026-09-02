@@ -35,9 +35,11 @@ Future vertical slices use `ICommandHandler<TCommand,TResult>` and `IQueryHandle
 - `LedgerLens.IntegrationContracts` initially contains only a technical `MessageEnvelope<TPayload>`; it never contains domain entities.
 - Event envelopes carry message identity, type, schema version, occurrence time, correlation and causation. Business ownership fields belong to the versioned payload when required.
 
-## EF Core Code First
+## EF Core schema ownership
 
-Each service has one scoped `DbContext` and design-time factory for its own database. Migrations are generated with pinned project-local `dotnet-ef`, inspected, tested against PostgreSQL, and applied through an explicit migration operation. Never use `EnsureCreated` for application databases or migrate silently during ordinary API startup. The foundation contains no business entities or tables.
+Each service has one scoped `DbContext` for its own database. Migrations are generated with pinned project-local `dotnet-ef`, inspected, tested against PostgreSQL, and applied through an explicit migration operation. Never use `EnsureCreated` for application databases or migrate silently during ordinary API startup.
+
+Portfolio Core pilots the accepted hybrid workflow in ADR-0016. Its service-owned Database project contains generated persistence types and `DbContext`; Infrastructure alone maps them to Domain and implements Application ports; the Migrations project owns the snapshot and preserved migration chain. Reverse engineering is restricted to approved local/nonproduction sources and explicit service-owned tables. Generated code never enters Domain/Application, production is never a scaffold source, and migration history is never stamped without schema-equivalence evidence.
 
 Future financial values use `decimal` and exact PostgreSQL `numeric`; queries use server-side filtering/projection, cancellation, bounded pagination, and one intentional materialization point.
 

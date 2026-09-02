@@ -66,12 +66,64 @@ public sealed class ServiceBoundaryTests
     }
 
     [Fact]
-    public void Foundation_contains_no_business_tables_or_migrations()
+    public void Database_projects_are_service_owned_and_hidden_behind_infrastructure()
     {
+        var databaseProjects = Directory.EnumerateFiles(ServicesRoot, "*.Database.csproj", SearchOption.AllDirectories)
+            .ToArray();
+        Assert.Single(databaseProjects);
+
+        var databaseProject = databaseProjects[0];
+        Assert.Contains("PortfolioCore", databaseProject, StringComparison.Ordinal);
+        Assert.Empty(XDocument.Load(databaseProject).Descendants("ProjectReference"));
+
+        var databaseProjectName = Path.GetFileNameWithoutExtension(databaseProject);
+        foreach (var project in Directory.EnumerateFiles(ServicesRoot, "*.csproj", SearchOption.AllDirectories))
+        {
+            var projectName = Path.GetFileNameWithoutExtension(project);
+            var referencesDatabase = XDocument.Load(project)
+                .Descendants("ProjectReference")
+                .Select(reference => Path.GetFileNameWithoutExtension(reference.Attribute("Include")!.Value))
+                .Any(reference => string.Equals(reference, databaseProjectName, StringComparison.Ordinal));
+            if (!referencesDatabase)
+            {
+                continue;
+            }
+
+            Assert.True(
+                projectName.EndsWith(".Infrastructure", StringComparison.Ordinal) ||
+                projectName.EndsWith(".Migrations", StringComparison.Ordinal),
+                $"{projectName} must not reference {databaseProjectName} directly.");
+            Assert.Equal(GetServiceName(project), GetServiceName(databaseProject));
+        }
+
+        var databaseSource = string.Join('\n', Directory.EnumerateFiles(
+                Path.GetDirectoryName(databaseProject)!,
+                "*.cs",
+                SearchOption.AllDirectories)
+            .Where(file => !file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+            .Select(File.ReadAllText));
+        Assert.DoesNotContain("LedgerLens.PortfolioCore.Domain", databaseSource, StringComparison.Ordinal);
+        Assert.DoesNotContain("LedgerLens.PortfolioCore.Application", databaseSource, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Business_tables_and_migrations_are_owned_only_by_Portfolio_Core()
+    {
+        var businessTableFiles = Directory.EnumerateFiles(ServicesRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(file => File.ReadAllText(file).Contains("DbSet<", StringComparison.Ordinal))
+            .ToArray();
+        Assert.NotEmpty(businessTableFiles);
+        Assert.All(businessTableFiles, file => Assert.Contains("PortfolioCore", file, StringComparison.Ordinal));
+
+        var migrationDirectories = Directory.EnumerateDirectories(ServicesRoot, "Migrations", SearchOption.AllDirectories)
+            .Where(directory => Directory.EnumerateFiles(directory, "*.cs", SearchOption.TopDirectoryOnly).Any())
+            .ToArray();
+        Assert.Single(migrationDirectories);
+        Assert.Contains("PortfolioCore", migrationDirectories[0], StringComparison.Ordinal);
+
         var source = string.Join('\n', Directory.EnumerateFiles(ServicesRoot, "*.cs", SearchOption.AllDirectories)
             .Select(File.ReadAllText));
-        Assert.DoesNotContain("DbSet<", source, StringComparison.Ordinal);
-        Assert.Empty(Directory.EnumerateDirectories(ServicesRoot, "Migrations", SearchOption.AllDirectories));
+        Assert.DoesNotContain("EnsureCreated", source, StringComparison.Ordinal);
     }
 
     private static string? GetServiceName(string path)

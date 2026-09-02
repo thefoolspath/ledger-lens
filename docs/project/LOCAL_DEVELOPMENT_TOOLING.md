@@ -1,6 +1,6 @@
 # Local Development Tooling
 
-Last reviewed: 2026-08-12. Status: Implemented and runtime-verified.
+Last reviewed: 2026-09-02. Status: Implemented and runtime-verified.
 
 This document records the inspected Windows environment, the supported target toolchain, and the boundary between project-local and system-level dependencies. The project-local bootstrap and development wrappers are implemented, and Docker runtime verification passed on 2026-08-12.
 
@@ -47,6 +47,7 @@ The policy means the newest supported stable/LTS-compatible release at the decis
 LedgerLens/
 |-- .dotnet/                 # local stable .NET 10 SDK; ignored
 |-- .tools/
+|   |-- dotnet-ef/           # pinned EF Core 10 CLI; ignored
 |   `-- node/                # optional portable Node 24 LTS; ignored
 |-- .a/                      # local Aspire CLI; short path avoids Windows MAX_PATH; ignored
 |-- global.json              # exact SDK version and local-only SDK search path
@@ -60,11 +61,17 @@ The bootstrap and wrappers:
 1. Install the exact GA .NET 10 SDK into `.dotnet/` with the official install script using `InstallDir` and `NoPath`.
 2. Configure `global.json` to search `.dotnet` without falling back to the machine preview SDK.
 3. Install the pinned Aspire CLI with the local SDK and `--tool-path .a`; use a temporary short drive alias only during restore because this repository's OneDrive path makes the NuGet tool layout exceed Windows `MAX_PATH` under `.tools/aspire`.
-4. Restore the pinned Node/Angular and local `dotnet-ef` toolchains without global installation.
+4. Restore the pinned Node/Angular and EF Core CLI toolchains without global installation. The EF tool version is declared in `toolchain.json` and installed under `.tools/dotnet-ef`.
 5. Be idempotent, avoid permanent user/system `PATH` changes, and fail with a clear restore instruction when a required local tool is absent.
 6. Provide wrapper commands that contributors and CI use instead of unqualified global `dotnet`, `aspire`, `node`, or `ng` commands.
 
 `lg.cmd` forwards commands to `scripts/dev.ps1`, which resolves only the pinned tools inside the repository. `scripts/install-powershell-cli.ps1` registers an `lg` function in the current user's PowerShell profile without modifying the user or machine `PATH`. The function refuses to run unless the current directory is the LedgerLens repository or one of its subdirectories. The installer is idempotent, removes the former `thefools` profile block during migration, and supports `-Uninstall`.
+
+Central package versions must remain compatible with every pinned consumer. Aspire 13.4.6 requires `Microsoft.Extensions.Hosting` 10.0.8 or later and `Microsoft.AspNetCore.Mvc.Testing` 10.0.10 raises the solution-wide minimum to 10.0.10, so the repository centrally pins Hosting 10.0.10 rather than the .NET 10.0.0 baseline. This prevents `NU1109` during solution restore and `lg run`.
+
+The wrappers set `NUGET_PACKAGES` to the ignored short path `.n`. This keeps restored assembly paths below the legacy Windows 260-character boundary even when the repository itself is under the long OneDrive workspace path; bootstrap, development, and database commands all use the same cache.
+
+`lg db` routes to the guarded Portfolio Core hybrid database workflow. It supports `scaffold`, `migration`, `check`, and reviewable `script` generation. It never applies a migration or writes a migration-history row. See [Hybrid Database Workflow](../architecture/HYBRID_DATABASE_WORKFLOW.md).
 
 ## System-level exceptions
 
@@ -79,6 +86,17 @@ The bootstrap and wrappers:
 `.dotnet/`, `.tools/`, `.a/`, downloaded installers, Aspire state, package-manager caches, and generated tool outputs must be ignored. Git tracks only version declarations, bootstrap/wrapper definitions, checksums where applicable, and documentation. Tool directories must never contain secrets or runtime investment data.
 
 The root `.gitignore` also excludes .NET test-result directories and TRX files, local appsettings overrides, local certificate/private-key files, and user-specific IDE or Windows metadata. `.env.example` remains explicitly trackable so contributors can document required environment-variable names without committing values.
+
+## Fixed local user setup
+
+Milestone 2 requires a stable UUIDv7 and owner-supplied email in the AppHost User Secrets store alongside the PostgreSQL password. Do not put either value in tracked settings or shell scripts:
+
+```powershell
+.\lg.cmd dotnet user-secrets set "Parameters:fixed-user-id" "<stable-uuidv7>" --project "src/LedgerLens.AppHost/LedgerLens.AppHost.csproj"
+.\lg.cmd dotnet user-secrets set "Parameters:fixed-user-email" "<owner-email>" --project "src/LedgerLens.AppHost/LedgerLens.AppHost.csproj"
+```
+
+Portfolio Core validates the identifier version and email shape during startup. The profile is bootstrapped idempotently on the first portfolio creation and no personal bootstrap value is embedded in a migration.
 
 ## Verification contract
 

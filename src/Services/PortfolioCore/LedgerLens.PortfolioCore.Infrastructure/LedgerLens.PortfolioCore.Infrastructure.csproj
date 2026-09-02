@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LedgerLens.PortfolioCore.Application\LedgerLens.PortfolioCore.Application.csproj" />
+    <ProjectReference Include="..\LedgerLens.PortfolioCore.Database\LedgerLens.PortfolioCore.Database.csproj" />
     <ProjectReference Include="..\LedgerLens.PortfolioCore.Domain\LedgerLens.PortfolioCore.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.NATS.Net" />
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design"><PrivateAssets>all</PrivateAssets></PackageReference>
   </ItemGroup>
 </Project>

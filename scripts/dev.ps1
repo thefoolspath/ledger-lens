@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', '--help', '-h', 'bootstrap', 'doctor', 'restore', 'build', 'test', 'run', 'dotnet', 'aspire', 'node', 'npm', 'ng')]
+    [ValidateSet('help', '--help', '-h', 'bootstrap', 'doctor', 'restore', 'build', 'test', 'run', 'db', 'dotnet', 'aspire', 'node', 'npm', 'ng')]
     [string] $Command = 'help',
 
     [Parameter(Position = 1, ValueFromRemainingArguments)]
@@ -17,8 +17,15 @@ $dotnetExe = Join-Path $repoRoot '.dotnet\dotnet.exe'
 $aspireExe = Join-Path $repoRoot '.a\aspire.cmd'
 $nodeExe = Join-Path $repoRoot '.tools\node\node.exe'
 $npmCmd = Join-Path $repoRoot '.tools\node\npm.cmd'
+$efExe = Join-Path $repoRoot '.tools\dotnet-ef\dotnet-ef.exe'
 $webRoot = Join-Path $repoRoot 'web\ledgerlens-web'
-$env:PATH = "$(Split-Path -Parent $nodeExe);$env:PATH"
+$env:DOTNET_ROOT = Split-Path -Parent $dotnetExe
+$env:DOTNET_CLI_HOME = Join-Path $repoRoot '.cache\dotnet-home'
+$env:NUGET_PACKAGES = Join-Path $repoRoot '.n'
+$env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+$env:DOTNET_NOLOGO = '1'
+$env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
+$env:PATH = "$env:DOTNET_ROOT;$(Split-Path -Parent $nodeExe);$env:PATH"
 
 function Assert-Tool {
     param([string] $Path, [string] $Name)
@@ -47,6 +54,7 @@ Commands:
   build       Build the .NET solution and Angular application
   test        Run .NET and Angular tests
   run         Start the complete Aspire application graph
+  db          Run guarded Portfolio Core hybrid database tooling
   dotnet      Run the project-local .NET CLI
   aspire      Run the project-local Aspire CLI
   node        Run the project-local Node.js executable
@@ -57,6 +65,7 @@ Commands:
 Examples:
   lg run
   lg test
+  lg db help
   lg dotnet --version
 '@ | Write-Host
     exit 0
@@ -70,18 +79,21 @@ if ($Command -eq 'bootstrap') {
 if ($Command -eq 'doctor') {
     Assert-Tool $dotnetExe '.NET SDK'
     Assert-Tool $aspireExe 'Aspire CLI'
+    Assert-Tool $efExe 'EF Core CLI'
     Assert-Tool $nodeExe 'Node.js'
     Assert-Tool $npmCmd 'npm'
 
     $failures = [System.Collections.Generic.List[string]]::new()
     $dotnetVersion = & $dotnetExe --version
     $aspireVersion = (& $aspireExe --version 2>&1 | Out-String).Trim()
+    $efVersion = (& $efExe --version 2>&1 | Select-Object -Last 1 | Out-String).Trim()
     $nodeVersion = & $nodeExe --version
     $npmVersion = & $npmCmd --version
     $dotnetSdkSentinel = Join-Path $repoRoot ".dotnet\sdk\$($manifest.dotnet.version)\Sdks\Microsoft.NET.Sdk\codestyle\cs\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.targets"
 
     if ($dotnetVersion -ne [string]$manifest.dotnet.version) { $failures.Add(".NET expected $($manifest.dotnet.version), found $dotnetVersion") }
     if ($aspireVersion -notmatch [regex]::Escape([string]$manifest.aspire.version)) { $failures.Add("Aspire expected $($manifest.aspire.version), found $aspireVersion") }
+    if ($efVersion -notmatch [regex]::Escape([string]$manifest.entityFramework.version)) { $failures.Add("EF CLI expected $($manifest.entityFramework.version), found $efVersion") }
     if ($nodeVersion -ne "v$($manifest.node.version)") { $failures.Add("Node expected $($manifest.node.version), found $nodeVersion") }
     if ($npmVersion -ne [string]$manifest.node.npmVersion) { $failures.Add("npm expected $($manifest.node.npmVersion), found $npmVersion") }
     if (-not (Test-Path -LiteralPath $dotnetSdkSentinel)) { $failures.Add(".NET SDK is incomplete; missing $dotnetSdkSentinel") }
@@ -94,6 +106,7 @@ if ($Command -eq 'doctor') {
     Write-Host ''
     Write-Host "Local .NET:   $dotnetVersion"
     Write-Host "Local Aspire: $aspireVersion"
+    Write-Host "Local EF CLI: $efVersion"
     Write-Host "Local Node:   $nodeVersion"
     Write-Host "Local npm:    $npmVersion"
 
@@ -135,6 +148,12 @@ switch ($Command) {
     'run' {
         Assert-Tool $dotnetExe '.NET SDK'
         & $dotnetExe run --project (Join-Path $repoRoot 'src\LedgerLens.AppHost\LedgerLens.AppHost.csproj') @Arguments
+        exit $LASTEXITCODE
+    }
+    'db' {
+        Assert-Tool $dotnetExe '.NET SDK'
+        Assert-Tool $efExe 'EF Core CLI'
+        & (Join-Path $PSScriptRoot 'portfolio-db.ps1') @Arguments
         exit $LASTEXITCODE
     }
     'dotnet' {
