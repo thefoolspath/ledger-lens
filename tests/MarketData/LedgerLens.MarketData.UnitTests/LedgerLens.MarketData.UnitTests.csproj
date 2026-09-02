@@ -18,4 +18,10 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Services\MarketData\LedgerLens.MarketData.Application\LedgerLens.MarketData.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\MarketData\LedgerLens.MarketData.Domain\LedgerLens.MarketData.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\MarketData\LedgerLens.MarketData.Infrastructure\LedgerLens.MarketData.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

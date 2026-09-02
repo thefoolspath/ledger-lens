@@ -7,4 +7,5 @@
   </PropertyGroup>
 
   <ItemGroup><ProjectReference Include="..\LedgerLens.MarketData.Domain\LedgerLens.MarketData.Domain.csproj" /></ItemGroup>
+  <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /></ItemGroup>
 </Project>

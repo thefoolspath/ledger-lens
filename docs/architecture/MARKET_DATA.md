@@ -1,6 +1,6 @@
 # Market Data Architecture
 
-Status: Proposed; MVP provider selection is conditional on terms confirmation.
+Status: Provider-neutral contracts and synthetic Development/test implementation are complete; live-provider admission remains conditional on terms confirmation.
 
 ## Provider-independent contracts
 
@@ -26,6 +26,19 @@ Every response wraps data with provider, entitlement/feed, data-as-of, retrieved
 - Retries use bounded exponential backoff with jitter for transient failures; quota and entitlement failures do not retry blindly.
 - Backend owns keys. Angular receives only normalized data and metadata.
 - Derived indicators are calculated locally from licensed retained candles.
+- Manual simulations use the latest available `LastTrade`, not bid/ask, and never label that observation as an executable fill. Market-closed, delayed, and EOD values remain usable only with visible freshness and user confirmation.
+- Normalized quote, candle, and FX snapshots supplied to Portfolio Core carry instrument identity, provider/feed, price kind, as-of, retrieved-at, freshness/delay, request ID, and retention-policy key. Angular never receives provider credentials or raw provider payloads.
+
+## Manual simulation HTTP surface
+
+```text
+GET  /v1/instruments/search
+POST /v1/quotes/latest
+GET  /v1/instruments/{instrumentId}/candles
+POST /v1/fx/latest
+```
+
+The first implementation keeps a deterministic synthetic provider for tests. An external adapter must fail closed when its key or explicit terms-acceptance setting is absent; the application does not silently scrape or switch feeds.
 
 ## Provider direction
 
