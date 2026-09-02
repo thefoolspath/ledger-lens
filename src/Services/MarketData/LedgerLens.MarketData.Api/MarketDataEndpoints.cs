@@ -8,18 +8,21 @@ public static class MarketDataEndpoints
     public static IEndpointRouteBuilder MapMarketDataEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/v1");
-        group.MapGet("/instruments/search", async (string query, string? market, SearchInstrumentsHandler handler, CancellationToken cancellationToken) =>
-            await ExecuteAsync(() => handler.HandleAsync(query, market ?? "US", cancellationToken)));
-        group.MapPost("/quotes/latest", async (LatestQuotesRequest request, GetLatestQuotesHandler handler, CancellationToken cancellationToken) =>
-            await ExecuteAsync(() => handler.HandleAsync(request.Instruments, cancellationToken)));
-        group.MapGet("/instruments/{instrumentId:guid}/candles", async (Guid instrumentId, string? interval, DateOnly from, DateOnly to,
-            GetCandlesHandler handler, CancellationToken cancellationToken) =>
+        group.MapGet("/instruments/search-list", async (string query, string? market, InstrumentsSearchListHandler handler, CancellationToken cancellationToken) =>
+            await ExecuteAsync(() => handler.HandleAsync(query, market ?? "US", cancellationToken)))
+            .WithName("InstrumentsSearchList");
+        group.MapPost("/quotes/get-latest-list", async (QuotesGetLatestListRequest request, QuotesGetLatestListHandler handler, CancellationToken cancellationToken) =>
+            await ExecuteAsync(() => handler.HandleAsync(request.Instruments, cancellationToken)))
+            .WithName("QuotesGetLatestList");
+        group.MapGet("/instrument-candles/get-one/{instrumentId:guid}", async (Guid instrumentId, string? interval, DateOnly from, DateOnly to,
+            InstrumentCandlesGetOneHandler handler, CancellationToken cancellationToken) =>
         {
             var result = await ExecuteAsync(() => handler.HandleAsync(instrumentId, interval ?? "1day", from, to, cancellationToken));
             return result;
-        });
-        group.MapPost("/fx/latest", async (FxRequest request, GetFxHandler handler, CancellationToken cancellationToken) =>
-            await ExecuteAsync(() => handler.HandleAsync(request.BaseCurrency, request.QuoteCurrency, cancellationToken)));
+        }).WithName("InstrumentCandlesGetOne");
+        group.MapPost("/foreign-exchange-rates/get-latest-list", async (ForeignExchangeRatesGetLatestListRequest request, ForeignExchangeRatesGetLatestListHandler handler, CancellationToken cancellationToken) =>
+            await ExecuteAsync(() => handler.HandleAsync(request.BaseCurrency, request.QuoteCurrency, cancellationToken)))
+            .WithName("ForeignExchangeRatesGetLatestList");
         return endpoints;
     }
 
@@ -40,6 +43,3 @@ public static class MarketDataEndpoints
         }
     }
 }
-
-public sealed record LatestQuotesRequest(IReadOnlyList<MarketInstrument> Instruments);
-public sealed record FxRequest(string BaseCurrency, string QuoteCurrency);

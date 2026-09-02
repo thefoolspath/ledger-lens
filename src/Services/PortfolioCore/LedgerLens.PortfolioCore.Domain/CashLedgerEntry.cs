@@ -1,8 +1,5 @@
 namespace LedgerLens.PortfolioCore.Domain;
 
-public enum CashLedgerEntryType { Deposit = 1, Withdrawal, Buy, Sell, Fee, Tax, Dividend }
-public enum LedgerEntryRole { Original = 1, Reversal, Replacement }
-
 public sealed class CashLedgerEntry
 {
     private CashLedgerEntry() { }

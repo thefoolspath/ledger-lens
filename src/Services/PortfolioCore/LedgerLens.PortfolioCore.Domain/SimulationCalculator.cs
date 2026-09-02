@@ -1,31 +1,5 @@
 namespace LedgerLens.PortfolioCore.Domain;
 
-public sealed record SimulationPosition(
-    string Symbol,
-    decimal Quantity,
-    decimal RemainingCostUsd,
-    decimal? AverageCostUsd,
-    decimal RealizedUsd,
-    decimal InvestedCapitalUsd,
-    decimal? RemainingCostThb,
-    decimal? RealizedThb);
-
-public sealed record SimulationValuation(
-    SimulationPosition Position,
-    decimal CurrentPrice,
-    decimal CurrentValueUsd,
-    decimal UnrealizedUsd,
-    decimal TotalPlUsd,
-    decimal? ReturnPercent,
-    decimal? CurrentFxRate,
-    decimal? CurrentValueThb,
-    decimal? UnrealizedThb,
-    decimal? TotalPlThb,
-    decimal? StockEffectThb,
-    decimal? FxEffectThb,
-    bool IsComplete,
-    IReadOnlyList<string> MissingReasons);
-
 public static class SimulationCalculator
 {
     public static IReadOnlyList<SimulationPosition> Rebuild(IReadOnlyList<SimulationTradeEntry> entries)

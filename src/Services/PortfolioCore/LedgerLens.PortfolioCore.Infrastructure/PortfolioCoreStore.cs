@@ -13,7 +13,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
     private static readonly string DividendType = CashLedgerEntryType.Dividend.ToString();
     private static readonly string ReversalRole = LedgerEntryRole.Reversal.ToString();
 
-    public async Task CreatePortfolioAsync(
+    public async Task PortfoliosCreateAsync(
         UserProfile userProfile,
         Portfolio portfolio,
         CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
             portfolio => portfolio.Id == portfolioId && portfolio.OwnerUserId == ownerUserId,
             cancellationToken);
 
-    public async Task AddAccountAsync(InvestmentAccount account, CancellationToken cancellationToken)
+    public async Task InvestmentAccountsCreateAsync(InvestmentAccount account, CancellationToken cancellationToken)
     {
         dbContext.InvestmentAccounts.Add(ToDatabase(account));
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -64,7 +64,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
          select new AccountIdentity(account.Id, account.PortfolioId, account.Currency))
         .SingleOrDefaultAsync(cancellationToken);
 
-    public async Task AddCashEntryAsync(CashLedgerEntry entry, CancellationToken cancellationToken)
+    public async Task CashLedgerEntriesCreateAsync(CashLedgerEntry entry, CancellationToken cancellationToken)
     {
         dbContext.CashLedgerEntries.Add(ToDatabase(entry));
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -85,7 +85,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
         return entry is null ? null : ToDomain(entry);
     }
 
-    public async Task<bool> CorrectEntryAsync(
+    public async Task<bool> CashLedgerEntriesCorrectAsync(
         CashLedgerEntry correctedEntry,
         CashLedgerEntry reversal,
         CashLedgerEntry replacement,
@@ -116,7 +116,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
         return corrected;
     }
 
-    public async Task<PortfolioOverview?> GetPortfolioOverviewAsync(
+    public async Task<PortfolioOverview?> PortfoliosGetOneAsync(
         Guid portfolioId,
         Guid ownerUserId,
         CancellationToken cancellationToken)
@@ -183,7 +183,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
             accountViews);
     }
 
-    public async Task<IReadOnlyList<PortfolioListItem>> ListPortfoliosAsync(
+    public async Task<IReadOnlyList<PortfolioListItem>> PortfoliosGetListAsync(
         Guid ownerUserId,
         CancellationToken cancellationToken) =>
         await dbContext.Portfolios.AsNoTracking()
@@ -197,7 +197,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
                 portfolio.ReportingCurrency))
             .ToListAsync(cancellationToken);
 
-    public async Task AddSimulationAccountAsync(SimulationAccount account, CancellationToken cancellationToken)
+    public async Task SimulationAccountsCreateAsync(SimulationAccount account, CancellationToken cancellationToken)
     {
         dbContext.SimulationAccounts.Add(new DatabaseModels.SimulationAccount
         {
@@ -209,7 +209,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<SimulationAccount?> FindOwnedSimulationAccountAsync(Guid accountId, Guid ownerUserId,
+    public async Task<SimulationAccount?> SimulationAccountsGetOneAsync(Guid accountId, Guid ownerUserId,
         CancellationToken cancellationToken)
     {
         var value = await (from account in dbContext.SimulationAccounts.AsNoTracking()
@@ -219,7 +219,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
         return value is null ? null : new SimulationAccount(value.Id, value.PortfolioId, value.Name, value.CreatedAt);
     }
 
-    public async Task<IReadOnlyList<SimulationAccountListItem>> ListSimulationAccountsAsync(Guid portfolioId,
+    public async Task<IReadOnlyList<SimulationAccountListItem>> SimulationAccountsGetListAsync(Guid portfolioId,
         Guid ownerUserId, CancellationToken cancellationToken) =>
         await (from account in dbContext.SimulationAccounts.AsNoTracking()
             join portfolio in dbContext.Portfolios.AsNoTracking() on account.PortfolioId equals portfolio.Id
@@ -228,7 +228,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
             select new SimulationAccountListItem(account.Id, account.PortfolioId, account.Name, account.CreatedAt))
         .Take(50).ToListAsync(cancellationToken);
 
-    public async Task AddSimulationDraftAsync(SimulationTradeDraft draft, CancellationToken cancellationToken)
+    public async Task SimulationTradeDraftsCreateAsync(SimulationTradeDraft draft, CancellationToken cancellationToken)
     {
         dbContext.SimulationTradeDrafts.Add(ToDatabase(draft));
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -245,7 +245,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
         return value is null ? null : ToDomain(value);
     }
 
-    public async Task<SimulationTradeEntry?> ConfirmSimulationDraftAsync(SimulationTradeDraft draft,
+    public async Task<SimulationTradeEntry?> SimulationTradeDraftsConfirmAsync(SimulationTradeDraft draft,
         SimulationTradeEntry trade, Guid ownerUserId, CancellationToken cancellationToken)
     {
         SimulationTradeEntry? result = null;
@@ -288,7 +288,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
         return value is null ? null : ToDomain(value);
     }
 
-    public async Task<bool> CorrectSimulationTradeAsync(SimulationTradeEntry corrected, SimulationTradeEntry reversal,
+    public async Task<bool> SimulationTradesCorrectAsync(SimulationTradeEntry corrected, SimulationTradeEntry reversal,
         SimulationTradeEntry replacement, Guid replacementDraftId, Guid ownerUserId, CancellationToken cancellationToken)
     {
         var result = false;
@@ -330,7 +330,11 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
         return values.Select(ToDomain).ToArray();
     }
 
-    public async Task AddSimulationValuationSnapshotsAsync(IReadOnlyList<SimulationValuationSnapshotData> snapshots,
+    public Task<IReadOnlyList<SimulationTradeEntry>> SimulationValuationsCalculateSeriesListAsync(
+        Guid accountId, Guid ownerUserId, CancellationToken cancellationToken) =>
+        GetSimulationEntriesAsync(accountId, ownerUserId, cancellationToken);
+
+    public async Task SimulationValuationsRecordListAsync(IReadOnlyList<SimulationValuationSnapshotData> snapshots,
         CancellationToken cancellationToken)
     {
         foreach (var snapshot in snapshots)

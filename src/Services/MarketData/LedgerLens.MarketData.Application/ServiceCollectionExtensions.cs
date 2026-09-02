@@ -7,10 +7,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddMarketDataApplication(this IServiceCollection services)
     {
         services.AddSingleton(TimeProvider.System);
-        services.AddScoped<SearchInstrumentsHandler>();
-        services.AddScoped<GetLatestQuotesHandler>();
-        services.AddScoped<GetCandlesHandler>();
-        services.AddScoped<GetFxHandler>();
+        services.AddScoped<InstrumentsSearchListHandler>();
+        services.AddScoped<QuotesGetLatestListHandler>();
+        services.AddScoped<InstrumentCandlesGetOneHandler>();
+        services.AddScoped<ForeignExchangeRatesGetLatestListHandler>();
         return services;
     }
 }

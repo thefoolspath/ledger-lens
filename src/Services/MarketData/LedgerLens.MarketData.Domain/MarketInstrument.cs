@@ -1,7 +1,5 @@
 namespace LedgerLens.MarketData.Domain;
 
-public enum FreshnessClass { RealTime = 1, Delayed, EndOfDay, LatestAvailable, Synthetic }
-
 public sealed record MarketInstrument(
     Guid Id,
     string Symbol,
@@ -31,40 +29,3 @@ public sealed record MarketInstrument(
         return normalized;
     }
 }
-
-public sealed record ObservationProvenance(
-    string Provider,
-    string Feed,
-    DateTimeOffset AsOf,
-    DateTimeOffset RetrievedAt,
-    FreshnessClass Freshness,
-    int? DelaySeconds,
-    string RequestId,
-    string RetentionPolicyKey);
-
-public sealed record QuoteSnapshot(
-    MarketInstrument Instrument,
-    decimal Price,
-    string PriceKind,
-    ObservationProvenance Provenance);
-
-public sealed record PriceCandle(
-    DateOnly Date,
-    decimal Open,
-    decimal High,
-    decimal Low,
-    decimal Close,
-    decimal Volume);
-
-public sealed record CandleSeries(
-    MarketInstrument Instrument,
-    string Interval,
-    IReadOnlyList<PriceCandle> Candles,
-    ObservationProvenance Provenance);
-
-public sealed record FxSnapshot(
-    string BaseCurrency,
-    string QuoteCurrency,
-    decimal Rate,
-    ObservationProvenance Provenance,
-    bool IsBenchmark);

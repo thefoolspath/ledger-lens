@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { MarketCandle, SimulationChart, SimulationSeriesPoint } from './simulation-chart';
+import { LedgerLensApiRoutes } from './api-routes';
 
 type ConnectivityState = 'checking' | 'connected' | 'unavailable';
 
@@ -268,8 +269,8 @@ export class App {
     const portfolio = this.selectedPortfolio();
     if (!portfolio || !this.simulationAccountName.trim()) return;
     this.startRequest();
-    this.http.post<SimulationAccount>(`/api/portfolio/v1/portfolios/${portfolio.id}/simulation-accounts`,
-      { name: this.simulationAccountName }, { headers: this.mutationHeaders }).subscribe({
+    this.http.post<SimulationAccount>(LedgerLensApiRoutes.SimulationAccountsCreate,
+      { portfolioId: portfolio.id, name: this.simulationAccountName }, { headers: this.mutationHeaders }).subscribe({
       next: account => {
         this.simulationAccountName = '';
         this.simulationAccounts.update(items => [...items, account]);
@@ -281,7 +282,7 @@ export class App {
 
   protected selectSimulationAccount(id: string): void {
     this.startRequest();
-    this.http.get<SimulationOverview>(`/api/portfolio/v1/simulation-accounts/${id}`).subscribe({
+    this.http.get<SimulationOverview>(LedgerLensApiRoutes.SimulationAccountsGetOne(id)).subscribe({
       next: overview => {
         this.selectedSimulation.set(overview);
         this.pendingDraft.set(null);
@@ -295,7 +296,7 @@ export class App {
   protected searchInstruments(): void {
     if (!this.instrumentQuery.trim()) return;
     this.startRequest();
-    this.http.get<readonly MarketInstrument[]>(`/api/market/v1/instruments/search?query=${encodeURIComponent(this.instrumentQuery)}&market=US`).subscribe({
+    this.http.get<readonly MarketInstrument[]>(LedgerLensApiRoutes.InstrumentsSearchList(this.instrumentQuery)).subscribe({
       next: instruments => {
         this.instrumentResults.set(instruments);
         this.finishRequest();
@@ -318,9 +319,9 @@ export class App {
     const from = new Date(today);
     from.setUTCFullYear(from.getUTCFullYear() - 1);
     forkJoin({
-      quotes: this.http.post<readonly MarketQuote[]>('/api/market/v1/quotes/latest', { instruments: [instrument] }),
-      fx: this.http.post<readonly FxSnapshot[]>('/api/market/v1/fx/latest', { baseCurrency: 'USD', quoteCurrency: 'THB' }),
-      candles: this.http.get<CandleSeries>(`/api/market/v1/instruments/${instrument.id}/candles?interval=1day&from=${this.isoDate(from)}&to=${this.isoDate(today)}`)
+      quotes: this.http.post<readonly MarketQuote[]>(LedgerLensApiRoutes.QuotesGetLatestList, { instruments: [instrument] }),
+      fx: this.http.post<readonly FxSnapshot[]>(LedgerLensApiRoutes.ForeignExchangeRatesGetLatestList, { baseCurrency: 'USD', quoteCurrency: 'THB' }),
+      candles: this.http.get<CandleSeries>(LedgerLensApiRoutes.InstrumentCandlesGetOne(instrument.id, this.isoDate(from), this.isoDate(today)))
     }).subscribe({
       next: result => {
         this.latestQuote.set(result.quotes[0] ?? null);
@@ -341,7 +342,8 @@ export class App {
     if ((byAmount && (!this.simulationAmount || this.simulationAmount <= 0)) ||
         (!byAmount && (!this.simulationQuantity || this.simulationQuantity <= 0))) return;
     this.startRequest();
-    this.http.post<SimulationDraft>(`/api/portfolio/v1/simulation-accounts/${simulation.account.id}/trade-drafts`, {
+    this.http.post<SimulationDraft>(LedgerLensApiRoutes.SimulationTradeDraftsCreate, {
+      accountId: simulation.account.id,
       side: this.simulationSide,
       inputMode: this.simulationInputMode,
       requestedQuantity: byAmount ? null : this.simulationQuantity,
@@ -366,11 +368,11 @@ export class App {
     if (!simulation || !draft) return;
     this.startRequest();
     const request = this.simulationCorrectionTarget
-      ? this.http.post(`/api/portfolio/v1/simulation-trades/${this.simulationCorrectionTarget.id}/corrections`, {
+      ? this.http.post(LedgerLensApiRoutes.SimulationTradesCorrect(this.simulationCorrectionTarget.id), {
           replacementDraftId: draft.id,
           reason: this.simulationCorrectionReason
         }, { headers: this.mutationHeaders })
-      : this.http.post(`/api/portfolio/v1/simulation-accounts/${simulation.account.id}/trade-drafts/${draft.id}/confirm`, {},
+      : this.http.post(LedgerLensApiRoutes.SimulationTradeDraftsConfirm(draft.id), { accountId: simulation.account.id },
           { headers: this.mutationHeaders });
     request.subscribe({
       next: () => {
@@ -418,7 +420,7 @@ export class App {
   protected createPortfolio(): void {
     if (!this.portfolioName.trim()) return;
     this.startRequest();
-    this.http.post<PortfolioListItem>('/api/portfolio/v1/portfolios', {
+    this.http.post<PortfolioListItem>(LedgerLensApiRoutes.PortfoliosCreate, {
       name: this.portfolioName,
       baseCurrency: 'USD',
       reportingCurrency: 'THB'
@@ -436,7 +438,8 @@ export class App {
     const portfolio = this.selectedPortfolio();
     if (!portfolio || !this.accountName.trim() || !this.broker.trim()) return;
     this.startRequest();
-    this.http.post(`/api/portfolio/v1/portfolios/${portfolio.id}/accounts`, {
+    this.http.post(LedgerLensApiRoutes.InvestmentAccountsCreate, {
+      portfolioId: portfolio.id,
       name: this.accountName,
       broker: this.broker,
       currency: this.accountCurrency
@@ -466,9 +469,9 @@ export class App {
       unitPrice: this.isTrade() ? this.unitPrice : null
     };
     const request = this.correctionTarget
-      ? this.http.post(`/api/portfolio/v1/ledger-entries/${this.correctionTarget.id}/corrections`,
+      ? this.http.post(LedgerLensApiRoutes.CashLedgerEntriesCorrect(this.correctionTarget.id),
           { ...body, reason: this.correctionReason }, { headers: this.mutationHeaders })
-      : this.http.post(`/api/portfolio/v1/accounts/${account.id}/ledger-entries`, body, { headers: this.mutationHeaders });
+      : this.http.post(LedgerLensApiRoutes.CashLedgerEntriesCreate, { accountId: account.id, ...body }, { headers: this.mutationHeaders });
     request.subscribe({
       next: () => {
         this.resetEntryForm();
@@ -516,7 +519,7 @@ export class App {
 
   protected selectPortfolio(id: string): void {
     this.startRequest();
-    this.http.get<PortfolioOverview>(`/api/portfolio/v1/portfolios/${id}`).subscribe({
+    this.http.get<PortfolioOverview>(LedgerLensApiRoutes.PortfoliosGetOne(id)).subscribe({
       next: portfolio => {
         this.selectedPortfolio.set(portfolio);
         this.finishRequest();
@@ -527,7 +530,7 @@ export class App {
   }
 
   private loadPortfolios(): void {
-    this.http.get<readonly PortfolioListItem[]>('/api/portfolio/v1/portfolios').subscribe({
+    this.http.get<readonly PortfolioListItem[]>(LedgerLensApiRoutes.PortfoliosGetList).subscribe({
       next: portfolios => {
         this.portfolios.set(portfolios);
         if (portfolios.length > 0) this.selectPortfolio(portfolios[0].id);
@@ -537,7 +540,7 @@ export class App {
   }
 
   private loadSimulationAccounts(portfolioId: string): void {
-    this.http.get<readonly SimulationAccount[]>(`/api/portfolio/v1/portfolios/${portfolioId}/simulation-accounts`).subscribe({
+    this.http.get<readonly SimulationAccount[]>(LedgerLensApiRoutes.SimulationAccountsGetList(portfolioId)).subscribe({
       next: accounts => {
         this.simulationAccounts.set(accounts);
         if (accounts.length > 0) this.selectSimulationAccount(accounts[0].id);
@@ -554,12 +557,12 @@ export class App {
     if (!simulation || !quote || !instrument || this.candles().length === 0) return;
     forkJoin({
       valuations: this.http.post<readonly SimulationValuation[]>(
-        `/api/portfolio/v1/simulation-accounts/${simulation.account.id}/valuations`,
-        { quotes: [this.toEvidence(quote)], currentFxRate: this.primaryFx()?.rate ?? null },
+        LedgerLensApiRoutes.SimulationValuationsRecordList,
+        { accountId: simulation.account.id, quotes: [this.toEvidence(quote)], currentFxRate: this.primaryFx()?.rate ?? null },
         { headers: this.mutationHeaders }),
       series: this.http.post<readonly SimulationSeriesPoint[]>(
-        `/api/portfolio/v1/simulation-accounts/${simulation.account.id}/valuation-series`,
-        { symbol: instrument.symbol, observations: this.candles().map(candle => ({ date: candle.date, price: candle.close, fxRate: null })) },
+        LedgerLensApiRoutes.SimulationValuationsCalculateSeriesList,
+        { accountId: simulation.account.id, symbol: instrument.symbol, observations: this.candles().map(candle => ({ date: candle.date, price: candle.close, fxRate: null })) },
         { headers: this.mutationHeaders })
     }).subscribe({
       next: result => {

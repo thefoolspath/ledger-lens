@@ -9,14 +9,15 @@ public static class PortfolioCoreEndpoints
     {
         var group = endpoints.MapGroup("/v1");
 
-        group.MapGet("/portfolios", async (
-            ListPortfoliosHandler handler,
+        group.MapGet("/portfolios/get-list", async (
+            PortfoliosGetListHandler handler,
             CancellationToken cancellationToken) =>
-            TypedResults.Ok(await handler.HandleAsync(cancellationToken)));
+            TypedResults.Ok(await handler.HandleAsync(cancellationToken)))
+            .WithName("PortfoliosGetList");
 
-        group.MapGet("/portfolios/{portfolioId:guid}", async (
+        group.MapGet("/portfolios/get-one/{portfolioId:guid}", async (
             Guid portfolioId,
-            GetPortfolioOverviewHandler handler,
+            PortfoliosGetOneHandler handler,
             CancellationToken cancellationToken) =>
         {
             if (!IsVersion7(portfolioId))
@@ -26,33 +27,32 @@ public static class PortfolioCoreEndpoints
 
             var portfolio = await handler.HandleAsync(portfolioId, cancellationToken);
             return portfolio is null ? Results.NotFound() : Results.Ok(portfolio);
-        });
+        }).WithName("PortfoliosGetOne");
 
-        group.MapPost("/portfolios", async (
-            CreatePortfolioRequest request,
-            CreatePortfolioHandler handler,
+        group.MapPost("/portfolios/create", async (
+            PortfoliosCreateRequest request,
+            PortfoliosCreateHandler handler,
             CancellationToken cancellationToken) =>
         {
             try
             {
                 var portfolio = await handler.HandleAsync(
-                    new CreatePortfolioCommand(request.Name, request.BaseCurrency, request.ReportingCurrency),
+                    new PortfoliosCreateCommand(request.Name, request.BaseCurrency, request.ReportingCurrency),
                     cancellationToken);
-                return Results.Created($"/v1/portfolios/{portfolio.Id}", portfolio);
+                return Results.Created($"/v1/portfolios/get-one/{portfolio.Id}", portfolio);
             }
             catch (ArgumentException exception)
             {
                 return Results.ValidationProblem(InvalidRequest(exception.Message));
             }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("PortfoliosCreate").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapPost("/portfolios/{portfolioId:guid}/accounts", async (
-            Guid portfolioId,
-            CreateAccountRequest request,
-            CreateAccountHandler handler,
+        group.MapPost("/investment-accounts/create", async (
+            InvestmentAccountsCreateRequest request,
+            InvestmentAccountsCreateHandler handler,
             CancellationToken cancellationToken) =>
         {
-            if (!IsVersion7(portfolioId))
+            if (!IsVersion7(request.PortfolioId))
             {
                 return Results.ValidationProblem(InvalidId("portfolioId"));
             }
@@ -60,25 +60,24 @@ public static class PortfolioCoreEndpoints
             try
             {
                 var account = await handler.HandleAsync(
-                    new CreateAccountCommand(portfolioId, request.Name, request.Broker, request.Currency),
+                    new InvestmentAccountsCreateCommand(request.PortfolioId, request.Name, request.Broker, request.Currency),
                     cancellationToken);
                 return account is null
                     ? Results.NotFound()
-                    : Results.Created($"/v1/accounts/{account.Id}", account);
+                    : Results.Created($"/v1/investment-accounts/get-one/{account.Id}", account);
             }
             catch (ArgumentException exception)
             {
                 return Results.ValidationProblem(InvalidRequest(exception.Message));
             }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("InvestmentAccountsCreate").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapPost("/accounts/{accountId:guid}/ledger-entries", async (
-            Guid accountId,
-            RecordLedgerEntryRequest request,
-            RecordLedgerEntryHandler handler,
+        group.MapPost("/cash-ledger-entries/create", async (
+            CashLedgerEntriesCreateRequest request,
+            CashLedgerEntriesCreateHandler handler,
             CancellationToken cancellationToken) =>
         {
-            if (!IsVersion7(accountId))
+            if (!IsVersion7(request.AccountId))
             {
                 return Results.ValidationProblem(InvalidId("accountId"));
             }
@@ -94,8 +93,8 @@ public static class PortfolioCoreEndpoints
             try
             {
                 var entry = await handler.HandleAsync(
-                    new RecordLedgerEntryCommand(
-                        accountId,
+                    new CashLedgerEntriesCreateCommand(
+                        request.AccountId,
                         entryType,
                         request.Amount,
                         request.Currency,
@@ -107,18 +106,18 @@ public static class PortfolioCoreEndpoints
                     cancellationToken);
                 return entry is null
                     ? Results.NotFound()
-                    : Results.Created($"/v1/ledger-entries/{entry.Id}", entry);
+                    : Results.Created($"/v1/cash-ledger-entries/get-one/{entry.Id}", entry);
             }
             catch (ArgumentException exception)
             {
                 return Results.ValidationProblem(InvalidRequest(exception.Message));
             }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("CashLedgerEntriesCreate").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapPost("/ledger-entries/{entryId:guid}/corrections", async (
+        group.MapPost("/cash-ledger-entries/correct/{entryId:guid}", async (
             Guid entryId,
-            CorrectLedgerEntryRequest request,
-            CorrectLedgerEntryHandler handler,
+            CashLedgerEntriesCorrectRequest request,
+            CashLedgerEntriesCorrectHandler handler,
             CancellationToken cancellationToken) =>
         {
             if (!IsVersion7(entryId)) return Results.ValidationProblem(InvalidId("entryId"));
@@ -129,7 +128,7 @@ public static class PortfolioCoreEndpoints
                 });
             try
             {
-                var result = await handler.HandleAsync(new CorrectLedgerEntryCommand(entryId, entryType, request.Amount,
+                var result = await handler.HandleAsync(new CashLedgerEntriesCorrectCommand(entryId, entryType, request.Amount,
                     request.Currency, request.EffectiveAt, request.Note, request.InstrumentSymbol, request.Quantity,
                     request.UnitPrice, request.Reason), cancellationToken);
                 return result is null ? Results.NotFound() : Results.Ok(result);
@@ -142,67 +141,67 @@ public static class PortfolioCoreEndpoints
             {
                 return Results.Conflict(new { error = exception.Message });
             }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("CashLedgerEntriesCorrect").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapGet("/portfolios/{portfolioId:guid}/simulation-accounts", async (Guid portfolioId,
-            ListSimulationAccountsHandler handler, CancellationToken cancellationToken) =>
+        group.MapGet("/simulation-accounts/get-list", async (Guid portfolioId,
+            SimulationAccountsGetListHandler handler, CancellationToken cancellationToken) =>
         {
             if (!IsVersion7(portfolioId)) return Results.ValidationProblem(InvalidId("portfolioId"));
             return Results.Ok(await handler.HandleAsync(portfolioId, cancellationToken));
-        });
+        }).WithName("SimulationAccountsGetList");
 
-        group.MapPost("/portfolios/{portfolioId:guid}/simulation-accounts", async (Guid portfolioId,
-            CreateSimulationAccountRequest request, CreateSimulationAccountHandler handler, CancellationToken cancellationToken) =>
+        group.MapPost("/simulation-accounts/create", async (
+            SimulationAccountsCreateRequest request, SimulationAccountsCreateHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!IsVersion7(portfolioId)) return Results.ValidationProblem(InvalidId("portfolioId"));
+            if (!IsVersion7(request.PortfolioId)) return Results.ValidationProblem(InvalidId("portfolioId"));
             try
             {
-                var account = await handler.HandleAsync(new(portfolioId, request.Name), cancellationToken);
-                return account is null ? Results.NotFound() : Results.Created($"/v1/simulation-accounts/{account.Id}", account);
+                var account = await handler.HandleAsync(new(request.PortfolioId, request.Name), cancellationToken);
+                return account is null ? Results.NotFound() : Results.Created($"/v1/simulation-accounts/get-one/{account.Id}", account);
             }
             catch (ArgumentException exception) { return Results.ValidationProblem(InvalidRequest(exception.Message)); }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("SimulationAccountsCreate").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapGet("/simulation-accounts/{accountId:guid}", async (Guid accountId,
-            GetSimulationOverviewHandler handler, CancellationToken cancellationToken) =>
+        group.MapGet("/simulation-accounts/get-one/{accountId:guid}", async (Guid accountId,
+            SimulationAccountsGetOneHandler handler, CancellationToken cancellationToken) =>
         {
             if (!IsVersion7(accountId)) return Results.ValidationProblem(InvalidId("accountId"));
             var result = await handler.HandleAsync(accountId, cancellationToken);
             return result is null ? Results.NotFound() : Results.Ok(result);
-        });
+        }).WithName("SimulationAccountsGetOne");
 
-        group.MapPost("/simulation-accounts/{accountId:guid}/trade-drafts", async (Guid accountId,
-            CreateSimulationDraftRequest request, CreateSimulationDraftHandler handler, CancellationToken cancellationToken) =>
+        group.MapPost("/simulation-trade-drafts/create", async (
+            SimulationTradeDraftsCreateRequest request, SimulationTradeDraftsCreateHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!IsVersion7(accountId)) return Results.ValidationProblem(InvalidId("accountId"));
+            if (!IsVersion7(request.AccountId)) return Results.ValidationProblem(InvalidId("accountId"));
             if (!Enum.TryParse<SimulationTradeSide>(request.Side, true, out var side) ||
                 !Enum.TryParse<SimulationInputMode>(request.InputMode, true, out var inputMode))
                 return Results.ValidationProblem(InvalidRequest("Side must be Buy or Sell and inputMode must be ByQuantity or ByAmount."));
             try
             {
-                var result = await handler.HandleAsync(new(accountId, side, inputMode, request.RequestedQuantity,
+                var result = await handler.HandleAsync(new(request.AccountId, side, inputMode, request.RequestedQuantity,
                     request.RequestedAmount, request.AssumedFee, request.AssumedTax, request.FxRate,
                     request.EffectiveAt, request.Quote), cancellationToken);
                 return result is null ? Results.NotFound() : Results.Created($"/v1/simulation-trade-drafts/{result.Id}", result);
             }
             catch (ArgumentException exception) { return Results.ValidationProblem(InvalidRequest(exception.Message)); }
             catch (InvalidOperationException exception) { return Results.Conflict(new { error = exception.Message }); }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("SimulationTradeDraftsCreate").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapPost("/simulation-accounts/{accountId:guid}/trade-drafts/{draftId:guid}/confirm", async (
-            Guid accountId, Guid draftId, ConfirmSimulationDraftHandler handler, CancellationToken cancellationToken) =>
+        group.MapPost("/simulation-trade-drafts/confirm/{draftId:guid}", async (
+            Guid draftId, SimulationTradeDraftsConfirmRequest request, SimulationTradeDraftsConfirmHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!IsVersion7(accountId) || !IsVersion7(draftId)) return Results.ValidationProblem(InvalidRequest("Account and draft IDs must be UUIDv7 values."));
+            if (!IsVersion7(request.AccountId) || !IsVersion7(draftId)) return Results.ValidationProblem(InvalidRequest("Account and draft IDs must be UUIDv7 values."));
             try
             {
-                var result = await handler.HandleAsync(accountId, draftId, cancellationToken);
+                var result = await handler.HandleAsync(request.AccountId, draftId, cancellationToken);
                 return result is null ? Results.NotFound() : Results.Ok(result);
             }
             catch (InvalidOperationException exception) { return Results.Conflict(new { error = exception.Message }); }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("SimulationTradeDraftsConfirm").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapPost("/simulation-trades/{tradeId:guid}/corrections", async (Guid tradeId,
-            CorrectSimulationTradeRequest request, CorrectSimulationTradeHandler handler, CancellationToken cancellationToken) =>
+        group.MapPost("/simulation-trades/correct/{tradeId:guid}", async (Guid tradeId,
+            SimulationTradesCorrectRequest request, SimulationTradesCorrectHandler handler, CancellationToken cancellationToken) =>
         {
             if (!IsVersion7(tradeId) || !IsVersion7(request.ReplacementDraftId)) return Results.ValidationProblem(InvalidRequest("Trade and draft IDs must be UUIDv7 values."));
             try
@@ -212,33 +211,33 @@ public static class PortfolioCoreEndpoints
             }
             catch (ArgumentException exception) { return Results.ValidationProblem(InvalidRequest(exception.Message)); }
             catch (InvalidOperationException exception) { return Results.Conflict(new { error = exception.Message }); }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("SimulationTradesCorrect").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapPost("/simulation-accounts/{accountId:guid}/valuations", async (Guid accountId,
-            RecordSimulationValuationRequest request, RecordSimulationValuationHandler handler, CancellationToken cancellationToken) =>
+        group.MapPost("/simulation-valuations/record-list", async (
+            SimulationValuationsRecordListRequest request, SimulationValuationsRecordListHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!IsVersion7(accountId)) return Results.ValidationProblem(InvalidId("accountId"));
+            if (!IsVersion7(request.AccountId)) return Results.ValidationProblem(InvalidId("accountId"));
             try
             {
-                var result = await handler.HandleAsync(new(accountId, request.Quotes, request.CurrentFxRate), cancellationToken);
+                var result = await handler.HandleAsync(new(request.AccountId, request.Quotes, request.CurrentFxRate), cancellationToken);
                 return result is null ? Results.NotFound() : Results.Ok(result);
             }
             catch (ArgumentException exception) { return Results.ValidationProblem(InvalidRequest(exception.Message)); }
             catch (InvalidOperationException exception) { return Results.Conflict(new { error = exception.Message }); }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("SimulationValuationsRecordList").AddEndpointFilter<LocalMutationFilter>();
 
-        group.MapPost("/simulation-accounts/{accountId:guid}/valuation-series", async (Guid accountId,
-            SimulationValuationSeriesRequest request, GetSimulationValuationSeriesHandler handler, CancellationToken cancellationToken) =>
+        group.MapPost("/simulation-valuations/calculate-series-list", async (
+            SimulationValuationsCalculateSeriesListRequest request, SimulationValuationsCalculateSeriesListHandler handler, CancellationToken cancellationToken) =>
         {
-            if (!IsVersion7(accountId)) return Results.ValidationProblem(InvalidId("accountId"));
+            if (!IsVersion7(request.AccountId)) return Results.ValidationProblem(InvalidId("accountId"));
             try
             {
-                var result = await handler.HandleAsync(accountId, request.Symbol, request.Observations, cancellationToken);
+                var result = await handler.HandleAsync(request.AccountId, request.Symbol, request.Observations, cancellationToken);
                 return result is null ? Results.NotFound() : Results.Ok(result);
             }
             catch (ArgumentException exception) { return Results.ValidationProblem(InvalidRequest(exception.Message)); }
             catch (InvalidOperationException exception) { return Results.Conflict(new { error = exception.Message }); }
-        }).AddEndpointFilter<LocalMutationFilter>();
+        }).WithName("SimulationValuationsCalculateSeriesList").AddEndpointFilter<LocalMutationFilter>();
 
         return endpoints;
     }
@@ -254,62 +253,4 @@ public static class PortfolioCoreEndpoints
     {
         ["request"] = [message],
     };
-}
-
-public sealed record CreatePortfolioRequest(string Name, string BaseCurrency, string ReportingCurrency);
-
-public sealed record CreateAccountRequest(string Name, string Broker, string Currency);
-
-public sealed record RecordLedgerEntryRequest(
-    string Type,
-    decimal Amount,
-    string Currency,
-    DateTimeOffset EffectiveAt,
-    string? Note,
-    string? InstrumentSymbol,
-    decimal? Quantity,
-    decimal? UnitPrice);
-
-public sealed record CorrectLedgerEntryRequest(
-    string Type,
-    decimal Amount,
-    string Currency,
-    DateTimeOffset EffectiveAt,
-    string? Note,
-    string? InstrumentSymbol,
-    decimal? Quantity,
-    decimal? UnitPrice,
-    string Reason);
-
-public sealed record CreateSimulationAccountRequest(string Name);
-public sealed record CreateSimulationDraftRequest(string Side, string InputMode, decimal? RequestedQuantity,
-    decimal? RequestedAmount, decimal AssumedFee, decimal AssumedTax, decimal? FxRate, DateTimeOffset EffectiveAt,
-    SimulationMarketEvidence Quote);
-public sealed record CorrectSimulationTradeRequest(Guid ReplacementDraftId, string Reason);
-public sealed record RecordSimulationValuationRequest(IReadOnlyList<SimulationMarketEvidence> Quotes, decimal? CurrentFxRate);
-public sealed record SimulationValuationSeriesRequest(string Symbol, IReadOnlyList<SimulationSeriesInput> Observations);
-
-public sealed class LocalMutationFilter : IEndpointFilter
-{
-    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
-    {
-        var request = context.HttpContext.Request;
-        if (!request.HasJsonContentType())
-        {
-            return Results.StatusCode(StatusCodes.Status415UnsupportedMediaType);
-        }
-
-        if (!request.Headers.TryGetValue("X-LedgerLens-Request", out var marker) || marker != "1")
-        {
-            return Results.Problem(statusCode: StatusCodes.Status400BadRequest, detail: "Missing local mutation marker.");
-        }
-
-        var source = request.Headers.Origin.FirstOrDefault() ?? request.Headers.Referer.FirstOrDefault();
-        if (!Uri.TryCreate(source, UriKind.Absolute, out var sourceUri) || !sourceUri.IsLoopback)
-        {
-            return Results.Problem(statusCode: StatusCodes.Status403Forbidden, detail: "Mutation origin must be loopback.");
-        }
-
-        return await next(context);
-    }
 }
