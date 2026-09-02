@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-Last reviewed: 2026-08-11.
+Last reviewed: 2026-09-01.
 
 An ADR becomes Accepted only when owner direction and supporting evidence are sufficient. `Needs Evidence` blocks the dependent implementation milestone.
 
@@ -21,3 +21,6 @@ An ADR becomes Accepted only when owner direction and supporting evidence are su
 | [0013](0013-defer-local-ai.md) | Deferred | No local AI dependency in MVP |
 | [0014](0014-explicit-handlers-before-mediator-library.md) | Accepted for Version 1 | Vertical slices and explicit command/query handlers before a mediator dependency |
 | [0015](0015-coarse-grained-microservices.md) | Accepted for Version 1 | Coarse-grained services, service-owned databases, HTTP/JSON and NATS JetStream |
+| [0016](0016-service-owned-hybrid-database-workflow.md) | Accepted for Portfolio Core pilot | Controlled DB-first scaffolding with service-owned persistence and reviewed EF migrations |
+| [0017](0017-isolated-manual-simulation-accounts.md) | Accepted | Manual simulation aggregates and tables remain isolated from confirmed accounting |
+| [0018](0018-apache-echarts-for-financial-visualization.md) | Accepted for simulation slice | Direct Apache ECharts integration with backend-authoritative calculations and accessible fallbacks |

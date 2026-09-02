@@ -1,6 +1,6 @@
 # Data Model
 
-Status: Proposed business model; no business tables are implemented in the distributed foundation.
+Status: Partially implemented. Portfolio Core owns the confirmed-ledger foundation and manual-simulation schema; later relationships remain proposed.
 
 ## Core relationships
 
@@ -15,6 +15,8 @@ SlipDocument *--* LedgerEntry (through SourceLink)
 Instrument 1--* MarketQuote / PriceCandle
 CurrencyPair 1--* ExchangeRate
 Portfolio 1--* Watchlist / ResearchNote / PortfolioSnapshot
+Portfolio 1--* SimulationAccount 1--* SimulationTradeEntry
+SimulationAccount 1--* SimulationTradeDraft / SimulationValuationSnapshot
 ```
 
 ## Proposed storage rules
@@ -30,11 +32,18 @@ Portfolio 1--* Watchlist / ResearchNote / PortfolioSnapshot
 - Never use binary floating point for canonical financial values.
 - Unique constraints for document content hash, broker reference within account, and provider/time-series natural keys.
 - Index ledger by account/effective instant/id, lots by instrument/acquisition instant, and quotes by provider/instrument/as-of.
+- Store simulation accounts, drafts, immutable trade entries, confirmed allocations, and valuation snapshots in Portfolio Core tables that have no foreign key or discriminator relationship to confirmed Investment Accounts or cash ledger entries. Draft confirmation is uniquely idempotent; entries are indexed by simulation account/effective instant/id and symbol.
 - Original documents live outside PostgreSQL; database stores relative application-data identity, hash, size, media type, and lifecycle state.
 
 Raw provider payload retention is off by default. Enable a bounded diagnostic copy only when terms allow it and redaction/retention are specified.
 
-Each service schema is generated and evolved only through its reviewed EF Core Code First migrations. `Database.EnsureCreated` is not used, and personal bootstrap values are never embedded in migrations. The foundation supplies migration infrastructure but creates no business tables.
+Service schemas are deployed only through reviewed EF Core migrations. Portfolio Core additionally accepts controlled DB-first authoring from approved local/nonproduction PostgreSQL under ADR-0016: its generated persistence model is isolated in a service-owned Database project, migration SQL is reviewed, and schema equivalence is required before any external history stamp. `Database.EnsureCreated` is not used, production is never scaffolded, and personal bootstrap values are never embedded in generated code or migrations.
+
+## Implemented Portfolio Core slice
+
+Migration `InitialPortfolioLedger` creates `user_profiles`, `portfolios`, `investment_accounts`, and append-only `cash_ledger_entries`. Portfolio ownership is required, account ownership is inherited through Portfolio, cash amounts use `numeric(28,10)`, and the application derives signed balances from positive Deposit/Withdrawal magnitudes. The service-owned Database project holds generated persistence records; Infrastructure maps them to domain types. The explicit `portfolio-migrations` Aspire resource applies the preserved migration chain before Portfolio Core API startup; ordinary API startup never migrates implicitly. Fixed-user identity and email remain external configuration and are not migration data.
+
+Migration `AddManualSimulationAccounts` adds `simulation_accounts`, short-lived `simulation_trade_drafts`, immutable `simulation_trade_entries`, and immutable `simulation_valuation_snapshots`. Their only aggregate parent is Portfolio/Simulation Account; they do not reference Investment Account or Cash Ledger Entry. Confirmation stores one trade ID on its draft for idempotency, corrections append linked Reversal and Replacement entries in a serializable transaction, and the 2026-09-02 EF drift check reports that the model matches the snapshot. Applying the migration to PostgreSQL remains blocked by the unavailable local Docker daemon.
 
 ## Evidence
 

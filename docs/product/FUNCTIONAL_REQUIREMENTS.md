@@ -17,5 +17,6 @@
 | FR-013 | Provide dashboard, holdings, ledger, lots, and slip inbox views | Each view is traceable to underlying records |
 | FR-014 | Provide watchlist and source-linked research notes | Alerts are not evaluated in Version 1 |
 | FR-015 | Back up and restore database plus documents consistently | Manifest and checksum validation pass |
+| FR-016 | Record and value manual simulated buys and sells without changing confirmed financial records | A synthetic multi-buy/partial-sell scenario reports source-labelled USD/THB P/L while confirmed cash, holdings, lots, and reconciliation remain unchanged |
 
 Requirements for automatic corporate actions, advanced fundamentals, TWR/MWR, alerts, authentication, and AI remain roadmap items.

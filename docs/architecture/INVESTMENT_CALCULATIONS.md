@@ -14,6 +14,22 @@ buy_cash_out = gross + fees + taxes
 sell_cash_in = gross - fees - taxes
 ```
 
+## Manual simulation trades
+
+Simulation trades use the same exact gross, lot-cost, proceeds, FIFO, average-cost, realized, unrealized, and THB-attribution policies as confirmed trades but rebuild from a separate immutable simulation ledger.
+
+For a simulation symbol, `invested capital USD` is the cumulative gross plus assumed fee and tax of every active Buy entry. It is not reduced by a Sell. The displayed simple return is `total P/L USD / invested capital USD * 100`; a missing or zero denominator yields `Incomplete`, never zero. A current valuation request also returns an explicit incomplete row for every open symbol whose latest-trade observation is absent. Incomplete rows are not persisted as market snapshots because they have no source observation to preserve.
+
+For quantity input, `quantity` is authoritative and `gross = quantity * confirmed_last_trade_price`. For amount input, the requested amount is gross security principal before fee/tax assumptions:
+
+```text
+quantity        = floor_to_scale(requested_gross / confirmed_last_trade_price, 12)
+gross           = floor_to_scale(quantity * confirmed_last_trade_price, 10)
+unused_remainder = requested_gross - gross
+```
+
+Buy cost is `gross + assumed_fees + assumed_taxes`; sell proceeds are `gross - assumed_fees - assumed_taxes`. Assumptions are explicit non-negative USD amounts, never a hard-coded broker schedule. A sell cannot exceed rebuilt simulated quantity. Draft confirmation fixes the displayed quote/FX snapshots and is idempotent. Missing or stale market inputs remain visible and produce an incomplete valuation rather than zero.
+
 Acquisition fees and taxes are allocated into lot cost. Disposal fees and taxes reduce realized proceeds. A correction reverses/replaces economic effect through linked entries.
 
 ## Lots and cost views
