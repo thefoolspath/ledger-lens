@@ -32,13 +32,13 @@ Every response wraps data with provider, entitlement/feed, data-as-of, retrieved
 ## Manual simulation HTTP surface
 
 ```text
-GET  /v1/instruments/search
-POST /v1/quotes/latest
-GET  /v1/instruments/{instrumentId}/candles
-POST /v1/fx/latest
+GET  /v1/instruments/search-list
+POST /v1/quotes/get-latest-list
+GET  /v1/instrument-candles/get-one/{instrumentId}
+POST /v1/foreign-exchange-rates/get-latest-list
 ```
 
-These implemented Version 1 verbs remain unchanged for contract stability. Instrument search uses `GET` because its bounded text/market filters fit the URI, and candle retrieval uses `GET` because it reads one identified instrument with bounded interval/range parameters. Batch latest-quote and FX lookups are safe, idempotent structured reads; a future API version may expose them with HTTP `QUERY` when the Gateway, OpenAPI tooling, Angular client, and other intermediaries pass the compatibility gate in the [.NET HTTP method policy](DOTNET_APPLICATION_ARCHITECTURE.md#http-get-and-query-policy). Until then, their existing `POST` routes are compatibility endpoints and must not mutate state.
+Plan 0003 changed only the Version 1 route names; the HTTP verbs remain unchanged for contract stability. Instrument search uses `GET` because its bounded text/market filters fit the URI, and candle retrieval uses `GET` because it reads one identified instrument with bounded interval/range parameters. Batch latest-quote and FX lookups are safe, idempotent structured reads; a future API version may expose them with HTTP `QUERY` when the Gateway, OpenAPI tooling, Angular client, and other intermediaries pass the compatibility gate in the [.NET HTTP method policy](DOTNET_APPLICATION_ARCHITECTURE.md#http-get-and-query-policy). Until then, their existing `POST` routes are compatibility reads and must not mutate state.
 
 The first implementation keeps a deterministic synthetic provider for tests. An external adapter must fail closed when its key or explicit terms-acceptance setting is absent; the application does not silently scrape or switch feeds.
 

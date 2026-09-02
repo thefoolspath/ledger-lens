@@ -1,12 +1,12 @@
 # API and Feature Naming Standard
 
-Status: Accepted naming direction; migration planned in [plan 0003](../plans/active/0003-api-feature-naming-migration.md). Last reviewed: 2026-09-02.
+Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification is tracked in [plan 0003](../plans/active/0003-api-feature-naming-migration.md). Last reviewed: 2026-09-02.
 
 ## Purpose
 
 This document is the normative LedgerLens terms-of-reference for naming business HTTP routes and their vertical-slice implementation. Its goal is deterministic traceability: a developer can derive one `OperationKey` from a public route and use that key to find the endpoint, request, response, application handler, persistence operation, Angular client, and tests for that operation.
 
-`MUST` and `MUST NOT` are mandatory. `SHOULD` describes the default and requires a documented reason to deviate. `MAY` is optional. Existing Version 1 business routes are nonconforming until plan 0003 is complete; this standard does not claim that the migration has already occurred.
+`MUST` and `MUST NOT` are mandatory. `SHOULD` describes the default and requires a documented reason to deviate. `MAY` is optional. The implemented Version 1 business routes conform to this standard; plan 0003 records the migration and verification evidence.
 
 ## Canonical route grammar
 
@@ -57,6 +57,7 @@ Every operation-specific production type and test MUST begin with its `Operation
 | `get-page` | Retrieve a paged collection | `{ items, totalCount, pageNumber, pageSize }` |
 | `search-list` | Filter/search and return a bounded collection | A top-level JSON array |
 | `search-page` | Filter/search and return a page | The standard page object |
+| `get-latest-list` | Retrieve the latest available observation for each bounded requested item | A top-level JSON array |
 | `get-autocomplete-list` | Server-filtered suggestions for typed input | A bounded top-level JSON array |
 | `get-combobox-list` | A finite option set for a combobox | A bounded top-level JSON array |
 | `export-file` | Export a downloadable representation | A file response, not JSON collection data |
@@ -156,7 +157,7 @@ Adding or changing a glossary term is an architecture change and requires review
 
 ## Version 1 migration map
 
-The following replacements are planned, not yet implemented.
+The following replacements were implemented atomically in plan 0003. The former routes have no compatibility aliases.
 
 ### Portfolio Core
 
@@ -227,7 +228,7 @@ For `/api/portfolio/v1/simulation-accounts/get-list?portfolioId=...`:
 
 ## Enforcement and exceptions
 
-Plan 0003 will add architecture and contract tests for route casing, plural features, approved operations, unique endpoint names, file/type alignment, one public top-level type per production file, and query response cardinality. A route migration is incomplete until Angular and all repository-owned tests use the canonical route and the old business route no longer appears in production code or tests.
+Plan 0003 added architecture and contract tests for route casing, plural features, approved operations, unique endpoint names, file/type alignment, one public top-level type per production file, and query response cardinality. Angular and repository-owned tests now use the canonical routes, and the old business routes no longer occur in production code or tests.
 
 An exception requires all of the following:
 

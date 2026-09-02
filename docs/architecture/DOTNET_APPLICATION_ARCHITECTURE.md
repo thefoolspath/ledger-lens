@@ -23,7 +23,7 @@ Service.Domain <- Service.Application <- Service.Infrastructure <- Service.Api/W
 
 Architecture tests enforce direction within a service and prevent references across service internals. No common Domain/SharedKernel project is created. Concepts that happen to share names may evolve independently in different bounded contexts.
 
-Business routes and their vertical-slice files follow the normative [API and Feature Naming Standard](API_AND_FEATURE_NAMING_STANDARD.md). The standard defines plural lowercase route features, result-cardinality operations, deterministic `OperationKey` derivation, one-public-type-per-file rules, and the planned Version 1 migration. Existing routes remain the implemented contract until [plan 0003](../plans/active/0003-api-feature-naming-migration.md) is executed and verified.
+Business routes and their vertical-slice files follow the normative [API and Feature Naming Standard](API_AND_FEATURE_NAMING_STANDARD.md). The standard defines plural lowercase route features, result-cardinality operations, deterministic `OperationKey` derivation, and one-public-type-per-file rules. [Plan 0003](../plans/active/0003-api-feature-naming-migration.md) migrated every implemented Version 1 business route, handler, persistence operation, Angular call, and repository-owned test without compatibility aliases.
 
 ## Explicit handlers, not a mediator package
 

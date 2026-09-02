@@ -1,6 +1,6 @@
 # API and Feature Naming Standard Migration
 
-Last reviewed: 2026-09-02. Status: Planned.
+Last reviewed: 2026-09-02. Status: Implemented; distributed runtime verification blocked by local container connectivity.
 
 ## Goal
 
@@ -71,6 +71,15 @@ Docker-unavailable tests remain an external blocker rather than a naming excepti
 - Business behavior, exact financial calculations, user ownership, correction/idempotency rules, and transaction boundaries are unchanged.
 - No EF migration is created and the Portfolio Core model-drift check remains clean.
 - `PROJECT_STATE.md`, this plan, architecture documentation, and verification evidence agree on the implemented status.
+
+## Implementation and verification evidence — 2026-09-02
+
+- The external-consumer gate passed: the repository has no release, tag, deployment configuration, package consumer, or owner-authorized publication, and the documented release policy prohibits publication without owner approval.
+- All 18 implemented Portfolio Core and Market Data business routes were replaced by the frozen migration map without compatibility aliases. Parent portfolio/account identifiers removed from route hierarchy are explicit request or query inputs; UUIDv7 and ownership checks remain at the same boundaries.
+- Operation-keyed request, command, handler, persistence method, endpoint name, Angular route constant, and test references are searchable for every operation. Non-generated production C# types were split to one public top-level type per matching file; generated Database types, migrations, and top-level `Program.cs` remain exempt.
+- `ApiNamingConventionTests` enforce the complete current route set, canonical casing/plural/operation vocabulary, deterministic and unique endpoint names, conforming/rejected examples, file/type alignment, cross-layer OperationKey traceability, and `GetOne`/`GetList`/`GetPage` JSON fixtures. Architecture tests pass `16/16`; Portfolio Core unit tests pass `10/10`; Market Data unit tests pass `1/1`; Gateway integration tests pass `2/2`; guarded distributed assembly tests pass `2/2`; Angular tests pass `5/5` across `3/3` files.
+- The complete .NET solution and Angular production application build with zero warnings/errors. `lg db check` reports no model drift, and no EF migration file changed. Production npm audit reports zero vulnerabilities. OperationKey search finds every key across the intended layers, and the targeted legacy-route scan finds no match in `src`, `tests`, or `web`.
+- The explicitly enabled Aspire scenario is currently `BLOCKED`, not passed: Docker client/server checks succeed, but ephemeral PostgreSQL connections fail with `NpgsqlException`/`EndOfStreamException` and NATS times out before `portfolio-api` becomes healthy. A direct Portfolio API startup on loopback succeeds, so current evidence identifies local container dependency connectivity rather than an API startup or route-registration failure. The full canonical Gateway/PostgreSQL flow must be rerun after that environment issue is repaired before this plan moves out of `active`.
 
 ## Documentation rule
 
