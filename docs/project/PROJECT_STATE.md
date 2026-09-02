@@ -16,6 +16,7 @@ Last reviewed: 2026-09-02.
 - Product scope, proposed architecture, research evidence, ADRs, quality gates, risks, and the first implementation plan are documented.
 - Manual Simulation Accounts are implemented through provider-neutral Market Data APIs, a deterministic Development/test provider, a terms/key-gated Twelve Data prototype adapter, separate Portfolio Core aggregates/tables and migration, idempotent preview/confirm plus reversal/replacement correction APIs, FIFO/average/simple-return and USD/THB valuation calculations, and a separate Angular Simulation mode. Apache ECharts 6.1.0 is directly lazy-loaded for value/cost and OHLCV views with ARIA and table fallbacks. Code-level, unit, component, build, migration-model, privacy, and dependency gates pass; current PostgreSQL end-to-end execution and desktop/mobile visual QA remain blocked by Docker availability.
 - The owner-approved FX reporting policy now separates trade-date stock attribution from actual exchange and USD-cash effects. It uses auditable USD cash lots with evidence/manual/FIFO allocation, parallel primary and BOT benchmark columns, and a non-overlapping bridge that must reconcile a closed cycle to actual THB proceeds minus contributions.
+- The API and vertical-slice naming direction is now documented in `docs/architecture/API_AND_FEATURE_NAMING_STANDARD.md`. Active plan 0003 will migrate existing Version 1 business routes, source files, Angular calls, and tests to deterministic operation-key naming; that migration is planned and no route or runtime behavior has changed yet.
 - The source planning context remains at `../LedgerLens_Codex_Planning_Context.md` relative to the LedgerLens folder.
 
 ## Accepted direction
@@ -38,4 +39,4 @@ Last reviewed: 2026-09-02.
 
 ## Next work
 
-Restore a healthy Docker daemon, then run the explicitly enabled synthetic distributed scenario and desktop/mobile visual QA for the manual Simulation mode. After that gate, continue confirmed-ledger Milestone 2 work without reusing simulation tables or projections. Keep the 32.178-second warm-start observation visible while collecting enough repeat runs to estimate p95.
+Restore a healthy Docker daemon, then run the explicitly enabled synthetic distributed scenario and desktop/mobile visual QA for the manual Simulation mode. After that gate, continue confirmed-ledger Milestone 2 work without reusing simulation tables or projections. Execute [active plan 0003](../plans/active/0003-api-feature-naming-migration.md) as a coordinated contract refactor only after confirming there are no external Version 1 consumers. Keep the 32.178-second warm-start observation visible while collecting enough repeat runs to estimate p95.

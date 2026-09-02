@@ -1,6 +1,6 @@
 # .NET Application Architecture and Design Rules
 
-Status: Accepted for the distributed foundation. Last reviewed: 2026-08-11.
+Status: Accepted for the distributed foundation. Last reviewed: 2026-09-02.
 
 ## Non-negotiable rules
 
@@ -23,6 +23,8 @@ Service.Domain <- Service.Application <- Service.Infrastructure <- Service.Api/W
 
 Architecture tests enforce direction within a service and prevent references across service internals. No common Domain/SharedKernel project is created. Concepts that happen to share names may evolve independently in different bounded contexts.
 
+Business routes and their vertical-slice files follow the normative [API and Feature Naming Standard](API_AND_FEATURE_NAMING_STANDARD.md). The standard defines plural lowercase route features, result-cardinality operations, deterministic `OperationKey` derivation, one-public-type-per-file rules, and the planned Version 1 migration. Existing routes remain the implemented contract until [plan 0003](../plans/active/0003-api-feature-naming-migration.md) is executed and verified.
+
 ## Explicit handlers, not a mediator package
 
 Future vertical slices use `ICommandHandler<TCommand,TResult>` and `IQueryHandler<TQuery,TResult>`, with the endpoint injecting its exact handler. There is no `IMediator`, runtime registry, MediatR, generic repository, mapper framework, or validation framework in the foundation. Middleware and endpoint filters own HTTP cross-cutting concerns.
@@ -34,6 +36,18 @@ Future vertical slices use `ICommandHandler<TCommand,TResult>` and `IQueryHandle
 - NATS JetStream carries versioned integration events/background commands after business logic exists. Delivery is at-least-once.
 - `LedgerLens.IntegrationContracts` initially contains only a technical `MessageEnvelope<TPayload>`; it never contains domain entities.
 - Event envelopes carry message identity, type, schema version, occurrence time, correlation and causation. Business ownership fields belong to the versioned payload when required.
+
+### HTTP GET and QUERY policy
+
+`GET` remains the default method for safe, idempotent resource retrieval when the request needs no content body. Use it for resource-by-ID routes, collections, and searches whose scalar filters, sort, and bounded pagination fit naturally in the URI query string. Prefer `GET` when the URL should be bookmarkable, shareable, directly navigable, or compatible with ordinary browser, proxy, cache, OpenAPI, and generated-client behaviour.
+
+Use the HTTP `QUERY` method only for safe and idempotent reads that require structured request content, such as deeply nested filters, large identifier sets, multiple ranges, or a complex projection that is unsuitable for a bounded URI. A `QUERY` request carries its query description in the body with an explicit `Content-Type`; it must not create, mutate, confirm, reverse, or delete business state. Do not choose HTTP `QUERY` merely because the Application layer operation implements `IQueryHandler`; application queries and HTTP methods are separate concerns. Do not use it only to conceal sensitive data: request bodies still require the normal privacy, logging, authorization, and size controls.
+
+Use `POST` for commands and state changes. When a safe structured read needs to support a client, Gateway, proxy, or tool that cannot carry `QUERY`, a documented `POST /.../search` compatibility endpoint is permitted, but its protocol semantics and retry/cache behaviour must not be presented as equivalent to `GET` or `QUERY`.
+
+Before admitting a `QUERY` route, verify the complete Angular-to-Gateway-to-service path, including request-body forwarding, `Content-Type`, CORS/preflight where applicable, authorization/antiforgery behaviour, observability, OpenAPI representation, generated clients, and deployed intermediaries. ASP.NET Core 10 routes it with `MapMethods(pattern, [HttpMethods.Query], handler)` or `[AcceptVerbs("QUERY")]`; clients use `HttpMethod.Query`. Existing published routes keep their current verbs until a deliberate versioned contract migration and compatibility evidence are recorded.
+
+References: [RFC 10008 — The HTTP QUERY Method](https://www.rfc-editor.org/rfc/rfc10008.html), [.NET 10 `HttpMethod.Query`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpmethod.query?view=net-10.0), and [ASP.NET Core 10 `HttpMethods.Query`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.httpmethods.query?view=aspnetcore-10.0).
 
 ## EF Core schema ownership
 

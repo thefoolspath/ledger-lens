@@ -4,6 +4,7 @@
 .a/
 .n/
 .cache/
+.codex-temp/
 
 # .NET and Aspire generated state
 .aspire/
