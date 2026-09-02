@@ -22,6 +22,8 @@ var operationsDatabase = postgres.AddDatabase("operations-db", "ledgerlens_opera
 
 var messaging = builder.AddNats("messaging")
     .WithJetStream();
+var fixedUserId = builder.AddParameter("fixed-user-id", secret: true);
+var fixedUserEmail = builder.AddParameter("fixed-user-email", secret: true);
 
 if (usePersistentVolumes)
 {
@@ -29,9 +31,14 @@ if (usePersistentVolumes)
     messaging.WithDataVolume("ledgerlens-nats-data");
 }
 
+var portfolioMigrations = builder.AddProject<Projects.LedgerLens_PortfolioCore_Migrations>("portfolio-migrations")
+    .WithReference(portfolioDatabase)
+    .WaitFor(portfolioDatabase);
 var portfolio = builder.AddProject<Projects.LedgerLens_PortfolioCore_Api>("portfolio-api")
     .WithReference(portfolioDatabase).WithReference(messaging)
-    .WaitFor(portfolioDatabase).WaitFor(messaging)
+    .WithEnvironment("LedgerLens__FixedUser__Id", fixedUserId)
+    .WithEnvironment("LedgerLens__FixedUser__Email", fixedUserEmail)
+    .WaitForCompletion(portfolioMigrations).WaitFor(messaging)
     .WithHttpHealthCheck("/health");
 var market = builder.AddProject<Projects.LedgerLens_MarketData_Api>("market-api")
     .WithReference(marketDatabase).WithReference(messaging)
