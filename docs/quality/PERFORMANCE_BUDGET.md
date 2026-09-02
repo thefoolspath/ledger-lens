@@ -11,6 +11,7 @@ Status: Proposed targets; validate against the owner's representative local mach
 | Import 1k normalized entries | validated batch | <= 5 seconds |
 | On-demand quote/FX | excluding provider latency | local overhead <= 200 ms |
 | Daily candle ingestion | 100 symbols x 10 years | <= 60 seconds after download |
+| Angular simulation charts | ECharts is loaded only when a populated chart is rendered | Initial production bundle remains within 500 kB warning budget; component-style warning budget is 6 kB for the expanded responsive workspace |
 | Slip extraction | one two-page document, CPU | p95 <= 10 seconds after model warm-up |
 | Angular interaction | local data already loaded | p95 <= 100 ms input response |
 

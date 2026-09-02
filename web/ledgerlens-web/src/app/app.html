@@ -1,21 +1,332 @@
 <main class="shell">
-  <header>
-    <p class="eyebrow">LedgerLens · Distributed Foundation</p>
-    <h1>Resource connectivity</h1>
-    <p class="lede">Technical readiness only. No portfolio or ledger business data exists in this milestone.</p>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">LedgerLens · Local portfolio accounting</p>
+      <h1>Portfolio ledger</h1>
+      <p class="lede">Record deposits, withdrawals, trades, fees, taxes, dividends, and append-only corrections.</p>
+    </div>
+    <button class="secondary" type="button" (click)="refreshConnectivity()">Check services</button>
   </header>
 
-  <section class="status-grid" aria-label="Service connectivity">
+  <section class="service-strip" aria-label="Service connectivity">
     @for (service of services(); track service.endpoint) {
-      <article class="status-card">
+      <span class="service-pill">
         <span class="indicator" [attr.data-state]="service.state" aria-hidden="true"></span>
-        <div>
-          <h2>{{ service.name }}</h2>
-          <p>{{ service.state }}</p>
-        </div>
-      </article>
+        {{ service.name }}
+      </span>
     }
   </section>
 
-  <button type="button" (click)="refresh()">Check again</button>
+  <nav class="mode-switch" aria-label="Portfolio mode">
+    <button type="button" [class.active]="mode() === 'real'" (click)="switchMode('real')">เงินจริง</button>
+    <button type="button" [class.active]="mode() === 'simulation'" (click)="switchMode('simulation')">จำลอง</button>
+  </nav>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (mode() === 'real') {
+  <div class="workspace">
+    <aside class="panel sidebar">
+      <h2>Portfolios</h2>
+      <nav aria-label="Portfolios">
+        @for (portfolio of portfolios(); track portfolio.id) {
+          <button type="button" class="portfolio-link" (click)="selectPortfolio(portfolio.id)">
+            <strong>{{ portfolio.name }}</strong>
+            <span>{{ portfolio.baseCurrency }} → {{ portfolio.reportingCurrency }}</span>
+          </button>
+        } @empty {
+          <p class="muted">No portfolio yet.</p>
+        }
+      </nav>
+
+      <form (ngSubmit)="createPortfolio()">
+        <label for="portfolio-name">New portfolio</label>
+        <input id="portfolio-name" name="portfolioName" [(ngModel)]="portfolioName" maxlength="100" required placeholder="Long-term investing">
+        <button type="submit" [disabled]="busy()">Create USD portfolio</button>
+      </form>
+    </aside>
+
+    <section class="content">
+      @if (selectedPortfolio(); as portfolio) {
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ portfolio.baseCurrency }} base · {{ portfolio.reportingCurrency }} reporting</p>
+            <h2>{{ portfolio.name }}</h2>
+          </div>
+        </div>
+
+        <form class="panel inline-form" (ngSubmit)="createAccount()">
+          <div>
+            <label for="account-name">Account name</label>
+            <input id="account-name" name="accountName" [(ngModel)]="accountName" required maxlength="100" placeholder="Dime USD">
+          </div>
+          <div>
+            <label for="broker">Broker</label>
+            <input id="broker" name="broker" [(ngModel)]="broker" required maxlength="100" placeholder="Dime">
+          </div>
+          <div>
+            <label for="currency">Currency</label>
+            <select id="currency" name="accountCurrency" [(ngModel)]="accountCurrency">
+              <option value="USD">USD</option>
+              <option value="THB">THB</option>
+            </select>
+          </div>
+          <button type="submit" [disabled]="busy()">Add account</button>
+        </form>
+
+        @for (account of portfolio.accounts; track account.id) {
+          <article class="panel account-card">
+            <div class="account-heading">
+              <div>
+                <p class="muted">{{ account.broker }} · {{ account.currency }}</p>
+                <h3>{{ account.name }}</h3>
+              </div>
+              <div class="balance">
+                <span>Ledger cash</span>
+                <strong>{{ account.cashBalance }} {{ account.currency }}</strong>
+              </div>
+            </div>
+
+            @if (correctionTarget) {
+              <p class="muted">Correcting {{ correctionTarget.type }} · {{ correctionTarget.id }}</p>
+            }
+            <form class="cash-form" (ngSubmit)="recordLedgerEntry(account)">
+              <select name="entryType" [(ngModel)]="entryType" aria-label="Ledger entry type">
+                <option value="Deposit">Deposit</option>
+                <option value="Withdrawal">Withdrawal</option>
+                <option value="Buy">Buy</option>
+                <option value="Sell">Sell</option>
+                <option value="Fee">Fee</option>
+                <option value="Tax">Tax</option>
+                <option value="Dividend">Dividend</option>
+              </select>
+              @if (isTrade()) {
+                <input name="instrumentSymbol" [(ngModel)]="instrumentSymbol" required maxlength="32" placeholder="Symbol" aria-label="Instrument symbol">
+                <input name="quantity" [(ngModel)]="quantity" type="number" min="0.000000000001" step="any" required placeholder="Quantity" aria-label="Quantity">
+                <input name="unitPrice" [(ngModel)]="unitPrice" type="number" min="0.0000000001" step="any" required placeholder="Unit price" aria-label="Unit price">
+                <span>{{ requestedAmount() }} {{ account.currency }}</span>
+              } @else {
+                <input name="entryAmount" [(ngModel)]="entryAmount" type="number" min="0.0000000001" step="any" required placeholder="Amount" aria-label="Amount">
+              }
+              <input name="entryNote" [(ngModel)]="entryNote" maxlength="500" placeholder="Optional note" aria-label="Optional note">
+              @if (correctionTarget) {
+                <input name="correctionReason" [(ngModel)]="correctionReason" maxlength="500" required placeholder="Correction reason" aria-label="Correction reason">
+                <button type="button" class="secondary" (click)="resetEntryForm()">Cancel</button>
+              }
+              <button type="submit" [disabled]="busy()">{{ correctionTarget ? 'Correct' : 'Record' }}</button>
+            </form>
+
+            <div class="ledger" role="table" aria-label="Auditable ledger entries">
+              @for (entry of account.entries; track entry.id) {
+                <div class="ledger-row" role="row">
+                  <span role="cell" [class.negative]="entry.signedAmount < 0">{{ entry.signedAmount }} {{ entry.currency }}</span>
+                  <span role="cell">{{ entry.type }} · {{ entry.role }}</span>
+                  <span role="cell">{{ entry.effectiveAt }}</span>
+                  <span role="cell" class="muted">
+                    @if (entry.instrumentSymbol) { {{ entry.instrumentSymbol }} × {{ entry.signedQuantity }} · }
+                    {{ entry.correctionReason || entry.note || '—' }}
+                  </span>
+                  @if (canCorrect(account, entry)) {
+                    <button type="button" class="secondary" (click)="beginCorrection(entry)">Correct</button>
+                  }
+                </div>
+              } @empty {
+                <p class="muted">No ledger entries recorded.</p>
+              }
+            </div>
+          </article>
+        } @empty {
+          <div class="panel empty-state">Add the first investment account to start the cash ledger.</div>
+        }
+      } @else {
+        <div class="panel empty-state">Create a portfolio to begin.</div>
+      }
+    </section>
+  </div>
+  } @else {
+    <section class="simulation-warning" role="status">
+      <strong>SIMULATION — ไม่มีการส่งคำสั่งซื้อจริง</strong>
+      <span>ข้อมูลนี้เป็นสถานการณ์สมมติ ไม่เปลี่ยนเงินสด หุ้น หรือต้นทุนในบัญชีจริง</span>
+    </section>
+
+    <div class="workspace simulation-workspace">
+      <aside class="panel sidebar">
+        <h2>Simulation accounts</h2>
+        <nav aria-label="Simulation accounts">
+          @for (account of simulationAccounts(); track account.id) {
+            <button type="button" class="portfolio-link" (click)="selectSimulationAccount(account.id)">
+              <strong>{{ account.name }}</strong><span>Manual what-if</span>
+            </button>
+          } @empty {
+            <p class="muted">No simulation account yet.</p>
+          }
+        </nav>
+        <form (ngSubmit)="createSimulationAccount()">
+          <label for="simulation-name">New simulation</label>
+          <input id="simulation-name" name="simulationAccountName" [(ngModel)]="simulationAccountName"
+            maxlength="100" required placeholder="NVDA what-if">
+          <button type="submit" [disabled]="busy() || !selectedPortfolio()">Create simulation</button>
+        </form>
+      </aside>
+
+      <section class="content">
+        <form class="panel search-form" (ngSubmit)="searchInstruments()">
+          <div>
+            <p class="eyebrow">Reliable, source-labelled observations</p>
+            <label for="instrument-query">US stock or ETF</label>
+            <input id="instrument-query" name="instrumentQuery" [(ngModel)]="instrumentQuery" maxlength="64"
+              required placeholder="NVDA">
+          </div>
+          <button type="submit" [disabled]="busy()">Search symbol</button>
+        </form>
+
+        @if (instrumentResults().length > 0) {
+          <div class="panel instrument-results" role="listbox" aria-label="Instrument search results">
+            @for (instrument of instrumentResults(); track instrument.id) {
+              <button type="button" class="instrument-option" (click)="chooseInstrument(instrument)">
+                <strong>{{ instrument.symbol }}</strong>
+                <span>{{ instrument.name }} · {{ instrument.exchange }} · {{ instrument.currency }}</span>
+              </button>
+            }
+          </div>
+        }
+
+        @if (latestQuote(); as quote) {
+          <article class="panel market-card">
+            <div>
+              <p class="eyebrow">{{ quote.priceKind }} · {{ quote.provenance.freshness }}</p>
+              <h2>{{ quote.instrument.symbol }} · {{ quote.price }} {{ quote.instrument.currency }}</h2>
+              <p class="muted">{{ quote.provenance.provider }} / {{ quote.provenance.feed }} · as of {{ quote.provenance.asOf }}</p>
+            </div>
+            <div class="market-actions">
+              @if (primaryFx(); as fx) { <span>USD/THB {{ fx.rate }}</span> }
+              @if (benchmarkFx(); as bot) { <span>BOT benchmark {{ bot.rate }}</span> }
+              <button type="button" class="secondary" (click)="fetchMarketData()" [disabled]="busy()">Refresh market data</button>
+            </div>
+          </article>
+        }
+
+        @if (selectedSimulation(); as simulation) {
+          <article class="panel trade-ticket">
+            <div class="section-heading">
+              <div><p class="eyebrow">Manual simulation</p><h2>{{ simulation.account.name }}</h2></div>
+              <span class="simulation-badge">NOT A REAL ORDER</span>
+            </div>
+            @if (simulationCorrectionTarget) {
+              <section class="correction-notice" role="status">
+                <strong>Replacing {{ simulationCorrectionTarget.side }} {{ simulationCorrectionTarget.quantity }} {{ simulationCorrectionTarget.symbol }}</strong>
+                <label for="simulation-correction-reason">Correction reason</label>
+                <input id="simulation-correction-reason" name="simulationCorrectionReason"
+                  [(ngModel)]="simulationCorrectionReason" maxlength="500" required>
+                <button type="button" class="secondary" (click)="cancelSimulationCorrection()">Cancel correction</button>
+              </section>
+            }
+            <form class="simulation-form" (ngSubmit)="previewSimulationTrade()">
+              <div><label for="simulation-side">Side</label><select id="simulation-side" name="simulationSide" [(ngModel)]="simulationSide"><option>Buy</option><option>Sell</option></select></div>
+              <div><label for="simulation-input-mode">Input</label><select id="simulation-input-mode" name="simulationInputMode" [(ngModel)]="simulationInputMode"><option value="ByAmount">USD amount</option><option value="ByQuantity">Shares</option></select></div>
+              @if (simulationInputMode === 'ByAmount') {
+                <div><label for="simulation-amount">Gross USD</label><input id="simulation-amount" name="simulationAmount" type="number" min="0.0000000001" step="any" [(ngModel)]="simulationAmount" required></div>
+              } @else {
+                <div><label for="simulation-quantity">Shares</label><input id="simulation-quantity" name="simulationQuantity" type="number" min="0.000000000001" step="any" [(ngModel)]="simulationQuantity" required></div>
+              }
+              <div><label for="simulation-fee">Assumed fee USD</label><input id="simulation-fee" name="simulationFee" type="number" min="0" step="any" [(ngModel)]="simulationFee"></div>
+              <div><label for="simulation-tax">Assumed tax USD</label><input id="simulation-tax" name="simulationTax" type="number" min="0" step="any" [(ngModel)]="simulationTax"></div>
+              <button type="submit" [disabled]="busy() || !latestQuote()">Preview at latest trade</button>
+            </form>
+
+            @if (pendingDraft(); as draft) {
+              <section class="draft-preview" aria-label="Simulation trade preview">
+                <div><span>Resolved shares</span><strong>{{ draft.quantity }}</strong></div>
+                <div><span>Gross</span><strong>{{ draft.grossAmount }} USD</strong></div>
+                <div><span>Unused</span><strong>{{ draft.unusedAmount }} USD</strong></div>
+                <div><span>Net cash effect</span><strong>{{ draft.netCash }} USD</strong></div>
+                <p class="muted">Quote is fixed for this draft until {{ draft.expiresAt }}</p>
+                <button type="button" (click)="confirmSimulationTrade()"
+                  [disabled]="busy() || (!!simulationCorrectionTarget && !simulationCorrectionReason.trim())">
+                  {{ simulationCorrectionTarget ? 'Confirm correction' : 'Confirm simulated ' + draft.side }}
+                </button>
+              </section>
+            }
+          </article>
+
+          <section class="position-grid" aria-label="Simulated positions">
+            @for (position of simulation.positions; track position.symbol) {
+              <article class="panel position-card">
+                <div class="section-heading"><h3>{{ position.symbol }}</h3><strong>{{ position.quantity }} shares</strong></div>
+                <dl>
+                  <div><dt>Remaining cost</dt><dd>{{ position.remainingCostUsd }} USD</dd></div>
+                  <div><dt>Invested capital</dt><dd>{{ position.investedCapitalUsd }} USD</dd></div>
+                  <div><dt>Average cost</dt><dd>{{ position.averageCostUsd || '—' }} USD</dd></div>
+                  <div><dt>Realized P/L</dt><dd [class.negative]="position.realizedUsd < 0">{{ position.realizedUsd }} USD</dd></div>
+                  @if (valuationFor(position.symbol); as value) {
+                    <div><dt>Market value</dt><dd>{{ value.currentValueUsd ?? 'Incomplete' }} USD</dd></div>
+                    <div><dt>Unrealized P/L</dt><dd [class.negative]="(value.unrealizedUsd ?? 0) < 0">{{ value.unrealizedUsd ?? 'Incomplete' }} USD</dd></div>
+                    <div><dt>Total P/L</dt><dd [class.negative]="(value.totalPlUsd ?? 0) < 0">{{ value.totalPlUsd ?? 'Incomplete' }} USD</dd></div>
+                    <div><dt>Simple return</dt><dd>{{ value.returnPercent ?? 'Incomplete' }}%</dd></div>
+                    <div><dt>Total P/L THB</dt><dd>{{ value.totalPlThb ?? 'Incomplete' }}</dd></div>
+                    @if (!value.isComplete) { <p class="error">{{ value.missingReasons.join(' ') }}</p> }
+                  }
+                </dl>
+              </article>
+            } @empty {
+              <div class="panel empty-state">Fetch a quote and confirm the first simulated Buy.</div>
+            }
+          </section>
+
+          @if (seriesPoints().length > 0) {
+            <article class="panel chart-panel">
+              <h3>Market value versus remaining cost basis</h3>
+              <app-simulation-chart kind="value" [points]="seriesPoints()"
+                description="Daily simulated market value and remaining USD cost basis"></app-simulation-chart>
+              <details><summary>Accessible value data</summary>
+                <div class="data-table" role="table" aria-label="Simulation value data">
+                  @for (point of seriesPoints(); track point.date) {
+                    <div role="row"><span role="cell">{{ point.date }}</span><span role="cell">Value {{ point.marketValueUsd }} USD</span><span role="cell">Cost {{ point.costBasisUsd }} USD</span></div>
+                  }
+                </div>
+              </details>
+            </article>
+          }
+
+          @if (candles().length > 0) {
+            <article class="panel chart-panel">
+              <h3>Daily price and simulated trades</h3>
+              <app-simulation-chart kind="price" [candles]="candles()" [trades]="simulation.trades"
+                description="Daily OHLCV candlesticks with simulated Buy and Sell markers"></app-simulation-chart>
+              <details><summary>Accessible OHLCV data</summary>
+                <div class="data-table" role="table" aria-label="Daily OHLCV data">
+                  @for (candle of candles(); track candle.date) {
+                    <div role="row"><span role="cell">{{ candle.date }}</span><span role="cell">O {{ candle.open }}</span><span role="cell">H {{ candle.high }}</span><span role="cell">L {{ candle.low }}</span><span role="cell">C {{ candle.close }}</span></div>
+                  }
+                </div>
+              </details>
+            </article>
+          }
+
+          <article class="panel">
+            <h3>Simulation trade log</h3>
+            <div class="data-table" role="table" aria-label="Simulation trade entries">
+              @for (trade of simulation.trades; track trade.id) {
+                <div role="row">
+                  <span role="cell">{{ trade.effectiveAt }}</span>
+                  <span role="cell">{{ trade.side }} {{ trade.quantity }} {{ trade.symbol }} · {{ trade.role }}</span>
+                  <span role="cell">{{ trade.unitPrice }} USD</span>
+                  <span role="cell">{{ trade.provider }} · {{ trade.freshness }}</span>
+                  <span role="cell">
+                    @if (canCorrectSimulation(simulation, trade)) {
+                      <button type="button" class="secondary" (click)="beginSimulationCorrection(trade)">Correct</button>
+                    }
+                  </span>
+                </div>
+              } @empty { <p class="muted">No simulated trades.</p> }
+            </div>
+          </article>
+        } @else {
+          <div class="panel empty-state">Create or select a simulation account.</div>
+        }
+      </section>
+    </div>
+  }
 </main>
