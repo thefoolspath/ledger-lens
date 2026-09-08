@@ -30,12 +30,12 @@ Manual simulation acceptance adds deterministic amount/quantity conversion, mult
 
 Hybrid DB-first changes add three mandatory migration checks: `lg db check` must report no pending model change after migration generation; the full migration chain must create an empty ephemeral PostgreSQL database; and the new migration must preserve synthetic data when applied from its immediate predecessor. A source-database history stamp additionally requires schema-equivalence evidence and is not automated by the repository tooling.
 
-## Manual simulation verification — 2026-09-02
+## Manual simulation verification — 2026-09-08
 
 - **PASS:** complete repository build, zero .NET warnings/errors, Angular production build, EF model/snapshot drift check, `git diff --check`, production npm audit (zero reported vulnerabilities), and tracked forbidden-path/credential-pattern scans.
 - **PASS:** Portfolio Core unit tests `10/10`, including amount rounding, multi-buy/partial-sell FIFO, fee/tax, USD/THB completeness, oversell, simple return, and reversal/replacement rebuild; Market Data unit test `1/1`; Angular tests `4/4` across two files, including permanent separation labelling and chart accessibility/lifecycle disposal.
-- **COMPILED / BLOCKED:** the synthetic distributed scenario now uses the canonical plan-0003 routes and exercises symbol/quote/FX, duplicate draft confirmation, two buys, partial sell, simulation correction, current valuation, and an unchanged confirmed cash/entry projection. Its project builds with zero warnings/errors, but current execution and PostgreSQL migration/isolation evidence are blocked because ephemeral PostgreSQL connections end their streams and NATS times out before the service graph becomes healthy, despite passing Docker client/server checks.
-- **BLOCKED:** desktop/mobile browser visual QA for resize, marker/tooltip, contrast, and table parity requires the same runnable graph. No visual pass is claimed.
+- **PASS:** the synthetic distributed scenario uses the canonical plan-0003 routes and exercises symbol/quote/FX, duplicate draft confirmation, two buys, partial sell, simulation correction, current valuation, and an unchanged confirmed cash/entry projection. On 2026-09-08 both distributed tests passed in 40 seconds against healthy ephemeral PostgreSQL and NATS resources, including the complete Portfolio Core migration chain.
+- **NOT RUN:** desktop/mobile browser visual QA for resize, marker/tooltip, contrast, and table parity remains pending under plan 0002. No visual pass is claimed.
 
 ## Project QA skill
 

@@ -4,6 +4,7 @@ using System.Reflection;
 
 var builder = DistributedApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true);
+builder.Configuration.AddCommandLine(args);
 
 var usePersistentVolumes = !bool.TryParse(
     builder.Configuration["LedgerLens:Runtime:UsePersistentVolumes"],

@@ -1,6 +1,6 @@
 # API and Feature Naming Standard
 
-Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification is tracked in [plan 0003](../plans/active/0003-api-feature-naming-migration.md). Last reviewed: 2026-09-02.
+Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification completed in [plan 0003](../plans/completed/0003-api-feature-naming-migration.md). Last reviewed: 2026-09-08.
 
 ## Purpose
 

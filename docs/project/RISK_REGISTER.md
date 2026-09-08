@@ -1,6 +1,6 @@
 # Risk Register
 
-Last reviewed: 2026-09-02.
+Last reviewed: 2026-09-08.
 
 ## R-FOUNDATION-ANGULAR-CLI-ADVISORY
 
@@ -27,6 +27,6 @@ Last reviewed: 2026-09-02.
 | R-014 | Documentation drifts from implementation | Medium | High | PROJECT_STATE updates and source-of-truth hierarchy | Open |
 | R-015 | Disk usage grows through candles, OCR, or backups | Medium | Medium | Retention, quotas, metrics, and storage budgets | Open |
 | R-016 | Corporate action invalidates lots | Medium | High | Explicit adjustment model, manual review; automation deferred | Open |
-| R-017 | Simulated activity contaminates confirmed accounting | Low | Critical | Separate aggregates/tables, no shared discriminator; compiled synthetic isolation scenario awaits Docker runtime evidence | Open |
+| R-017 | Simulated activity contaminates confirmed accounting | Low | Critical | Separate aggregates/tables, no shared discriminator; synthetic PostgreSQL scenario verifies confirmed cash and entries remain unchanged | Open |
 | R-018 | Last trade or simulated P/L is mistaken for an executable result | Medium | High | Persistent simulation label, price-kind/feed/freshness display, explicit assumptions, no broker surface | Open |
 | R-019 | Chart presentation diverges from authoritative decimal results | Medium | High | Backend decimal projections, display-only JavaScript numbers, accessible table parity tests | Open |

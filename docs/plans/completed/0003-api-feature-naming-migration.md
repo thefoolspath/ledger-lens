@@ -1,6 +1,6 @@
 # API and Feature Naming Standard Migration
 
-Last reviewed: 2026-09-02. Status: Implemented; distributed runtime verification blocked by local container connectivity.
+Last reviewed: 2026-09-08. Status: Complete.
 
 ## Goal
 
@@ -79,7 +79,9 @@ Docker-unavailable tests remain an external blocker rather than a naming excepti
 - Operation-keyed request, command, handler, persistence method, endpoint name, Angular route constant, and test references are searchable for every operation. Non-generated production C# types were split to one public top-level type per matching file; generated Database types, migrations, and top-level `Program.cs` remain exempt.
 - `ApiNamingConventionTests` enforce the complete current route set, canonical casing/plural/operation vocabulary, deterministic and unique endpoint names, conforming/rejected examples, file/type alignment, cross-layer OperationKey traceability, and `GetOne`/`GetList`/`GetPage` JSON fixtures. Architecture tests pass `16/16`; Portfolio Core unit tests pass `10/10`; Market Data unit tests pass `1/1`; Gateway integration tests pass `2/2`; guarded distributed assembly tests pass `2/2`; Angular tests pass `5/5` across `3/3` files.
 - The complete .NET solution and Angular production application build with zero warnings/errors. `lg db check` reports no model drift, and no EF migration file changed. Production npm audit reports zero vulnerabilities. OperationKey search finds every key across the intended layers, and the targeted legacy-route scan finds no match in `src`, `tests`, or `web`.
-- The explicitly enabled Aspire scenario is currently `BLOCKED`, not passed: Docker client/server checks succeed, but ephemeral PostgreSQL connections fail with `NpgsqlException`/`EndOfStreamException` and NATS times out before `portfolio-api` becomes healthy. A direct Portfolio API startup on loopback succeeds, so current evidence identifies local container dependency connectivity rather than an API startup or route-registration failure. The full canonical Gateway/PostgreSQL flow must be rerun after that environment issue is repaired before this plan moves out of `active`.
+- The 2026-09-08 closeout found and corrected two runtime-only defects. AppHost now reapplies command-line configuration after User Secrets so synthetic distributed-test parameters cannot be replaced by developer-local values. Market Data now serializes freshness enums as their canonical string names, matching the Angular and Portfolio Core transport contract.
+- `./scripts/dev.ps1 doctor` passed with Docker Desktop 4.86.0, Engine 29.7.2, Compose 5.3.1, .NET 10.0.302, Aspire 13.4.6, EF CLI 10.0.8, Node 24.19.0, and npm 11.17.0. `./scripts/dev.ps1 test` passed the explicitly enabled Aspire scenario (`2/2` distributed tests in 40 seconds), architecture (`16/16`), Portfolio Core (`10/10`), Market Data (`1/1`), Gateway (`2/2`), and Angular (`5/5` across `3/3` files).
+- The final production build passed with zero .NET warnings/errors and a 260.60 kB Angular initial bundle. `lg db check` found no pending model changes, production npm audit found zero vulnerabilities, and targeted legacy-route, tracked forbidden-path, high-confidence secret, migration-diff, and whitespace scans found no violations. Plan 0003 therefore satisfies its completion criteria and moved to `plans/completed/`.
 
 ## Documentation rule
 

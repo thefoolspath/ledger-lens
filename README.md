@@ -24,7 +24,7 @@ the Slip Import worker, PostgreSQL databases, NATS JetStream, and Aspire Dashboa
 
 LedgerLens is a proposed local web application for recording, reconciling, analysing, and researching a personal investment portfolio. The first usable release focuses on US stocks and ETFs held through Dime, a USD portfolio view, an additional THB reporting view, and deterministic separation of security-price and foreign-exchange effects.
 
-Status: **distributed foundation implemented; runtime gate pending**. The source builds and the non-container test gates pass, but business logic remains intentionally absent. Container connectivity is still unverified because Docker Desktop could not start in the current Windows session; see [Project State](docs/project/PROJECT_STATE.md).
+Status: **distributed foundation and initial portfolio/simulation slices implemented**. The complete build, canonical API naming migration, and synthetic Aspire/PostgreSQL/NATS end-to-end flow pass. Manual Simulation desktop/mobile visual QA and the remaining Portfolio Core milestones are still pending; see [Project State](docs/project/PROJECT_STATE.md).
 
 ## Safety boundary
 

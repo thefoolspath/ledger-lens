@@ -1,6 +1,6 @@
 # Manual Simulation Accounts
 
-Last reviewed: 2026-09-02. Status: Implemented with PostgreSQL end-to-end and visual QA blocked by unavailable Docker.
+Last reviewed: 2026-09-08. Status: Implemented with PostgreSQL end-to-end verified; visual QA pending.
 
 ## Goal
 
@@ -31,7 +31,7 @@ Create simulation accounts and immutable buy/sell entries through preview/confir
 
 **Acceptance:** multiple buys and partial sells reconcile exactly; overselling is rejected; amount and quantity modes obey scale rules; fees/taxes are included in cost/proceeds; no confirmed Portfolio Core account, cash entry, lot, holding, or balance changes.
 
-**Current evidence:** Separate domain and persistence models, preview/confirm/correction handlers, HTTP endpoints, four-table EF migration, FIFO/average-cost rebuild, simple return, and valuation kernel are implemented. Portfolio Core builds with zero warnings/errors, unit tests pass (`10/10`), and `lg db check` reports no pending model changes. The distributed isolation scenario compiles but PostgreSQL execution remains blocked by the unavailable Docker daemon.
+**Current evidence:** Separate domain and persistence models, preview/confirm/correction handlers, HTTP endpoints, four-table EF migration, FIFO/average-cost rebuild, simple return, and valuation kernel are implemented. Portfolio Core builds with zero warnings/errors, unit tests pass (`10/10`), and `lg db check` reports no pending model changes. On 2026-09-08 the explicitly enabled distributed scenario applied the full migration chain to ephemeral PostgreSQL and passed duplicate confirmation, multiple buys, a partial sell, correction, valuation, and confirmed-ledger isolation.
 
 ### Slice 3 — current and historical valuation
 
@@ -47,11 +47,11 @@ Add separate Real and Simulation modes, a persistent simulation warning, symbol 
 
 **Acceptance:** component and end-to-end tests complete a synthetic multi-buy/partial-sell flow, show provider/freshness metadata, render incomplete/error states, preserve keyboard and screen-reader access, and prove the real ledger is unchanged.
 
-**Current evidence:** The separate Real/Simulation UI, persistent warning, symbol/quote/FX/candle workflow, preview/confirm/correction ticket, summary cards, explicit incomplete states, lazy ECharts value and OHLCV views, ARIA descriptions, and table fallbacks are implemented. The production build completes without warnings with a 259.42 kB raw initial bundle (68.40 kB estimated transfer); chart code is lazy. Angular tests pass (`4/4` across `2/2` files). End-to-end PostgreSQL and desktop/mobile browser evidence remain blocked by Docker.
+**Current evidence:** The separate Real/Simulation UI, persistent warning, symbol/quote/FX/candle workflow, preview/confirm/correction ticket, summary cards, explicit incomplete states, lazy ECharts value and OHLCV views, ARIA descriptions, and table fallbacks are implemented. The 2026-09-08 production build completes without warnings with a 260.60 kB raw initial bundle (68.66 kB estimated transfer); chart code is lazy. Angular tests pass (`5/5` across `3/3` files), and PostgreSQL end-to-end behavior passes. Desktop/mobile browser visual QA remains not run.
 
-## Verification summary — 2026-09-02
+## Verification summary — 2026-09-08
 
-The complete repository build passes with zero warnings/errors. Independent non-Docker tests, EF model drift, diff whitespace, tracked privacy patterns, and production dependency audit pass. The explicitly enabled synthetic distributed flow includes idempotent confirmation, multi-buy/partial-sell, correction, valuation, and real-ledger isolation, and its project compiles; runtime execution stops before product code because Docker has no active daemon pipe. The feature is therefore implemented but not release-ready until that external gate and visual QA pass.
+The complete repository build passes with zero warnings/errors. Unit, architecture, Gateway, Angular, EF model-drift, diff-whitespace, tracked privacy, production dependency, and explicitly enabled synthetic distributed gates pass. The PostgreSQL scenario verifies idempotent confirmation, multi-buy/partial-sell, correction, valuation, and real-ledger isolation through canonical Gateway routes. The feature is implemented but not release-ready until desktop/mobile visual QA passes.
 
 ## Verification and documentation rule
 

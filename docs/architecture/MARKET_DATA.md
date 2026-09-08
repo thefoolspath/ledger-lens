@@ -16,7 +16,7 @@ GetNews(instruments, range)
 GetMarketCalendar(market, range)
 ```
 
-Every response wraps data with provider, entitlement/feed, data-as-of, retrieved-at, freshness class, delay when known, request ID when available, and license/retention policy key.
+Every response wraps data with provider, entitlement/feed, data-as-of, retrieved-at, freshness class, delay when known, request ID when available, and license/retention policy key. HTTP JSON serializes freshness enum values as their canonical string names so Angular and Portfolio Core receive the documented transport shape.
 
 ## Version 1 behaviour
 
