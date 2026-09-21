@@ -1,6 +1,6 @@
 # API and Feature Naming Standard
 
-Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification completed in [plan 0003](../plans/completed/0003-api-feature-naming-migration.md). A unified response contract is accepted for future implementation in [plan 0004](../plans/active/0004-unified-api-response-contract.md). Last reviewed: 2026-09-18.
+Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification completed in [plan 0003](../plans/completed/0003-api-feature-naming-migration.md). The unified response contract is in implementation under [plan 0004](../plans/active/0004-unified-api-response-contract.md). Last reviewed: 2026-09-21.
 
 ## Purpose
 
@@ -64,7 +64,7 @@ Every operation-specific production type and test MUST begin with its `Operation
 
 `List` describes zero-to-many logical records even when an item is a projection rather than a domain entity. `Page` MUST be used whenever pagination metadata is returned. `One` MUST NOT return an array, and `List` MUST NOT silently switch to a page envelope.
 
-The shapes in this table describe the currently implemented Version 1 contract. Plan 0004 will migrate successful business JSON responses to a shared `{ data, meta }` envelope: object results remain objects inside `data`, list results remain arrays inside `data`, and page metadata moves to `meta.pagination`. The raw shapes remain normative until that migration is implemented and verified across backend APIs, Gateway scenarios, Angular clients, and tests.
+The operation categories in this table remain normative. Current Portfolio Core and Market Data business JSON responses use the plan-0004 shared `{ data, meta }` envelope: object results remain objects inside `data`, list results remain arrays inside `data`, and page metadata belongs in `meta.pagination`.
 
 Autocomplete endpoints MUST accept a bounded search term and enforce a result limit. Combobox endpoints MUST represent a finite option set. A lookup reused by multiple screens SHOULD live under the resource that owns the data, such as `roles/get-combobox-list`; a screen-specific lookup MAY use a nested feature path such as `users/roles/get-combobox-list`.
 
@@ -103,9 +103,9 @@ The following names are ambiguous and MUST NOT be introduced: `get`, `get-data`,
 
 Successful creation returns `201 Created`. Successful reads return `200 OK`. A missing `get-one` resource returns `404 Not Found`. Updates return `200 OK` when they have a response body or `204 No Content` otherwise. Successful deletion returns `204 No Content`. Validation failures use RFC Problem Details. Conflicting state transitions return `409 Conflict`; an idempotent command MAY return the previously committed result when that behavior is part of its contract.
 
-## Planned unified response and error standard
+## Unified response and error standard
 
-The following direction is accepted but is not implemented behavior until plan 0004 completes:
+The following contract is implemented for current Portfolio Core and Market Data endpoints; plan 0004 remains active until its complete error, localization, distributed-runtime, and closeout gates pass:
 
 - Successful business JSON responses with bodies use `ApiResponse<T>` containing required `data` and `meta`. Metadata always carries `correlationId`; paged operations additionally carry `pageNumber`, `pageSize`, `totalCount`, and `totalPages` under `meta.pagination`.
 - A missing single resource remains `404`, empty collections remain arrays, `201 Created` retains `Location`, and `204`, file/stream, health, liveness, and Development ping responses are not wrapped.

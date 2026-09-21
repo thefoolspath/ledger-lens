@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using LedgerLens.ApiContracts;
 
 namespace LedgerLens.ArchitectureTests;
 
@@ -111,15 +112,35 @@ public sealed class ApiNamingConventionTests
     public void Collection_contract_fixtures_preserve_required_json_shapes()
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-        var getOne = JsonSerializer.SerializeToElement(new { id = Guid.CreateVersion7() }, options);
-        var getList = JsonSerializer.SerializeToElement(Array.Empty<object>(), options);
-        var getPage = JsonSerializer.SerializeToElement(new PageFixture([], 0, 1, 50), options);
+        var correlationId = Guid.NewGuid().ToString("N");
+        var getOne = JsonSerializer.SerializeToElement(
+            new ApiResponse<object>(new { id = Guid.CreateVersion7() }, new ApiResponseMeta(correlationId)), options);
+        var getList = JsonSerializer.SerializeToElement(
+            new ApiResponse<IReadOnlyList<object>>([], new ApiResponseMeta(correlationId)), options);
+        var getPage = JsonSerializer.SerializeToElement(
+            new ApiResponse<IReadOnlyList<object>>([], new ApiResponseMeta(correlationId,
+                new PaginationMetadata(1, 50, 0, 0))), options);
 
-        Assert.Equal(JsonValueKind.Object, getOne.ValueKind);
-        Assert.Equal(JsonValueKind.Array, getList.ValueKind);
-        Assert.Equal(0, getList.GetArrayLength());
-        Assert.Equal(["items", "totalCount", "pageNumber", "pageSize"],
-            getPage.EnumerateObject().Select(property => property.Name).ToArray());
+        Assert.Equal(["data", "meta"], getOne.EnumerateObject().Select(property => property.Name).ToArray());
+        Assert.Equal(JsonValueKind.Object, getOne.GetProperty("data").ValueKind);
+        Assert.False(getOne.GetProperty("meta").TryGetProperty("pagination", out _));
+        Assert.Equal(JsonValueKind.Array, getList.GetProperty("data").ValueKind);
+        Assert.Equal(0, getList.GetProperty("data").GetArrayLength());
+        Assert.Equal(["pageNumber", "pageSize", "totalCount", "totalPages"],
+            getPage.GetProperty("meta").GetProperty("pagination").EnumerateObject()
+                .Select(property => property.Name).ToArray());
+    }
+
+    [Fact]
+    public void Business_endpoints_use_shared_success_and_Problem_Details_contracts()
+    {
+        var source = ApiSource();
+
+        Assert.Contains("ApiResults.Ok", source, StringComparison.Ordinal);
+        Assert.Contains("ApiProblemFactory", source, StringComparison.Ordinal);
+        Assert.DoesNotMatch(@"(?<![A-Za-z0-9_])Results\.(Ok|Created|Conflict)\(", source);
+        Assert.DoesNotContain("exception.Message", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("new { error =", source, StringComparison.Ordinal);
     }
 
     private static string ApiSource() => string.Join('\n', Directory.EnumerateFiles(
@@ -164,5 +185,4 @@ public sealed class ApiNamingConventionTests
         throw new DirectoryNotFoundException("Could not locate the LedgerLens repository root.");
     }
 
-    private sealed record PageFixture(IReadOnlyList<object> Items, int TotalCount, int PageNumber, int PageSize);
 }

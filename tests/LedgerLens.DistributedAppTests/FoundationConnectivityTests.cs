@@ -1,4 +1,5 @@
 using Aspire.Hosting.Testing;
+using LedgerLens.ApiContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
@@ -85,8 +86,7 @@ public sealed class FoundationConnectivityTests
             new { name = "Synthetic portfolio", baseCurrency = "USD", reportingCurrency = "THB" },
             timeout.Token);
         await EnsureSuccessAsync(createPortfolioResponse, timeout.Token);
-        var createdPortfolio = await createPortfolioResponse.Content.ReadFromJsonAsync<CreatedResource>(timeout.Token);
-        Assert.NotNull(createdPortfolio);
+        var createdPortfolio = await ReadDataAsync<CreatedResource>(createPortfolioResponse, timeout.Token);
         Assert.Equal(7, createdPortfolio.Id.Version);
 
         using var createAccountResponse = await client.PostAsJsonAsync(
@@ -94,8 +94,7 @@ public sealed class FoundationConnectivityTests
             new { portfolioId = createdPortfolio.Id, name = "Synthetic USD account", broker = "Synthetic Broker", currency = "USD" },
             timeout.Token);
         await EnsureSuccessAsync(createAccountResponse, timeout.Token);
-        var createdAccount = await createAccountResponse.Content.ReadFromJsonAsync<CreatedResource>(timeout.Token);
-        Assert.NotNull(createdAccount);
+        var createdAccount = await ReadDataAsync<CreatedResource>(createAccountResponse, timeout.Token);
         Assert.Equal(7, createdAccount.Id.Version);
 
         Guid withdrawalId = Guid.Empty;
@@ -115,8 +114,7 @@ public sealed class FoundationConnectivityTests
                 new { accountId = createdAccount.Id, entry.type, entry.amount, entry.currency, entry.effectiveAt, entry.note, entry.instrumentSymbol, entry.quantity, entry.unitPrice },
                 timeout.Token);
             await EnsureSuccessAsync(entryResponse, timeout.Token);
-            var createdEntry = await entryResponse.Content.ReadFromJsonAsync<CreatedResource>(timeout.Token);
-            Assert.NotNull(createdEntry);
+            var createdEntry = await ReadDataAsync<CreatedResource>(entryResponse, timeout.Token);
             if (entry.type == "Withdrawal") withdrawalId = createdEntry.Id;
         }
 
@@ -132,10 +130,9 @@ public sealed class FoundationConnectivityTests
             $"/api/portfolio/v1/cash-ledger-entries/correct/{withdrawalId}", correction, timeout.Token);
         Assert.Equal(System.Net.HttpStatusCode.Conflict, duplicateCorrectionResponse.StatusCode);
 
-        var overview = await client.GetFromJsonAsync<PortfolioOverview>(
+        var overview = await GetDataAsync<PortfolioOverview>(client,
             $"/api/portfolio/v1/portfolios/get-one/{createdPortfolio.Id}",
             timeout.Token);
-        Assert.NotNull(overview);
         var account = Assert.Single(overview.Accounts);
         Assert.Equal(900m, account.CashBalance);
         Assert.Equal(9, account.Entries.Length);
@@ -143,25 +140,24 @@ public sealed class FoundationConnectivityTests
         Assert.Contains(account.Entries, entry => entry.Role == "Reversal" && entry.SignedAmount == 25m);
         Assert.Contains(account.Entries, entry => entry.Role == "Replacement" && entry.SignedAmount == -20m);
 
-        var instruments = await client.GetFromJsonAsync<MarketInstrument[]>(
+        var instruments = await GetDataAsync<MarketInstrument[]>(client,
             "/api/market/v1/instruments/search-list?query=NVDA&market=US", timeout.Token);
-        var instrument = Assert.Single(instruments!);
+        var instrument = Assert.Single(instruments);
         using var quoteResponse = await client.PostAsJsonAsync("/api/market/v1/quotes/get-latest-list",
             new { instruments = new[] { instrument } }, timeout.Token);
         await EnsureSuccessAsync(quoteResponse, timeout.Token);
-        var quote = Assert.Single((await quoteResponse.Content.ReadFromJsonAsync<MarketQuote[]>(timeout.Token))!);
+        var quote = Assert.Single(await ReadDataAsync<MarketQuote[]>(quoteResponse, timeout.Token));
         using var fxResponse = await client.PostAsJsonAsync("/api/market/v1/foreign-exchange-rates/get-latest-list",
             new { baseCurrency = "USD", quoteCurrency = "THB" }, timeout.Token);
         await EnsureSuccessAsync(fxResponse, timeout.Token);
-        var fxRates = await fxResponse.Content.ReadFromJsonAsync<FxRate[]>(timeout.Token);
-        var primaryFx = Assert.Single(fxRates!, rate => !rate.IsBenchmark);
+        var fxRates = await ReadDataAsync<FxRate[]>(fxResponse, timeout.Token);
+        var primaryFx = Assert.Single(fxRates, rate => !rate.IsBenchmark);
 
         using var createSimulationResponse = await client.PostAsJsonAsync(
             "/api/portfolio/v1/simulation-accounts/create",
             new { portfolioId = createdPortfolio.Id, name = "Synthetic NVDA what-if" }, timeout.Token);
         await EnsureSuccessAsync(createSimulationResponse, timeout.Token);
-        var simulation = await createSimulationResponse.Content.ReadFromJsonAsync<CreatedResource>(timeout.Token);
-        Assert.NotNull(simulation);
+        var simulation = await ReadDataAsync<CreatedResource>(createSimulationResponse, timeout.Token);
 
         object Evidence() => new
         {
@@ -200,20 +196,18 @@ public sealed class FoundationConnectivityTests
                     quote = Evidence(),
                 }, timeout.Token);
             await EnsureSuccessAsync(draftResponse, timeout.Token);
-            var draft = await draftResponse.Content.ReadFromJsonAsync<SimulationDraft>(timeout.Token);
-            Assert.NotNull(draft);
+            var draft = await ReadDataAsync<SimulationDraft>(draftResponse, timeout.Token);
             using var confirmResponse = await client.PostAsJsonAsync(
                 $"/api/portfolio/v1/simulation-trade-drafts/confirm/{draft.Id}",
                 new { accountId = simulation.Id }, timeout.Token);
             await EnsureSuccessAsync(confirmResponse, timeout.Token);
-            var trade = await confirmResponse.Content.ReadFromJsonAsync<SimulationTrade>(timeout.Token);
-            Assert.NotNull(trade);
+            var trade = await ReadDataAsync<SimulationTrade>(confirmResponse, timeout.Token);
             using var duplicateConfirmResponse = await client.PostAsJsonAsync(
                 $"/api/portfolio/v1/simulation-trade-drafts/confirm/{draft.Id}",
                 new { accountId = simulation.Id }, timeout.Token);
             await EnsureSuccessAsync(duplicateConfirmResponse, timeout.Token);
-            var duplicateTrade = await duplicateConfirmResponse.Content.ReadFromJsonAsync<SimulationTrade>(timeout.Token);
-            Assert.Equal(trade.Id, duplicateTrade!.Id);
+            var duplicateTrade = await ReadDataAsync<SimulationTrade>(duplicateConfirmResponse, timeout.Token);
+            Assert.Equal(trade.Id, duplicateTrade.Id);
             return trade;
         }
 
@@ -238,17 +232,16 @@ public sealed class FoundationConnectivityTests
                 quote = Evidence(),
             }, timeout.Token);
         await EnsureSuccessAsync(replacementDraftResponse, timeout.Token);
-        var replacementDraft = await replacementDraftResponse.Content.ReadFromJsonAsync<SimulationDraft>(timeout.Token);
+        var replacementDraft = await ReadDataAsync<SimulationDraft>(replacementDraftResponse, timeout.Token);
         using var simulationCorrectionResponse = await client.PostAsJsonAsync(
             $"/api/portfolio/v1/simulation-trades/correct/{simulatedSell.Id}",
-            new { replacementDraftId = replacementDraft!.Id, reason = "Synthetic quantity correction" }, timeout.Token);
+            new { replacementDraftId = replacementDraft.Id, reason = "Synthetic quantity correction" }, timeout.Token);
         await EnsureSuccessAsync(simulationCorrectionResponse, timeout.Token);
-        var correctionEntries = await simulationCorrectionResponse.Content.ReadFromJsonAsync<SimulationTrade[]>(timeout.Token);
-        Assert.Equal(2, correctionEntries!.Length);
+        var correctionEntries = await ReadDataAsync<SimulationTrade[]>(simulationCorrectionResponse, timeout.Token);
+        Assert.Equal(2, correctionEntries.Length);
 
-        var simulationOverview = await client.GetFromJsonAsync<SimulationOverview>(
+        var simulationOverview = await GetDataAsync<SimulationOverview>(client,
             $"/api/portfolio/v1/simulation-accounts/get-one/{simulation.Id}", timeout.Token);
-        Assert.NotNull(simulationOverview);
         var simulatedPosition = Assert.Single(simulationOverview.Positions);
         Assert.Equal(2m, simulatedPosition.Quantity);
         Assert.Equal(5, simulationOverview.Trades.Length);
@@ -257,13 +250,13 @@ public sealed class FoundationConnectivityTests
             "/api/portfolio/v1/simulation-valuations/record-list",
             new { accountId = simulation.Id, quotes = new[] { Evidence() }, currentFxRate = primaryFx.Rate }, timeout.Token);
         await EnsureSuccessAsync(valuationResponse, timeout.Token);
-        var valuation = Assert.Single((await valuationResponse.Content.ReadFromJsonAsync<SimulationValuation[]>(timeout.Token))!);
+        var valuation = Assert.Single(await ReadDataAsync<SimulationValuation[]>(valuationResponse, timeout.Token));
         Assert.True(valuation.IsComplete);
         Assert.Equal(quote.Price * simulatedPosition.Quantity, valuation.CurrentValueUsd);
 
-        var realOverviewAfterSimulation = await client.GetFromJsonAsync<PortfolioOverview>(
+        var realOverviewAfterSimulation = await GetDataAsync<PortfolioOverview>(client,
             $"/api/portfolio/v1/portfolios/get-one/{createdPortfolio.Id}", timeout.Token);
-        var realAccountAfterSimulation = Assert.Single(realOverviewAfterSimulation!.Accounts);
+        var realAccountAfterSimulation = Assert.Single(realOverviewAfterSimulation.Accounts);
         Assert.Equal(900m, realAccountAfterSimulation.CashBalance);
         Assert.Equal(9, realAccountAfterSimulation.Entries.Length);
     }
@@ -291,5 +284,20 @@ public sealed class FoundationConnectivityTests
     {
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         Assert.True(response.IsSuccessStatusCode, $"HTTP {(int)response.StatusCode}: {body}");
+    }
+
+    private static async Task<T> GetDataAsync<T>(HttpClient client, string path, CancellationToken cancellationToken)
+    {
+        using var response = await client.GetAsync(path, cancellationToken);
+        await EnsureSuccessAsync(response, cancellationToken);
+        return await ReadDataAsync<T>(response, cancellationToken);
+    }
+
+    private static async Task<T> ReadDataAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        var envelope = await response.Content.ReadFromJsonAsync<ApiResponse<T>>(cancellationToken);
+        Assert.NotNull(envelope);
+        Assert.False(string.IsNullOrWhiteSpace(envelope.Meta.CorrelationId));
+        return envelope.Data;
     }
 }

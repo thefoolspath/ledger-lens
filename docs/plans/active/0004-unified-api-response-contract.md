@@ -1,12 +1,12 @@
 # Unified API Response Contract
 
-Last reviewed: 2026-09-18. Status: Planned.
+Last reviewed: 2026-09-21. Status: In progress.
 
 ## Goal
 
 Adopt one predictable HTTP response family across LedgerLens business APIs without weakening HTTP semantics: successful JSON responses use a shared `ApiResponse<T>` envelope, while failures use RFC Problem Details extended with stable error codes and request diagnostics. Add English and Thai user-facing error resources without storing ordinary validation or domain error text in the database.
 
-This plan follows the completed [API and Feature Naming Standard Migration](../completed/0003-api-feature-naming-migration.md). The currently implemented raw object, array, and page response shapes remain the runtime source of truth until this plan is implemented and verified atomically across backend APIs, Gateway scenarios, Angular clients, and tests.
+This plan follows the completed [API and Feature Naming Standard Migration](../completed/0003-api-feature-naming-migration.md). The shared contract foundation, common localized Problem Details behavior, Portfolio Core and Market Data success envelopes, Angular unwrapping, and host registration are now implemented. Full typed expected-failure coverage, service-specific message catalogs, and the complete closeout gate remain before this plan can move to `completed/`.
 
 ## Boundaries and decisions
 
@@ -106,6 +106,13 @@ Register the common failure behavior in Slip Import, Research, and Operations AP
 Run the complete .NET and Angular builds, unit tests, architecture tests, Gateway integration tests, component tests, explicitly enabled distributed scenario, EF model-drift check, dependency audit, privacy/credential scans, contract-shape scans, and `git diff --check`. Verify both languages through direct backend and Gateway requests and inspect the final diff for accidental route, schema, calculation, or persistence changes.
 
 **Acceptance:** every current business JSON endpoint follows the success/failure contract or has a narrowly documented exception; no EF migration or route compatibility alias exists; all available gates pass; documentation records exact evidence before the plan moves to `completed/`.
+
+## Implementation evidence — 2026-09-21
+
+- **PASS:** the project-local .NET solution build completed with zero errors using a single MSBuild worker; three existing EF Core 10.0.0/10.0.8 assembly-version warnings remain visible.
+- **PASS:** Architecture tests `17/17`, Gateway integration tests `3/3`, Portfolio Core unit tests `10/10`, Market Data unit test `1/1`, Angular tests `8/8`, Angular production build, and `git diff --check` passed.
+- **IMPLEMENTED:** `LedgerLens.ApiContracts`, shared success helpers, English/Thai common RESX resources, Problem Details diagnostics, Portfolio Core and Market Data endpoint migration, Angular response unwrapping and problem parsing, and response registration in all current API hosts and Gateway.
+- **NOT CLOSED:** the explicitly enabled Aspire/PostgreSQL/NATS scenario, EF model-drift check, dependency/privacy scans, complete status/localization/non-disclosure matrix, and service-specific typed expected-failure catalogs were not re-run or completed in this change.
 
 ## Completion criteria
 

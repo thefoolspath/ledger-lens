@@ -11,4 +11,8 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LedgerLens.ApiContracts\LedgerLens.ApiContracts.csproj" />
+  </ItemGroup>
+
 </Project>

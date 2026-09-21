@@ -37,6 +37,12 @@ Hybrid DB-first changes add three mandatory migration checks: `lg db check` must
 - **PASS:** the synthetic distributed scenario uses the canonical plan-0003 routes and exercises symbol/quote/FX, duplicate draft confirmation, two buys, partial sell, simulation correction, current valuation, and an unchanged confirmed cash/entry projection. On 2026-09-18 both distributed tests passed in 51 seconds against healthy ephemeral PostgreSQL and NATS resources, including the complete Portfolio Core migration chain.
 - **PASS:** desktop and 390-by-844 mobile browser QA verified responsive reflow without horizontal document overflow, persistent simulation and non-order labelling, visible 3-pixel keyboard focus, source/freshness metadata, chart marker/tooltip rendering, accessible table-fallback parity, readable formatted money/quantity/percentage output, and no browser console warnings or errors.
 
+## Unified API response verification — 2026-09-21
+
+- **PASS:** project-local .NET solution build with one MSBuild worker completed with zero errors; three existing EF Core 10.0.0/10.0.8 assembly-version warnings remain.
+- **PASS:** Architecture tests `17/17`, Gateway integration tests `3/3`, Portfolio Core unit tests `10/10`, Market Data unit test `1/1`, Angular tests `8/8`, Angular production build, and `git diff --check`.
+- **NOT RUN/CLOSED:** the explicitly enabled distributed scenario, EF model-drift check, dependency/privacy scans, and the complete status/localization/non-disclosure matrix remain plan-0004 closeout work. The guarded distributed test assembly was discovered by the ordinary test command, but that does not count as execution of its enabled runtime body.
+
 ## Project QA skill
 
 The repository-local `$ledgerlens-qa` skill under `.agents/skills/ledgerlens-qa/` defines the repeatable QA workflow for milestone scoping, wrapper-based build and test gates, conditional distributed/UI testing, evidence capture, status classification, and release recommendations. It supplements this strategy without changing any acceptance criterion; this document and the active implementation plan remain authoritative.

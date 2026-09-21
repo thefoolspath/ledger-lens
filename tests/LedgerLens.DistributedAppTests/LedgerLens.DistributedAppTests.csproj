@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Testing" />
+    <ProjectReference Include="..\..\src\LedgerLens.ApiContracts\LedgerLens.ApiContracts.csproj" />
     <ProjectReference Include="..\..\src\LedgerLens.AppHost\LedgerLens.AppHost.csproj" />
   </ItemGroup>
 </Project>

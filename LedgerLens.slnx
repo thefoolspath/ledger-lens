@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/LedgerLens.ApiContracts/LedgerLens.ApiContracts.csproj" />
     <Project Path="src/LedgerLens.AppHost/LedgerLens.AppHost.csproj" />
     <Project Path="src/LedgerLens.Gateway/LedgerLens.Gateway.csproj" />
     <Project Path="src/LedgerLens.IntegrationContracts/LedgerLens.IntegrationContracts.csproj" />

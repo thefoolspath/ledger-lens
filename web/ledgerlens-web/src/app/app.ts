@@ -1,7 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, map, Observable } from 'rxjs';
+import { ApiResponse, apiProblemMessage } from './api-response';
 import { MarketCandle, SimulationChart, SimulationSeriesPoint } from './simulation-chart';
 import { LedgerLensApiRoutes } from './api-routes';
 
@@ -293,39 +294,39 @@ export class App {
     const portfolio = this.selectedPortfolio();
     if (!portfolio || !this.simulationAccountName.trim()) return;
     this.startRequest();
-    this.http.post<SimulationAccount>(LedgerLensApiRoutes.SimulationAccountsCreate,
+    this.postData<SimulationAccount>(LedgerLensApiRoutes.SimulationAccountsCreate,
       { portfolioId: portfolio.id, name: this.simulationAccountName }, { headers: this.mutationHeaders }).subscribe({
       next: account => {
         this.simulationAccountName = '';
         this.simulationAccounts.update(items => [...items, account]);
         this.selectSimulationAccount(account.id);
       },
-      error: () => this.failRequest('Could not create the simulation account.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not create the simulation account.'))
     });
   }
 
   protected selectSimulationAccount(id: string): void {
     this.startRequest();
-    this.http.get<SimulationOverview>(LedgerLensApiRoutes.SimulationAccountsGetOne(id)).subscribe({
+    this.getData<SimulationOverview>(LedgerLensApiRoutes.SimulationAccountsGetOne(id)).subscribe({
       next: overview => {
         this.selectedSimulation.set(overview);
         this.pendingDraft.set(null);
         this.finishRequest();
         if (this.latestQuote()) this.refreshSimulationOutputs();
       },
-      error: () => this.failRequest('Could not load the simulation account.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not load the simulation account.'))
     });
   }
 
   protected searchInstruments(): void {
     if (!this.instrumentQuery.trim()) return;
     this.startRequest();
-    this.http.get<readonly MarketInstrument[]>(LedgerLensApiRoutes.InstrumentsSearchList(this.instrumentQuery)).subscribe({
+    this.getData<readonly MarketInstrument[]>(LedgerLensApiRoutes.InstrumentsSearchList(this.instrumentQuery)).subscribe({
       next: instruments => {
         this.instrumentResults.set(instruments);
         this.finishRequest();
       },
-      error: () => this.failRequest('Market-data search is unavailable. Check the configured provider.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Market-data search is unavailable. Check the configured provider.'))
     });
   }
 
@@ -343,9 +344,9 @@ export class App {
     const from = new Date(today);
     from.setUTCFullYear(from.getUTCFullYear() - 1);
     forkJoin({
-      quotes: this.http.post<readonly MarketQuote[]>(LedgerLensApiRoutes.QuotesGetLatestList, { instruments: [instrument] }),
-      fx: this.http.post<readonly FxSnapshot[]>(LedgerLensApiRoutes.ForeignExchangeRatesGetLatestList, { baseCurrency: 'USD', quoteCurrency: 'THB' }),
-      candles: this.http.get<CandleSeries>(LedgerLensApiRoutes.InstrumentCandlesGetOne(instrument.id, this.isoDate(from), this.isoDate(today)))
+      quotes: this.postData<readonly MarketQuote[]>(LedgerLensApiRoutes.QuotesGetLatestList, { instruments: [instrument] }),
+      fx: this.postData<readonly FxSnapshot[]>(LedgerLensApiRoutes.ForeignExchangeRatesGetLatestList, { baseCurrency: 'USD', quoteCurrency: 'THB' }),
+      candles: this.getData<CandleSeries>(LedgerLensApiRoutes.InstrumentCandlesGetOne(instrument.id, this.isoDate(from), this.isoDate(today)))
     }).subscribe({
       next: result => {
         this.latestQuote.set(result.quotes[0] ?? null);
@@ -354,7 +355,7 @@ export class App {
         this.finishRequest();
         this.refreshSimulationOutputs();
       },
-      error: () => this.failRequest('Could not refresh quote, candles, or USD/THB FX.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not refresh quote, candles, or USD/THB FX.'))
     });
   }
 
@@ -366,7 +367,7 @@ export class App {
     if ((byAmount && (!this.simulationAmount || this.simulationAmount <= 0)) ||
         (!byAmount && (!this.simulationQuantity || this.simulationQuantity <= 0))) return;
     this.startRequest();
-    this.http.post<SimulationDraft>(LedgerLensApiRoutes.SimulationTradeDraftsCreate, {
+    this.postData<SimulationDraft>(LedgerLensApiRoutes.SimulationTradeDraftsCreate, {
       accountId: simulation.account.id,
       side: this.simulationSide,
       inputMode: this.simulationInputMode,
@@ -382,7 +383,7 @@ export class App {
         this.pendingDraft.set(draft);
         this.finishRequest();
       },
-      error: () => this.failRequest('Could not preview the simulated trade. A sell may exceed the simulated holding.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not preview the simulated trade. A sell may exceed the simulated holding.'))
     });
   }
 
@@ -392,11 +393,11 @@ export class App {
     if (!simulation || !draft) return;
     this.startRequest();
     const request = this.simulationCorrectionTarget
-      ? this.http.post(LedgerLensApiRoutes.SimulationTradesCorrect(this.simulationCorrectionTarget.id), {
+      ? this.postData<unknown>(LedgerLensApiRoutes.SimulationTradesCorrect(this.simulationCorrectionTarget.id), {
           replacementDraftId: draft.id,
           reason: this.simulationCorrectionReason
         }, { headers: this.mutationHeaders })
-      : this.http.post(LedgerLensApiRoutes.SimulationTradeDraftsConfirm(draft.id), { accountId: simulation.account.id },
+      : this.postData<unknown>(LedgerLensApiRoutes.SimulationTradeDraftsConfirm(draft.id), { accountId: simulation.account.id },
           { headers: this.mutationHeaders });
     request.subscribe({
       next: () => {
@@ -404,7 +405,7 @@ export class App {
         this.cancelSimulationCorrection();
         this.selectSimulationAccount(simulation.account.id);
       },
-      error: () => this.failRequest('Could not confirm or correct the simulation trade; refresh the quote and try again.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not confirm or correct the simulation trade; refresh the quote and try again.'))
     });
   }
 
@@ -456,7 +457,7 @@ export class App {
   protected createPortfolio(): void {
     if (!this.portfolioName.trim()) return;
     this.startRequest();
-    this.http.post<PortfolioListItem>(LedgerLensApiRoutes.PortfoliosCreate, {
+    this.postData<PortfolioListItem>(LedgerLensApiRoutes.PortfoliosCreate, {
       name: this.portfolioName,
       baseCurrency: 'USD',
       reportingCurrency: 'THB'
@@ -466,7 +467,7 @@ export class App {
         this.portfolios.update(items => [...items, portfolio]);
         this.selectPortfolio(portfolio.id);
       },
-      error: () => this.failRequest('Could not create the portfolio. Check fixed-user configuration and try again.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not create the portfolio. Check fixed-user configuration and try again.'))
     });
   }
 
@@ -474,7 +475,7 @@ export class App {
     const portfolio = this.selectedPortfolio();
     if (!portfolio || !this.accountName.trim() || !this.broker.trim()) return;
     this.startRequest();
-    this.http.post(LedgerLensApiRoutes.InvestmentAccountsCreate, {
+    this.postData<unknown>(LedgerLensApiRoutes.InvestmentAccountsCreate, {
       portfolioId: portfolio.id,
       name: this.accountName,
       broker: this.broker,
@@ -485,7 +486,7 @@ export class App {
         this.broker = '';
         this.selectPortfolio(portfolio.id);
       },
-      error: () => this.failRequest('Could not create the investment account.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not create the investment account.'))
     });
   }
 
@@ -505,15 +506,15 @@ export class App {
       unitPrice: this.isTrade() ? this.unitPrice : null
     };
     const request = this.correctionTarget
-      ? this.http.post(LedgerLensApiRoutes.CashLedgerEntriesCorrect(this.correctionTarget.id),
+      ? this.postData<unknown>(LedgerLensApiRoutes.CashLedgerEntriesCorrect(this.correctionTarget.id),
           { ...body, reason: this.correctionReason }, { headers: this.mutationHeaders })
-      : this.http.post(LedgerLensApiRoutes.CashLedgerEntriesCreate, { accountId: account.id, ...body }, { headers: this.mutationHeaders });
+      : this.postData<unknown>(LedgerLensApiRoutes.CashLedgerEntriesCreate, { accountId: account.id, ...body }, { headers: this.mutationHeaders });
     request.subscribe({
       next: () => {
         this.resetEntryForm();
         this.selectPortfolio(portfolioId);
       },
-      error: () => this.failRequest('Could not record the ledger entry. Check its values or correction status.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not record the ledger entry. Check its values or correction status.'))
     });
   }
 
@@ -555,34 +556,34 @@ export class App {
 
   protected selectPortfolio(id: string): void {
     this.startRequest();
-    this.http.get<PortfolioOverview>(LedgerLensApiRoutes.PortfoliosGetOne(id)).subscribe({
+    this.getData<PortfolioOverview>(LedgerLensApiRoutes.PortfoliosGetOne(id)).subscribe({
       next: portfolio => {
         this.selectedPortfolio.set(portfolio);
         this.finishRequest();
         if (this.mode() === 'simulation') this.loadSimulationAccounts(portfolio.id);
       },
-      error: () => this.failRequest('Could not load the selected portfolio.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not load the selected portfolio.'))
     });
   }
 
   private loadPortfolios(): void {
-    this.http.get<readonly PortfolioListItem[]>(LedgerLensApiRoutes.PortfoliosGetList).subscribe({
+    this.getData<readonly PortfolioListItem[]>(LedgerLensApiRoutes.PortfoliosGetList).subscribe({
       next: portfolios => {
         this.portfolios.set(portfolios);
         if (portfolios.length > 0) this.selectPortfolio(portfolios[0].id);
       },
-      error: () => this.error.set('Portfolio Core is not ready. Verify migration and fixed-user configuration.')
+      error: error => this.error.set(apiProblemMessage(error, 'Portfolio Core is not ready. Verify migration and fixed-user configuration.'))
     });
   }
 
   private loadSimulationAccounts(portfolioId: string): void {
-    this.http.get<readonly SimulationAccount[]>(LedgerLensApiRoutes.SimulationAccountsGetList(portfolioId)).subscribe({
+    this.getData<readonly SimulationAccount[]>(LedgerLensApiRoutes.SimulationAccountsGetList(portfolioId)).subscribe({
       next: accounts => {
         this.simulationAccounts.set(accounts);
         if (accounts.length > 0) this.selectSimulationAccount(accounts[0].id);
         else this.selectedSimulation.set(null);
       },
-      error: () => this.failRequest('Could not load simulation accounts.')
+      error: error => this.failRequest(apiProblemMessage(error, 'Could not load simulation accounts.'))
     });
   }
 
@@ -592,11 +593,11 @@ export class App {
     const instrument = this.selectedInstrument();
     if (!simulation || !quote || !instrument || this.candles().length === 0) return;
     forkJoin({
-      valuations: this.http.post<readonly SimulationValuation[]>(
+      valuations: this.postData<readonly SimulationValuation[]>(
         LedgerLensApiRoutes.SimulationValuationsRecordList,
         { accountId: simulation.account.id, quotes: [this.toEvidence(quote)], currentFxRate: this.primaryFx()?.rate ?? null },
         { headers: this.mutationHeaders }),
-      series: this.http.post<readonly SimulationSeriesPoint[]>(
+      series: this.postData<readonly SimulationSeriesPoint[]>(
         LedgerLensApiRoutes.SimulationValuationsCalculateSeriesList,
         { accountId: simulation.account.id, symbol: instrument.symbol, observations: this.candles().map(candle => ({ date: candle.date, price: candle.close, fxRate: null })) },
         { headers: this.mutationHeaders })
@@ -605,7 +606,7 @@ export class App {
         this.valuations.set(result.valuations);
         this.seriesPoints.set(result.series);
       },
-      error: () => this.error.set('Market data loaded, but simulation valuation could not be calculated.')
+      error: error => this.error.set(apiProblemMessage(error, 'Market data loaded, but simulation valuation could not be calculated.'))
     });
   }
 
@@ -631,6 +632,14 @@ export class App {
 
   private isoDate(value: Date): string {
     return value.toISOString().slice(0, 10);
+  }
+
+  private getData<T>(url: string): Observable<T> {
+    return this.http.get<ApiResponse<T>>(url).pipe(map(response => response.data));
+  }
+
+  private postData<T>(url: string, body: unknown, options?: { readonly headers?: HttpHeaders }): Observable<T> {
+    return this.http.post<ApiResponse<T>>(url, body, options).pipe(map(response => response.data));
   }
 
   private startRequest(): void {

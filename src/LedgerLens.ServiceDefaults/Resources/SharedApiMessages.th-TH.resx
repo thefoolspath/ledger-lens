@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="common.validation.failed.Title" xml:space="preserve"><value>ข้อมูลไม่ถูกต้อง</value></data>
+  <data name="common.validation.failed.Detail" xml:space="preserve"><value>ค่าหนึ่งค่าหรือมากกว่าในคำขอไม่ถูกต้อง</value></data>
+  <data name="common.validation.invalid_identifier.Title" xml:space="preserve"><value>รหัสไม่ถูกต้อง</value></data>
+  <data name="common.validation.invalid_identifier.Detail" xml:space="preserve"><value>รหัสทรัพยากร LedgerLens ต้องเป็น UUIDv7</value></data>
+  <data name="common.validation.invalid_request.Title" xml:space="preserve"><value>คำขอไม่ถูกต้อง</value></data>
+  <data name="common.validation.invalid_request.Detail" xml:space="preserve"><value>คำขอไม่ผ่านกฎการตรวจสอบของการดำเนินการนี้</value></data>
+  <data name="portfolio.cash_ledger_entry.invalid_type.Title" xml:space="preserve"><value>ประเภทรายการบัญชีไม่ถูกต้อง</value></data>
+  <data name="portfolio.cash_ledger_entry.invalid_type.Detail" xml:space="preserve"><value>ประเภทต้องเป็น Deposit, Withdrawal, Buy, Sell, Fee, Tax หรือ Dividend</value></data>
+  <data name="portfolio.simulation_trade.invalid_input.Title" xml:space="preserve"><value>รายการจำลองไม่ถูกต้อง</value></data>
+  <data name="portfolio.simulation_trade.invalid_input.Detail" xml:space="preserve"><value>Side ต้องเป็น Buy หรือ Sell และ input mode ต้องเป็น ByQuantity หรือ ByAmount</value></data>
+  <data name="common.request.unsupported_media_type.Title" xml:space="preserve"><value>ชนิดข้อมูลไม่รองรับ</value></data>
+  <data name="common.request.unsupported_media_type.Detail" xml:space="preserve"><value>การดำเนินการนี้ต้องใช้ request body แบบ JSON</value></data>
+  <data name="common.request.mutation_marker_missing.Title" xml:space="preserve"><value>ไม่พบ request marker</value></data>
+  <data name="common.request.mutation_marker_missing.Detail" xml:space="preserve"><value>ไม่พบ local mutation marker ที่จำเป็น</value></data>
+  <data name="common.request.loopback_origin_required.Title" xml:space="preserve"><value>ต้นทางไม่ได้รับอนุญาต</value></data>
+  <data name="common.request.loopback_origin_required.Detail" xml:space="preserve"><value>คำขอแก้ไขข้อมูลต้องมาจาก loopback address</value></data>
+  <data name="common.resource.not_found.Title" xml:space="preserve"><value>ไม่พบข้อมูล</value></data>
+  <data name="common.resource.not_found.Detail" xml:space="preserve"><value>ไม่พบข้อมูลที่ร้องขอ</value></data>
+  <data name="common.state.conflict.Title" xml:space="preserve"><value>สถานะขัดแย้งกัน</value></data>
+  <data name="common.state.conflict.Detail" xml:space="preserve"><value>ไม่สามารถดำเนินการกับสถานะปัจจุบันของข้อมูลได้</value></data>
+  <data name="common.internal.unexpected.Title" xml:space="preserve"><value>เกิดข้อผิดพลาด</value></data>
+  <data name="common.internal.unexpected.Detail" xml:space="preserve"><value>ไม่สามารถดำเนินการตามคำขอได้</value></data>
+  <data name="market.provider.unavailable.Title" xml:space="preserve"><value>ข้อมูลตลาดไม่พร้อมใช้งาน</value></data>
+  <data name="market.provider.unavailable.Detail" xml:space="preserve"><value>ข้อมูลตลาดไม่พร้อมใช้งานชั่วคราว</value></data>
+</root>

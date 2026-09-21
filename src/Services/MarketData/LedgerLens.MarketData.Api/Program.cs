@@ -7,10 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 builder.Services.AddMarketDataApplication();
 builder.AddMarketDataInfrastructure();
-builder.Services.AddProblemDetails();
+builder.AddLedgerLensApiResponses();
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 var app = builder.Build();
+app.UseLedgerLensApiResponses();
 app.UseExceptionHandler();
 app.MapDefaultEndpoints("market-api");
 app.MapMarketDataEndpoints();

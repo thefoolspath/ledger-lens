@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="common.validation.failed.Title" xml:space="preserve"><value>Validation failed</value></data>
+  <data name="common.validation.failed.Detail" xml:space="preserve"><value>One or more request values are invalid.</value></data>
+  <data name="common.validation.invalid_identifier.Title" xml:space="preserve"><value>Invalid identifier</value></data>
+  <data name="common.validation.invalid_identifier.Detail" xml:space="preserve"><value>LedgerLens resource identifiers must be UUIDv7 values.</value></data>
+  <data name="common.validation.invalid_request.Title" xml:space="preserve"><value>Invalid request</value></data>
+  <data name="common.validation.invalid_request.Detail" xml:space="preserve"><value>The request does not satisfy the operation's validation rules.</value></data>
+  <data name="portfolio.cash_ledger_entry.invalid_type.Title" xml:space="preserve"><value>Invalid ledger entry type</value></data>
+  <data name="portfolio.cash_ledger_entry.invalid_type.Detail" xml:space="preserve"><value>Type must be Deposit, Withdrawal, Buy, Sell, Fee, Tax, or Dividend.</value></data>
+  <data name="portfolio.simulation_trade.invalid_input.Title" xml:space="preserve"><value>Invalid simulation trade</value></data>
+  <data name="portfolio.simulation_trade.invalid_input.Detail" xml:space="preserve"><value>Side must be Buy or Sell and input mode must be ByQuantity or ByAmount.</value></data>
+  <data name="common.request.unsupported_media_type.Title" xml:space="preserve"><value>Unsupported media type</value></data>
+  <data name="common.request.unsupported_media_type.Detail" xml:space="preserve"><value>This operation requires a JSON request body.</value></data>
+  <data name="common.request.mutation_marker_missing.Title" xml:space="preserve"><value>Missing request marker</value></data>
+  <data name="common.request.mutation_marker_missing.Detail" xml:space="preserve"><value>The required local mutation marker is missing.</value></data>
+  <data name="common.request.loopback_origin_required.Title" xml:space="preserve"><value>Forbidden origin</value></data>
+  <data name="common.request.loopback_origin_required.Detail" xml:space="preserve"><value>Mutation requests must originate from a loopback address.</value></data>
+  <data name="common.resource.not_found.Title" xml:space="preserve"><value>Resource not found</value></data>
+  <data name="common.resource.not_found.Detail" xml:space="preserve"><value>The requested resource was not found.</value></data>
+  <data name="common.state.conflict.Title" xml:space="preserve"><value>State conflict</value></data>
+  <data name="common.state.conflict.Detail" xml:space="preserve"><value>The operation conflicts with the resource's current state.</value></data>
+  <data name="common.internal.unexpected.Title" xml:space="preserve"><value>Unexpected error</value></data>
+  <data name="common.internal.unexpected.Detail" xml:space="preserve"><value>The request could not be completed.</value></data>
+  <data name="market.provider.unavailable.Title" xml:space="preserve"><value>Market data unavailable</value></data>
+  <data name="market.provider.unavailable.Detail" xml:space="preserve"><value>Market data is temporarily unavailable.</value></data>
+</root>

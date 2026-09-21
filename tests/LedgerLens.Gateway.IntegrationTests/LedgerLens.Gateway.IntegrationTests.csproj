@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <ProjectReference Include="..\..\src\LedgerLens.ApiContracts\LedgerLens.ApiContracts.csproj" />
     <ProjectReference Include="..\..\src\LedgerLens.Gateway\LedgerLens.Gateway.csproj" />
+    <ProjectReference Include="..\..\src\LedgerLens.ServiceDefaults\LedgerLens.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

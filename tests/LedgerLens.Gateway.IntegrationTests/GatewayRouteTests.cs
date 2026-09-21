@@ -1,7 +1,14 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using LedgerLens.ApiContracts;
+using LedgerLens.ServiceDefaults;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace LedgerLens.Gateway.IntegrationTests;
 
@@ -67,6 +74,52 @@ public sealed class GatewayRouteTests
             {
                 await service.DisposeAsync();
             }
+        }
+    }
+
+    [Fact]
+    public async Task Shared_API_contract_wraps_success_and_localizes_Problem_Details()
+    {
+        var builder = WebApplication.CreateSlimBuilder();
+        builder.WebHost.UseUrls("http://127.0.0.1:0");
+        builder.AddLedgerLensApiResponses();
+        var app = builder.Build();
+        app.UseLedgerLensApiResponses();
+        app.Use(async (context, next) =>
+        {
+            context.TraceIdentifier = "contract-correlation";
+            context.Response.Headers["X-Correlation-ID"] = context.TraceIdentifier;
+            await next(context);
+        });
+        app.MapGet("/success", (HttpContext context) => ApiResults.Ok(context, Array.Empty<object>()));
+        app.MapGet("/invalid", (HttpContext context, ApiProblemFactory problems) =>
+            problems.Validation(context, ApiErrorCodes.InvalidIdentifier, "resourceId"));
+        await app.StartAsync();
+
+        try
+        {
+            using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()) };
+            var success = await client.GetFromJsonAsync<ApiResponse<object[]>>("/success");
+            Assert.NotNull(success);
+            Assert.Empty(success.Data);
+            Assert.Equal("contract-correlation", success.Meta.CorrelationId);
+            Assert.Null(success.Meta.Pagination);
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, "/invalid");
+            request.Headers.AcceptLanguage.ParseAdd("th-TH");
+            using var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+            var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal(ApiErrorCodes.InvalidIdentifier, problem.GetProperty("code").GetString());
+            Assert.Equal("contract-correlation", problem.GetProperty("correlationId").GetString());
+            Assert.Equal("รหัสไม่ถูกต้อง", problem.GetProperty("title").GetString());
+            Assert.Equal("รหัสทรัพยากร LedgerLens ต้องเป็น UUIDv7",
+                problem.GetProperty("errors").GetProperty("resourceId")[0].GetString());
+        }
+        finally
+        {
+            await app.DisposeAsync();
         }
     }
 

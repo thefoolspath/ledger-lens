@@ -70,6 +70,8 @@ public static class Extensions
             var correlationId = !string.IsNullOrWhiteSpace(suppliedId) && suppliedId.Length <= 128
                 ? suppliedId
                 : Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString("N");
+            context.TraceIdentifier = correlationId;
+            context.Request.Headers[headerName] = correlationId;
             context.Response.Headers[headerName] = correlationId;
             using (context.RequestServices.GetRequiredService<ILoggerFactory>()
                 .CreateLogger("LedgerLens.Correlation")

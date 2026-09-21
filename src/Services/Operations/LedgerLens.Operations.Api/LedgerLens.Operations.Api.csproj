@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\LedgerLens.ApiContracts\LedgerLens.ApiContracts.csproj" />
     <ProjectReference Include="..\LedgerLens.Operations.Application\LedgerLens.Operations.Application.csproj" />
     <ProjectReference Include="..\LedgerLens.Operations.Infrastructure\LedgerLens.Operations.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\LedgerLens.ServiceDefaults\LedgerLens.ServiceDefaults.csproj" />
