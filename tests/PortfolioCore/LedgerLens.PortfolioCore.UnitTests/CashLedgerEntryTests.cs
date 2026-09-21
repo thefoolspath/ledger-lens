@@ -96,6 +96,32 @@ public sealed class CashLedgerEntryTests
             DateTimeOffset.UnixEpoch));
     }
 
+    [Fact]
+    public void Domain_preserves_client_whitespace_instead_of_trimming_it()
+    {
+        var portfolio = new Portfolio(
+            Guid.CreateVersion7(),
+            Guid.CreateVersion7(),
+            "  Synthetic portfolio  ",
+            "usd",
+            "thb",
+            DateTimeOffset.UnixEpoch);
+        var entry = new CashLedgerEntry(
+            Guid.CreateVersion7(),
+            Guid.CreateVersion7(),
+            CashLedgerEntryType.Deposit,
+            100m,
+            "usd",
+            DateTimeOffset.UnixEpoch,
+            "  client note  ",
+            DateTimeOffset.UnixEpoch);
+
+        Assert.Equal("  Synthetic portfolio  ", portfolio.Name);
+        Assert.Equal("  client note  ", entry.Note);
+        Assert.Throws<ArgumentException>(() => new Portfolio(
+            Guid.CreateVersion7(), Guid.CreateVersion7(), "Synthetic portfolio", " usd ", "thb", DateTimeOffset.UnixEpoch));
+    }
+
     private static CashLedgerEntry Entry(CashLedgerEntryType type, decimal amount, DateTimeOffset time) =>
         new(Guid.CreateVersion7(), Guid.CreateVersion7(), type, amount, "USD", time, null, time);
 

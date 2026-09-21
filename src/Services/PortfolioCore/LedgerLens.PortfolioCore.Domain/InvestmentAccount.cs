@@ -43,12 +43,11 @@ public sealed class InvestmentAccount
             throw new ArgumentException($"{parameterName} must contain 1 to {maximumLength} characters.", parameterName);
         }
 
-        var normalized = value.Trim();
-        if (normalized.Length is < 1 || normalized.Length > maximumLength)
+        if (value.Length is < 1 || value.Length > maximumLength)
         {
             throw new ArgumentException($"{parameterName} must contain 1 to {maximumLength} characters.", parameterName);
         }
 
-        return normalized;
+        return value;
     }
 }

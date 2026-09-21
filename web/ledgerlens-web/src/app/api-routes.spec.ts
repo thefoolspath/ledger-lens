@@ -23,4 +23,9 @@ describe('LedgerLensApiRoutes', () => {
     expect(LedgerLensApiRoutes.ForeignExchangeRatesGetLatestList)
       .toBe('/api/market/v1/foreign-exchange-rates/get-latest-list');
   });
+
+  it('trims the instrument search query before encoding it', () => {
+    expect(LedgerLensApiRoutes.InstrumentsSearchList('  BRK B  '))
+      .toBe('/api/market/v1/instruments/search-list?query=BRK%20B&market=US');
+  });
 });

@@ -24,8 +24,7 @@ public sealed record MarketInstrument(
     private static string Required(string value, int maximumLength, string name)
     {
         if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Value is required.", name);
-        var normalized = value.Trim();
-        if (normalized.Length > maximumLength) throw new ArgumentException($"Value cannot exceed {maximumLength} characters.", name);
-        return normalized;
+        if (value.Length > maximumLength) throw new ArgumentException($"Value cannot exceed {maximumLength} characters.", name);
+        return value;
     }
 }

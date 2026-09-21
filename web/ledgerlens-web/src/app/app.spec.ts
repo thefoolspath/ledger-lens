@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { App, formatMoney, formatPercent, formatQuantity } from './app';
+import { LedgerLensApiRoutes } from './api-routes';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -22,6 +23,25 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('Portfolio ledger');
+  });
+
+  it('should trim user-entered text before sending a create request', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance as unknown as {
+      portfolioName: string;
+      createPortfolio(): void;
+    };
+    const http = TestBed.inject(HttpTestingController);
+
+    app.portfolioName = '  Long-term growth  ';
+    app.createPortfolio();
+
+    const request = http.expectOne(LedgerLensApiRoutes.PortfoliosCreate);
+    expect(request.request.body).toEqual({
+      name: 'Long-term growth',
+      baseCurrency: 'USD',
+      reportingCurrency: 'THB'
+    });
   });
 
   it('should keep simulation visibly separated from real activity', () => {

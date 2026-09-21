@@ -55,7 +55,10 @@ public sealed class ServiceBoundaryTests
 
             if (projectName.EndsWith(".Application", StringComparison.Ordinal))
             {
-                Assert.All(serviceReferences, reference => Assert.EndsWith(".Domain", reference, StringComparison.Ordinal));
+                Assert.All(serviceReferences, reference => Assert.True(
+                    reference!.EndsWith(".Domain", StringComparison.Ordinal) ||
+                    string.Equals(reference, "LedgerLens.Application.Abstractions", StringComparison.Ordinal),
+                    $"{projectName} has an unsupported outward dependency on {reference}."));
             }
             else if (projectName.EndsWith(".Infrastructure", StringComparison.Ordinal))
             {
