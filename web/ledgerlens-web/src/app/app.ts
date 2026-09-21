@@ -188,6 +188,30 @@ interface SimulationMarketEvidence {
   readonly retentionPolicyKey: string;
 }
 
+const moneyFormatter = new Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+const quantityFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 12
+});
+const percentFormatter = new Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4
+});
+
+export function formatMoney(value: number): string {
+  return moneyFormatter.format(value);
+}
+
+export function formatQuantity(value: number): string {
+  return quantityFormatter.format(value);
+}
+
+export function formatPercent(value: number): string {
+  return percentFormatter.format(value);
+}
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule, SimulationChart],
@@ -415,6 +439,18 @@ export class App {
 
   protected valuationFor(symbol: string): SimulationValuation | undefined {
     return this.valuations().find(value => value.symbol === symbol);
+  }
+
+  protected displayMoney(value: number | undefined): string {
+    return value === undefined ? 'Incomplete' : formatMoney(value);
+  }
+
+  protected displayQuantity(value: number): string {
+    return formatQuantity(value);
+  }
+
+  protected displayPercent(value: number | undefined): string {
+    return value === undefined ? 'Incomplete' : formatPercent(value);
   }
 
   protected createPortfolio(): void {

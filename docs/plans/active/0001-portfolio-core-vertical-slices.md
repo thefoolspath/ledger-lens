@@ -40,7 +40,7 @@ Implement incomplete-state dashboard composition plus Operations-coordinated wri
 
 ## Milestone 6 — quotes, watchlist and performance
 
-Implement quotes/candles/provider quotas in Market Data, deliver the isolated manual Simulation Account slices in [plan 0002](0002-simulation-portfolio.md), and activate Research watchlists when required. Validate provider terms before accepting an external adapter.
+Implement quotes/candles/provider quotas in Market Data, retain the completed isolated manual Simulation Account slices in [plan 0002](../completed/0002-simulation-portfolio.md), and activate Research watchlists when required. Validate provider terms before accepting an external adapter.
 
 ## Milestone 7 — Dime import
 

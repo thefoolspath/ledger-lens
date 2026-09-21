@@ -1,6 +1,6 @@
 # Manual Simulation Accounts
 
-Last reviewed: 2026-09-08. Status: Implemented with PostgreSQL end-to-end verified; visual QA pending.
+Last reviewed: 2026-09-18. Status: Complete.
 
 ## Goal
 
@@ -47,11 +47,11 @@ Add separate Real and Simulation modes, a persistent simulation warning, symbol 
 
 **Acceptance:** component and end-to-end tests complete a synthetic multi-buy/partial-sell flow, show provider/freshness metadata, render incomplete/error states, preserve keyboard and screen-reader access, and prove the real ledger is unchanged.
 
-**Current evidence:** The separate Real/Simulation UI, persistent warning, symbol/quote/FX/candle workflow, preview/confirm/correction ticket, summary cards, explicit incomplete states, lazy ECharts value and OHLCV views, ARIA descriptions, and table fallbacks are implemented. The 2026-09-08 production build completes without warnings with a 260.60 kB raw initial bundle (68.66 kB estimated transfer); chart code is lazy. Angular tests pass (`5/5` across `3/3` files), and PostgreSQL end-to-end behavior passes. Desktop/mobile browser visual QA remains not run.
+**Current evidence:** The separate Real/Simulation UI, persistent warning, symbol/quote/FX/candle workflow, preview/confirm/correction ticket, summary cards, explicit incomplete states, lazy ECharts value and OHLCV views, ARIA descriptions, and table fallbacks are implemented. On 2026-09-18 desktop and 390-by-844 mobile browser QA passed persistent labelling, responsive reflow without horizontal document overflow, visible keyboard focus, chart marker/tooltip rendering, table-fallback parity, and a clean browser console. The QA pass found raw floating-point presentation artifacts; display-only money, quantity, and percentage formatters plus a focused Angular test corrected them without changing authoritative decimal calculations. The production build completes without warnings with a 261.33 kB raw initial bundle (68.80 kB estimated transfer); chart code remains lazy. Angular tests pass (`6/6` across `3/3` files), and PostgreSQL end-to-end behavior passes.
 
-## Verification summary — 2026-09-08
+## Verification summary — 2026-09-18
 
-The complete repository build passes with zero warnings/errors. Unit, architecture, Gateway, Angular, EF model-drift, diff-whitespace, tracked privacy, production dependency, and explicitly enabled synthetic distributed gates pass. The PostgreSQL scenario verifies idempotent confirmation, multi-buy/partial-sell, correction, valuation, and real-ledger isolation through canonical Gateway routes. The feature is implemented but not release-ready until desktop/mobile visual QA passes.
+The complete repository build passes with zero warnings/errors. Unit, architecture, Gateway, Angular, EF model-drift, diff-whitespace, tracked privacy, production dependency, and explicitly enabled synthetic distributed gates pass. The PostgreSQL scenario verifies idempotent confirmation, multi-buy/partial-sell, correction, valuation, and real-ledger isolation through canonical Gateway routes. Desktop and mobile browser QA passed the Simulation warning, provenance, responsive layout, keyboard focus, chart rendering, accessible fallbacks, and console checks after correcting display-only numeric formatting. Plan 0002 is complete.
 
 ## Verification and documentation rule
 

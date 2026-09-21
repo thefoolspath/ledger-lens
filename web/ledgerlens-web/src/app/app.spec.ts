@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { App } from './app';
+import { App, formatMoney, formatPercent, formatQuantity } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -34,5 +34,12 @@ describe('App', () => {
     const warning = (fixture.nativeElement as HTMLElement).querySelector('.simulation-warning');
     expect(warning?.textContent).toContain('ไม่มีการส่งคำสั่งซื้อจริง');
     expect(warning?.textContent).toContain('ไม่เปลี่ยนเงินสด');
+  });
+
+  it('should format simulation values without floating-point artifacts', () => {
+    expect(formatMoney(999.9999999999)).toBe('1,000.00');
+    expect(formatMoney(3.1e-11)).toBe('0.00');
+    expect(formatQuantity(5.547850208044)).toBe('5.547850208044');
+    expect(formatPercent(3.10000000000031e-12)).toBe('0.00');
   });
 });

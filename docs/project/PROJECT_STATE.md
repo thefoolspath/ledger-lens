@@ -1,6 +1,6 @@
 # Project State
 
-Last reviewed: 2026-09-08.
+Last reviewed: 2026-09-18.
 
 ## Current state
 
@@ -14,7 +14,7 @@ Last reviewed: 2026-09-08.
 - Portfolio Core now models eight business tables: the four confirmed-ledger tables plus isolated `simulation_accounts`, `simulation_trade_drafts`, `simulation_trade_entries`, and `simulation_valuation_snapshots`. LedgerLens-owned identifiers are generated as UUIDv7 and route resource identifiers are rejected when they are not UUIDv7. The complete migration chain, including the four simulation tables, is verified against ephemeral PostgreSQL.
 - Portfolio Core pilots the accepted service-owned hybrid database workflow: generated persistence types and `PortfolioCoreDbContext` are isolated in `LedgerLens.PortfolioCore.Database`; Infrastructure maps persistence records to Domain; the one-shot Migrations project owns the preserved migration IDs and snapshot; and guarded `lg db` commands support approved DB-first scaffolding, migration generation, drift checking, and reviewed SQL without automatic database/history writes.
 - Product scope, proposed architecture, research evidence, ADRs, quality gates, risks, and the first implementation plan are documented.
-- Manual Simulation Accounts are implemented through provider-neutral Market Data APIs, a deterministic Development/test provider, a terms/key-gated Twelve Data prototype adapter, separate Portfolio Core aggregates/tables and migration, idempotent preview/confirm plus reversal/replacement correction APIs, FIFO/average/simple-return and USD/THB valuation calculations, and a separate Angular Simulation mode. Apache ECharts 6.1.0 is directly lazy-loaded for value/cost and OHLCV views with ARIA and table fallbacks. Code-level, unit, component, build, migration-model, privacy, dependency, and PostgreSQL end-to-end isolation gates pass; desktop/mobile visual QA remains pending.
+- Manual Simulation Accounts are complete through provider-neutral Market Data APIs, a deterministic Development/test provider, a terms/key-gated Twelve Data prototype adapter, separate Portfolio Core aggregates/tables and migration, idempotent preview/confirm plus reversal/replacement correction APIs, FIFO/average/simple-return and USD/THB valuation calculations, and a separate Angular Simulation mode. Apache ECharts 6.1.0 is directly lazy-loaded for value/cost and OHLCV views with ARIA and table fallbacks. Code-level, unit, component, build, migration-model, privacy, dependency, PostgreSQL end-to-end isolation, and desktop/mobile visual QA gates pass. Plan 0002 is archived under `docs/plans/completed/`.
 - The owner-approved FX reporting policy now separates trade-date stock attribution from actual exchange and USD-cash effects. It uses auditable USD cash lots with evidence/manual/FIFO allocation, parallel primary and BOT benchmark columns, and a non-overlapping bridge that must reconcile a closed cycle to actual THB proceeds minus contributions.
 - Plan 0003 is complete across all 18 current Portfolio Core and Market Data business operations: canonical Version 1 routes, unique endpoint names, operation-keyed transport/application/persistence identifiers, Angular route constants, repository-owned scenarios, one-public-type-per-file organization, naming/cardinality architecture tests, and the explicitly enabled Aspire/PostgreSQL/NATS flow all pass without compatibility aliases or EF schema changes. The plan is archived under `docs/plans/completed/`.
 - The source planning context remains at `../LedgerLens_Codex_Planning_Context.md` relative to the LedgerLens folder.
@@ -39,4 +39,4 @@ Last reviewed: 2026-09-08.
 
 ## Next work
 
-Complete desktop/mobile visual QA for the manual Simulation mode, then close plan 0002 if its remaining acceptance evidence passes. Continue confirmed-ledger Milestone 2 work without reusing simulation tables or projections. Keep the 32.178-second warm-start observation visible while collecting enough repeat runs to estimate p95.
+Continue confirmed-ledger Milestone 2 work without reusing simulation tables or projections: buys, sells, fees, taxes, dividends, correction/reversal semantics, UI, and reconciliation coverage remain. Correct the current machine's invalid fixed-user UUID User Secret before relying on an ordinary persistent `lg run`; ephemeral synthetic command-line configuration remains verified. Keep the 32.178-second warm-start observation visible while collecting enough repeat runs to estimate p95.

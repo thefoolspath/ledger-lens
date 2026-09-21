@@ -238,10 +238,10 @@
 
             @if (pendingDraft(); as draft) {
               <section class="draft-preview" aria-label="Simulation trade preview">
-                <div><span>Resolved shares</span><strong>{{ draft.quantity }}</strong></div>
-                <div><span>Gross</span><strong>{{ draft.grossAmount }} USD</strong></div>
-                <div><span>Unused</span><strong>{{ draft.unusedAmount }} USD</strong></div>
-                <div><span>Net cash effect</span><strong>{{ draft.netCash }} USD</strong></div>
+                <div><span>Resolved shares</span><strong>{{ displayQuantity(draft.quantity) }}</strong></div>
+                <div><span>Gross</span><strong>{{ displayMoney(draft.grossAmount) }} USD</strong></div>
+                <div><span>Unused</span><strong>{{ displayMoney(draft.unusedAmount) }} USD</strong></div>
+                <div><span>Net cash effect</span><strong>{{ displayMoney(draft.netCash) }} USD</strong></div>
                 <p class="muted">Quote is fixed for this draft until {{ draft.expiresAt }}</p>
                 <button type="button" (click)="confirmSimulationTrade()"
                   [disabled]="busy() || (!!simulationCorrectionTarget && !simulationCorrectionReason.trim())">
@@ -254,18 +254,18 @@
           <section class="position-grid" aria-label="Simulated positions">
             @for (position of simulation.positions; track position.symbol) {
               <article class="panel position-card">
-                <div class="section-heading"><h3>{{ position.symbol }}</h3><strong>{{ position.quantity }} shares</strong></div>
+                <div class="section-heading"><h3>{{ position.symbol }}</h3><strong>{{ displayQuantity(position.quantity) }} shares</strong></div>
                 <dl>
-                  <div><dt>Remaining cost</dt><dd>{{ position.remainingCostUsd }} USD</dd></div>
-                  <div><dt>Invested capital</dt><dd>{{ position.investedCapitalUsd }} USD</dd></div>
-                  <div><dt>Average cost</dt><dd>{{ position.averageCostUsd || '—' }} USD</dd></div>
-                  <div><dt>Realized P/L</dt><dd [class.negative]="position.realizedUsd < 0">{{ position.realizedUsd }} USD</dd></div>
+                  <div><dt>Remaining cost</dt><dd>{{ displayMoney(position.remainingCostUsd) }} USD</dd></div>
+                  <div><dt>Invested capital</dt><dd>{{ displayMoney(position.investedCapitalUsd) }} USD</dd></div>
+                  <div><dt>Average cost</dt><dd>{{ displayMoney(position.averageCostUsd) }} USD</dd></div>
+                  <div><dt>Realized P/L</dt><dd [class.negative]="position.realizedUsd < 0">{{ displayMoney(position.realizedUsd) }} USD</dd></div>
                   @if (valuationFor(position.symbol); as value) {
-                    <div><dt>Market value</dt><dd>{{ value.currentValueUsd ?? 'Incomplete' }} USD</dd></div>
-                    <div><dt>Unrealized P/L</dt><dd [class.negative]="(value.unrealizedUsd ?? 0) < 0">{{ value.unrealizedUsd ?? 'Incomplete' }} USD</dd></div>
-                    <div><dt>Total P/L</dt><dd [class.negative]="(value.totalPlUsd ?? 0) < 0">{{ value.totalPlUsd ?? 'Incomplete' }} USD</dd></div>
-                    <div><dt>Simple return</dt><dd>{{ value.returnPercent ?? 'Incomplete' }}%</dd></div>
-                    <div><dt>Total P/L THB</dt><dd>{{ value.totalPlThb ?? 'Incomplete' }}</dd></div>
+                    <div><dt>Market value</dt><dd>{{ displayMoney(value.currentValueUsd) }} USD</dd></div>
+                    <div><dt>Unrealized P/L</dt><dd [class.negative]="(value.unrealizedUsd ?? 0) < 0">{{ displayMoney(value.unrealizedUsd) }} USD</dd></div>
+                    <div><dt>Total P/L</dt><dd [class.negative]="(value.totalPlUsd ?? 0) < 0">{{ displayMoney(value.totalPlUsd) }} USD</dd></div>
+                    <div><dt>Simple return</dt><dd>{{ displayPercent(value.returnPercent) }}%</dd></div>
+                    <div><dt>Total P/L THB</dt><dd>{{ displayMoney(value.totalPlThb) }} THB</dd></div>
                     @if (!value.isComplete) { <p class="error">{{ value.missingReasons.join(' ') }}</p> }
                   }
                 </dl>
@@ -283,7 +283,7 @@
               <details><summary>Accessible value data</summary>
                 <div class="data-table" role="table" aria-label="Simulation value data">
                   @for (point of seriesPoints(); track point.date) {
-                    <div role="row"><span role="cell">{{ point.date }}</span><span role="cell">Value {{ point.marketValueUsd }} USD</span><span role="cell">Cost {{ point.costBasisUsd }} USD</span></div>
+                    <div role="row"><span role="cell">{{ point.date }}</span><span role="cell">Value {{ displayMoney(point.marketValueUsd) }} USD</span><span role="cell">Cost {{ displayMoney(point.costBasisUsd) }} USD</span></div>
                   }
                 </div>
               </details>
@@ -311,8 +311,8 @@
               @for (trade of simulation.trades; track trade.id) {
                 <div role="row">
                   <span role="cell">{{ trade.effectiveAt }}</span>
-                  <span role="cell">{{ trade.side }} {{ trade.quantity }} {{ trade.symbol }} · {{ trade.role }}</span>
-                  <span role="cell">{{ trade.unitPrice }} USD</span>
+                  <span role="cell">{{ trade.side }} {{ displayQuantity(trade.quantity) }} {{ trade.symbol }} · {{ trade.role }}</span>
+                  <span role="cell">{{ displayMoney(trade.unitPrice) }} USD</span>
                   <span role="cell">{{ trade.provider }} · {{ trade.freshness }}</span>
                   <span role="cell">
                     @if (canCorrectSimulation(simulation, trade)) {

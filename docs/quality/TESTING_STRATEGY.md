@@ -30,12 +30,12 @@ Manual simulation acceptance adds deterministic amount/quantity conversion, mult
 
 Hybrid DB-first changes add three mandatory migration checks: `lg db check` must report no pending model change after migration generation; the full migration chain must create an empty ephemeral PostgreSQL database; and the new migration must preserve synthetic data when applied from its immediate predecessor. A source-database history stamp additionally requires schema-equivalence evidence and is not automated by the repository tooling.
 
-## Manual simulation verification — 2026-09-08
+## Manual simulation verification — 2026-09-18
 
 - **PASS:** complete repository build, zero .NET warnings/errors, Angular production build, EF model/snapshot drift check, `git diff --check`, production npm audit (zero reported vulnerabilities), and tracked forbidden-path/credential-pattern scans.
-- **PASS:** Portfolio Core unit tests `10/10`, including amount rounding, multi-buy/partial-sell FIFO, fee/tax, USD/THB completeness, oversell, simple return, and reversal/replacement rebuild; Market Data unit test `1/1`; Angular tests `4/4` across two files, including permanent separation labelling and chart accessibility/lifecycle disposal.
-- **PASS:** the synthetic distributed scenario uses the canonical plan-0003 routes and exercises symbol/quote/FX, duplicate draft confirmation, two buys, partial sell, simulation correction, current valuation, and an unchanged confirmed cash/entry projection. On 2026-09-08 both distributed tests passed in 40 seconds against healthy ephemeral PostgreSQL and NATS resources, including the complete Portfolio Core migration chain.
-- **NOT RUN:** desktop/mobile browser visual QA for resize, marker/tooltip, contrast, and table parity remains pending under plan 0002. No visual pass is claimed.
+- **PASS:** Portfolio Core unit tests `10/10`, including amount rounding, multi-buy/partial-sell FIFO, fee/tax, USD/THB completeness, oversell, simple return, and reversal/replacement rebuild; Market Data unit test `1/1`; Angular tests `6/6` across three files, including permanent separation labelling, chart accessibility/lifecycle disposal, canonical route coverage, and display formatting that suppresses floating-point presentation artifacts.
+- **PASS:** the synthetic distributed scenario uses the canonical plan-0003 routes and exercises symbol/quote/FX, duplicate draft confirmation, two buys, partial sell, simulation correction, current valuation, and an unchanged confirmed cash/entry projection. On 2026-09-18 both distributed tests passed in 51 seconds against healthy ephemeral PostgreSQL and NATS resources, including the complete Portfolio Core migration chain.
+- **PASS:** desktop and 390-by-844 mobile browser QA verified responsive reflow without horizontal document overflow, persistent simulation and non-order labelling, visible 3-pixel keyboard focus, source/freshness metadata, chart marker/tooltip rendering, accessible table-fallback parity, readable formatted money/quantity/percentage output, and no browser console warnings or errors.
 
 ## Project QA skill
 
