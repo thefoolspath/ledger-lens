@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-Last reviewed: 2026-08-11.
+Last reviewed: 2026-09-23.
 
 The source brief is `../../../LedgerLens_Codex_Planning_Context.md` relative to this document and remains unchanged.
 
@@ -10,7 +10,9 @@ The source brief is `../../../LedgerLens_Codex_Planning_Context.md` relative to 
 | Vision, local deployment, no trading advice | [Vision](../product/VISION.md), [Scope](../product/SCOPE.md) |
 | Stack and distributed architecture | [Platform Research](../research/PLATFORM_AND_DEPENDENCY_EVALUATION.md), [Communication Research](../research/ASPIRE_INTERSERVICE_COMMUNICATION_EVALUATION.md), [System](../architecture/SYSTEM_OVERVIEW.md), ADR-0001, ADR-0003, ADR-0015 |
 | Clean Code, handlers, Code First | [.NET Architecture](../architecture/DOTNET_APPLICATION_ARCHITECTURE.md), ADR-0014 |
-| No authentication / fixed local user / future OIDC | [.NET Architecture](../architecture/DOTNET_APPLICATION_ARCHITECTURE.md), [Security](../architecture/SECURITY_AND_PRIVACY.md), ADR-0012 |
+| Current fixed local user and proposed Google OIDC/BFF evolution | [.NET Architecture](../architecture/DOTNET_APPLICATION_ARCHITECTURE.md), [Identity and Access](../architecture/IDENTITY_ACCESS_AND_UI_LOCALIZATION.md), [Security](../architecture/SECURITY_AND_PRIVACY.md), ADR-0012, ADR-0019–0021, [plan 0006](../plans/active/0006-identity-access-google-oidc-and-ui-resources.md) |
+| User/group administration, page/action permission, and UI key synchronization | [Access Administration and Resource Catalog](../architecture/ACCESS_ADMINISTRATION_AND_RESOURCE_CATALOG.md), [Threat Model](../../LedgerLens-threat-model.md), ADR-0021, [plan 0006](../plans/active/0006-identity-access-google-oidc-and-ui-resources.md) |
+| Security dashboard, user session inventory/expiry/revocation, and two-factor authentication | [Session and MFA Administration](../architecture/SESSION_AND_MFA_ADMINISTRATION.md), [Identity and Access](../architecture/IDENTITY_ACCESS_AND_UI_LOCALIZATION.md), [Threat Model](../../LedgerLens-threat-model.md), ADR-0019, [plan 0006](../plans/active/0006-identity-access-google-oidc-and-ui-resources.md) |
 | Portfolio/account/transaction capabilities | [Functional Requirements](../product/FUNCTIONAL_REQUIREMENTS.md), [Domain Model](../architecture/DOMAIN_MODEL.md) |
 | Calculations, precision, FIFO/average, TWR/MWR | [Calculation Specification](../architecture/INVESTMENT_CALCULATIONS.md), ADR-0004–0006 |
 | Dime workflow | [Slip Import](../architecture/SLIP_IMPORT.md), [Dime Research](../research/DIME_SLIP_EXTRACTION_EVALUATION.md), ADR-0009 |

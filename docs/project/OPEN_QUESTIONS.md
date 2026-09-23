@@ -1,6 +1,6 @@
 # Open Questions
 
-Last reviewed: 2026-08-11.
+Last reviewed: 2026-09-23.
 
 ## Owner decisions
 
@@ -8,6 +8,8 @@ Last reviewed: 2026-08-11.
 - Provide representative Dime slips for private local inspection and describe known layout/date variants.
 - Confirm whether the official Bank of Thailand daily reference or a broker-displayed rate should be the default when both exist.
 - Confirm the owner machine profile used to accept performance budgets.
+- Confirm the identity/access owner decisions: IdentityAccess service ownership, closed registration/controlled owner link, session lifetimes, database-managed UI text, Gateway-issued internal tokens, fixed `http://localhost:4200` explicit-button Google development flow, and the split between local/deployment manifest sync and in-application administration/review.
+- Confirm the security dashboard/MFA decisions: `RequiredForAdministrators` initial policy, five-minute recently-active window, one-minute activity coalescing, ten-minute critical-action step-up, session/audit retention and client-summary privacy, and the result of the required narrow ASP.NET Core Identity-versus-custom-TOTP spike. Passkeys are not counted as built-in 2FA in the .NET 10 design.
 
 ## Research/implementation gates
 

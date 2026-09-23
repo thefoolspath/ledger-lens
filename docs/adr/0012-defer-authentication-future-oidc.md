@@ -35,3 +35,7 @@ Developers may assume localhost is automatically safe.
 ## Revisit conditions
 
 Revisit only when remote/LAN/multi-user access becomes an accepted product requirement.
+
+## Revisit status — 2026-09-22
+
+The owner requested a decision-complete Google OIDC, permission, and UI-localization design before implementation. Proposed ADR-0019, ADR-0020, ADR-0021, and [plan 0006](../plans/active/0006-identity-access-google-oidc-and-ui-resources.md) now define that candidate path. This ADR remains effective and no authentication behavior or non-loopback exposure is authorized until those proposals are accepted and their security gates pass.

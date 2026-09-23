@@ -5,6 +5,7 @@ Status: Accepted foundation direction.
 | Service | Owns | May communicate with |
 | --- | --- | --- |
 | Gateway | public routes, HTTP composition, future OIDC/BFF | all service HTTP APIs |
+| IdentityAccess (proposed) | local users, external identity mappings, sessions, roles, resource grants, UI resource catalog/localized text, security audit | Gateway HTTP; service-owned identity contracts only |
 | Portfolio Core | future users, portfolios, accounts, ledger, lots, cash, calculations | NATS; Gateway HTTP only in foundation |
 | Market Data | future provider adapters, quotes, candles, FX, freshness and quota | NATS; Gateway HTTP only in foundation |
 | Slip Import | future documents, hashes, extraction, review and posting state | NATS; Gateway HTTP only in foundation |
@@ -21,3 +22,4 @@ Status: Accepted foundation direction.
 - NATS delivery is at-least-once. Business publishers require a transactional Outbox and consumers require Inbox idempotency when business events are introduced.
 - Breaking HTTP/event contracts create a new version; do not mutate an established semantic contract.
 - Provider and OCR DTOs remain private to their Infrastructure layer.
+- If ADR-0019 is accepted, IdentityAccess becomes the identity/access authority while Portfolio Core retains its local `UserProfile` projection and financial ownership. No service reads the identity database directly, and email/provider claims do not become cross-service identity keys.

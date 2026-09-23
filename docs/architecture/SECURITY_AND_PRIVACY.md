@@ -25,6 +25,10 @@ Do not log file bodies, full OCR text, transaction request bodies, account/refer
 
 OIDC sign-in, OAuth where delegated API access is needed, unique issuer/subject-to-local-user mapping, portfolio authorization, HTTPS, CSRF design, secure cookies/tokens, rate limiting, audit logging, hardened secret management, and encrypted backups must all be accepted before non-loopback access. Email alone must never be treated as the durable external identity.
 
+The proposed implementation direction is documented in [Identity, Access Control, and UI Localization Architecture](IDENTITY_ACCESS_AND_UI_LOCALIZATION.md) and [Session Visibility, Security Dashboard, and MFA Administration](SESSION_AND_MFA_ADMINISTRATION.md). It keeps Google authentication at the Gateway BFF, stores no Google access/refresh token, uses a separate internal IdentityAccess boundary, requires independently validated audience-bound identity at every business API, preserves Portfolio ownership checks, and adds LedgerLens-managed TOTP MFA/step-up without exposing secrets or tokens through administration views. The proposal does not relax the loopback-only rule.
+
+The repository-grounded [Identity, Access, and UI Resource Threat Model](../../LedgerLens-threat-model.md) covers the current fixed-user exposure and proposed authentication/administration/catalog boundaries. Its deployment, administrator-count, key-store, and session/token assumptions must be reconfirmed before implementation or external exposure.
+
 ## Evidence
 
 - [ASP.NET Core CORS guidance](https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-10.0)
