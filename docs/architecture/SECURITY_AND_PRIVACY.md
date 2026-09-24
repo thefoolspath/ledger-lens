@@ -1,6 +1,6 @@
 # Security and Privacy Architecture
 
-Status: Proposed; required before implementation.
+Status: Version 1 controls partially implemented; authenticated-access controls proposed. Last reviewed: 2026-09-24.
 
 ## Version 1 controls
 

@@ -30,3 +30,5 @@ Corporate-action corrections are designed in the model; automated split/merger i
 ## Out of scope for Version 1
 
 Thai securities, mutual funds, gold, automatic trading, tax filing, continuous background operation, alerts, Windows notifications, public hosting, LAN access, authentication, multi-user authorization, mobile apps, and local AI.
+
+Plan 0006 is a design-only Phase 6 proposal. Its presence under active planning does not move authentication or multi-user authorization into Version 1. Doing so requires explicit owner reprioritization plus coordinated updates to this scope, the roadmap, ADR-0015, and ADR-0019 through ADR-0021 before implementation begins.

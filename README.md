@@ -10,6 +10,7 @@ lg bootstrap
 lg restore
 lg build
 lg test
+lg docs
 lg run
 ```
 
@@ -22,13 +23,13 @@ to list every command. To remove it, run
 `run` starts the complete Aspire graph on loopback: Angular, Gateway, five APIs,
 the Slip Import worker, PostgreSQL databases, NATS JetStream, and Aspire Dashboard.
 
-LedgerLens is a proposed local web application for recording, reconciling, analysing, and researching a personal investment portfolio. The first usable release focuses on US stocks and ETFs held through Dime, a USD portfolio view, an additional THB reporting view, and deterministic separation of security-price and foreign-exchange effects.
+LedgerLens is a local web application under active implementation for recording, reconciling, analysing, and researching a personal investment portfolio. The first usable release focuses on US stocks and ETFs held through Dime, a USD portfolio view, an additional THB reporting view, and deterministic separation of security-price and foreign-exchange effects.
 
-Status: **distributed foundation and initial portfolio/simulation slices implemented**. The complete build, canonical API naming migration, and synthetic Aspire/PostgreSQL/NATS end-to-end flow pass. Manual Simulation desktop/mobile visual QA and the remaining Portfolio Core milestones are still pending; see [Project State](docs/project/PROJECT_STATE.md).
+Status: **distributed foundation, initial confirmed-ledger slice, and manual Simulation Accounts implemented**. Manual Simulation desktop/mobile visual QA is complete. Portfolio Core Milestone 2 and the unified API response closeout remain in progress; [Project State](docs/project/PROJECT_STATE.md) is the canonical current-status record.
 
 ## Safety boundary
 
-- Version 1 is loopback-only and has no authentication or authorization.
+- Version 1 is loopback-only and has no interactive authentication or multi-user authorization. It uses one externally configured fixed local principal plus owner-scoped portfolio checks.
 - Real slips, holdings, account identifiers, API keys, database files, exports, backups, OCR text, and logs must remain outside the repository.
 - Examples, screenshots, parser fixtures, and calculation scenarios must be synthetic.
 - LedgerLens records and explains data; it does not place trades or promise investment returns.
@@ -42,7 +43,7 @@ Start with [docs/README.md](docs/README.md). The source planning brief remains o
 - USD is the portfolio base currency; THB is a reporting currency.
 - FIFO and average cost are both first-class report views derived from one auditable ledger.
 - Market and FX data are fetched on demand; the system is not expected to run continuously.
-- Alerts, Windows notifications, authentication, external access, automatic trading, Thai securities, funds, gold, and local AI are deferred.
+- Alerts, Windows notifications, authentication, external access, automatic trading, Thai securities, funds, gold, and local AI are deferred from Version 1. Plan 0006 is a design-only Phase 6 proposal and does not authorize implementation.
 
 ## License status
 

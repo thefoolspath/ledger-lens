@@ -32,7 +32,7 @@ Evidence-grounded summaries only after evaluation, source citation, numeric grou
 
 OIDC sign-in, OAuth where delegated API access is required, local issuer/subject mapping, portfolio authorization, HTTPS, CSRF design, rate limiting, audit logging, service-to-service identity, and encrypted backups. Only after this gate may any non-loopback access be considered.
 
-The owner requested the structure before code. [Plan 0006](../plans/active/0006-identity-access-google-oidc-and-ui-resources.md) and ADR-0019 through ADR-0021 now propose Google OIDC at a cookie-based Gateway BFF, a separate IdentityAccess boundary, short-lived internal service identity, and shared resource keys for role/menu/page/action permission plus English/Thai UI text. This remains proposed and does not change current Version 1 behavior or permit external exposure.
+The owner requested the structure before code. [Plan 0006](../plans/active/0006-identity-access-google-oidc-and-ui-resources.md) and ADR-0019 through ADR-0021 now propose Google OIDC at a cookie-based Gateway BFF, a separate IdentityAccess boundary, short-lived internal service identity, and shared resource keys for role/menu/page/action permission plus English/Thai UI text. This is design-only Phase 6 work: it does not authorize implementation, change current Version 1 behaviour, reorder Phases 1–5, or permit external exposure. Any reprioritization requires an explicit owner decision and synchronized scope/ADR updates.
 
 ## Version 2 / Phase 7 — simulated trading bot
 

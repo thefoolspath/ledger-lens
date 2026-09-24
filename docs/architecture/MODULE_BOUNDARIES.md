@@ -1,16 +1,16 @@
 # Service Boundaries
 
-Status: Accepted foundation direction.
+Status: Accepted and partially implemented. Last reviewed: 2026-09-24.
 
 | Service | Owns | May communicate with |
 | --- | --- | --- |
-| Gateway | public routes, HTTP composition, future OIDC/BFF | all service HTTP APIs |
+| Gateway | implemented public routes and HTTP composition; proposed OIDC/BFF | all current service HTTP APIs; proposed IdentityAccess |
 | IdentityAccess (proposed) | local users, external identity mappings, sessions, roles, resource grants, UI resource catalog/localized text, security audit | Gateway HTTP; service-owned identity contracts only |
-| Portfolio Core | future users, portfolios, accounts, ledger, lots, cash, calculations | NATS; Gateway HTTP only in foundation |
-| Market Data | future provider adapters, quotes, candles, FX, freshness and quota | NATS; Gateway HTTP only in foundation |
-| Slip Import | future documents, hashes, extraction, review and posting state | NATS; Gateway HTTP only in foundation |
-| Research | future watchlists, notes, theses, sources and comparable research | NATS; Gateway HTTP only in foundation |
-| Operations | future backup/restore orchestration, manifests and maintenance state | NATS; service-owned operational contracts only |
+| Portfolio Core | implemented local user projection, portfolios, accounts, cash ledger, and isolated Simulation; later confirmed trades/lots/calculations remain | NATS; Gateway HTTP |
+| Market Data | implemented provider abstraction, quotes, candles, FX, freshness/quota results; later external-provider/event coverage remains | NATS; Gateway HTTP |
+| Slip Import | foundation host now; documents, hashes, extraction, review and posting state remain proposed | NATS; Gateway HTTP |
+| Research | foundation host now; watchlists, notes, theses, sources and comparable research remain proposed | NATS; Gateway HTTP |
+| Operations | foundation host now; backup/restore orchestration, manifests and maintenance state remain proposed | NATS; service-owned operational contracts only |
 
 ## Boundary rules
 

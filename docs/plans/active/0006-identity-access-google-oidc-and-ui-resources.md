@@ -1,12 +1,14 @@
 # Identity, Access, Google OIDC, and UI Resource Foundation
 
-Last reviewed: 2026-09-23. Status: Proposed; implementation has not started.
+Last reviewed: 2026-09-24. Status: Design-only proposal; implementation is not authorized and has not started.
 
 ## Goal
 
 Replace the fixed local principal through the smallest secure, reversible vertical slices: Google OIDC at the Gateway BFF, revocable cookie sessions, LedgerLens-managed TOTP MFA and critical-operation step-up, independently verifiable internal service identity, unchanged financial owner isolation, user/role/resource authorization, a security/session dashboard, and English/Thai menu/page/action localization through shared resource keys.
 
 This plan does not authorize non-loopback exposure. It follows [ADR-0019](../../adr/0019-google-oidc-bff-session.md), [ADR-0020](../../adr/0020-gateway-internal-service-tokens.md), [ADR-0021](../../adr/0021-resource-key-access-and-localization.md), the detailed [identity/access architecture](../../architecture/IDENTITY_ACCESS_AND_UI_LOCALIZATION.md), and the [session/MFA administration design](../../architecture/SESSION_AND_MFA_ADMINISTRATION.md). All three ADRs remain Proposed until the owner confirms the open decisions and the relevant evidence gates pass.
+
+Authentication and multi-user authorization remain outside Version 1 and scheduled as optional Roadmap Phase 6. Before any slice begins, the owner must explicitly reprioritize the work and the same change must update product scope, roadmap ordering, ADR-0015's service roster, and the relevant proposed ADR statuses. Merely keeping this plan in `active/` does not grant implementation authority.
 
 ## Boundaries
 

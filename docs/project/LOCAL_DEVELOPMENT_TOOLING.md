@@ -35,7 +35,7 @@ The audit is a point-in-time observation, not a reproducible environment declara
 | Aspire | 13.4 stable | Pin the exact CLI and package versions validated by the platform spike |
 | Node.js | Node 24 LTS | Use a release compatible with Angular 22, currently 24.15 or later |
 | Angular | 22.x | Install CLI and framework packages locally through the workspace package manager |
-| Tailwind CSS | Stable Angular-compatible release | Install and pin locally with the future Angular workspace; do not add Bootstrap UI packages |
+| Tailwind CSS | Stable Angular-compatible release | Pin locally through the implemented Angular workspace; upgrades are explicit and Bootstrap UI packages remain excluded |
 | PostgreSQL | 18.x | Use the current supported minor through an Aspire-managed container |
 | Npgsql | 10.x | Keep the EF provider major aligned with EF Core 10 |
 

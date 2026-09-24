@@ -1,11 +1,12 @@
 # System Overview
 
-Status: Accepted foundation direction. Last reviewed: 2026-08-11.
+Status: Accepted and partially implemented. Last reviewed: 2026-09-24.
 
 LedgerLens is a loopback-only distributed application orchestrated by Aspire.
 
 ```text
 Angular -> ASP.NET Core/YARP Gateway
+              |-> IdentityAccess (proposed) -> identity database
               |-> Portfolio Core -> portfolio database
               |-> Market Data    -> market database
               |-> Slip Import    -> slip database / document store / OCR worker
@@ -15,6 +16,8 @@ Angular -> ASP.NET Core/YARP Gateway
 Services <-> NATS JetStream
 All .NET resources -> Aspire Dashboard via OpenTelemetry
 ```
+
+The current runtime graph contains Gateway plus the five Version 1 business services. IdentityAccess is a design-only Phase 6 proposal and is not present in source or runtime.
 
 ## Trust and consistency boundaries
 
@@ -35,4 +38,3 @@ All .NET resources -> Aspire Dashboard via OpenTelemetry
 - Aspire models, runs, connects, and observes the application; it does not replace security or justify fine-grained services.
 
 See [ADR-0015](../adr/0015-coarse-grained-microservices.md).
-

@@ -2,15 +2,19 @@
 
 ## Project state
 
-LedgerLens currently contains planning documentation only. Proposed interfaces and architecture are not implemented behaviour.
+Last reviewed: 2026-09-24.
+
+LedgerLens contains an implemented local application and planning documentation. The distributed foundation, initial confirmed-ledger vertical slice, manual Simulation Accounts, shared API response contract foundation, and explicit generic-handler operation slices exist in source and tests. Authentication, multi-user authorization, IdentityAccess, and non-loopback exposure remain proposed only.
+
+For current behaviour, use source code and automated tests first, then `docs/project/PROJECT_STATE.md`. A document marked Proposed describes a target, not implemented behaviour.
 
 ## Repository map
 
 - `docs/product/`: vision, scope, requirements, MVP, and roadmap.
-- `docs/architecture/`: proposed system, data, security, and operational design.
+- `docs/architecture/`: current and proposed system, data, security, and operational design; each document states its implementation status.
 - `docs/research/`: evidence, findings, and decision gates.
 - `docs/adr/`: architecture decision records.
-- `docs/plans/active/`: executable future implementation plans.
+- `docs/plans/active/`: non-archived implementation plans and decision logs; each file's explicit status determines whether implementation is authorized.
 - `docs/quality/`: correctness, testing, performance, and reconciliation.
 - `docs/project/`: state, risks, release strategy, safety, dependencies, and traceability.
 

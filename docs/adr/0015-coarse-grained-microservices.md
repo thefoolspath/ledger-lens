@@ -36,3 +36,6 @@ Excessive synchronous chains, shared contract leakage, duplicated messages, cros
 
 Merge or split a service only when measured coupling, lifecycle, isolation, scale, or reliability evidence justifies it. gRPC requires a streaming or throughput benchmark.
 
+## Proposed extension — 2026-09-24
+
+ADR-0019 and plan 0006 propose adding an internal IdentityAccess service/database for optional authenticated access. The current Version 1 service roster remains authoritative. Accepting ADR-0019 must explicitly amend this ADR with the evidence for a separate security-sensitive lifecycle and update product scope and topology in the same decision; the proposal alone does not add a runtime service.

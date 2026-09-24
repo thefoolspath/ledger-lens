@@ -1,6 +1,6 @@
 # Project State
 
-Last reviewed: 2026-09-23.
+Last reviewed: 2026-09-24.
 
 ## Current state
 
@@ -24,12 +24,13 @@ Last reviewed: 2026-09-23.
 
 ## Accepted direction
 
-.NET 10 LTS, Aspire 13.4 stable, Node 24 LTS, Angular 22.x with project-local Tailwind CSS and no Bootstrap UI dependency, PostgreSQL 18.x, EF/Npgsql 10.x; project-local SDK/CLI tooling with Docker as the system runtime; coarse-grained Gateway, Portfolio Core, Market Data, Slip Import, Research, and Operations services; per-service Clean Architecture and database ownership; HTTP/JSON through Gateway and NATS JetStream for future asynchronous integration; Aspire Dashboard observability; explicit handlers and no mediator package; reviewed EF migrations with a guarded Portfolio Core hybrid DB-first pilot; free dependencies only; loopback-only; no business logic until the distributed foundation gate passes; trade-date stock FX plus separately reconciled actual exchange/USD-cash FX with primary and BOT benchmark views.
+.NET 10 LTS, Aspire 13.4 stable, Node 24 LTS, Angular 22.x with project-local Tailwind CSS and no Bootstrap UI dependency, PostgreSQL 18.x, EF/Npgsql 10.x; project-local SDK/CLI tooling with Docker as the system runtime; coarse-grained Gateway, Portfolio Core, Market Data, Slip Import, Research, and Operations services; per-service Clean Architecture and database ownership; HTTP/JSON through Gateway and NATS JetStream for future asynchronous integration; Aspire Dashboard observability; explicit handlers and no mediator package; reviewed EF migrations with a guarded Portfolio Core hybrid DB-first pilot; free dependencies only; loopback-only; the distributed foundation gate preceded business logic and remains a regression gate; trade-date stock FX plus separately reconciled actual exchange/USD-cash FX with primary and BOT benchmark views.
 
 ## Tooling readiness
 
 - Project-local .NET SDK 10.0.302, Aspire CLI 13.4.6, Node 24.19.0, and npm 11.17.0 are pinned by `toolchain.json` and restored under ignored project-local paths.
 - The repository-scoped `lg` development CLI wraps the existing project-local commands. Its PowerShell profile function supports bare `lg run` only from inside the repository tree and does not modify the user or machine `PATH`.
+- `lg docs` validates active-plan indexing, prohibited stale central-state phrases, central review dates, and internal Markdown links without requiring the application toolchain or Docker.
 - Docker client/server 29.7.2, Docker Desktop 4.86.0, and Docker Compose 5.3.1 are verified healthy on 2026-09-08; WSL 2.7.11.0 was last verified on 2026-08-12.
 - The accepted design installs .NET, Aspire, Node/Angular CLI, and EF tooling per project without permanent `PATH` changes. See [Local Development Tooling](LOCAL_DEVELOPMENT_TOOLING.md).
 
