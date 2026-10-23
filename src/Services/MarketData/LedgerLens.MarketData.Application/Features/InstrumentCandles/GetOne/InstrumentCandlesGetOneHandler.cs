@@ -10,8 +10,6 @@ public sealed class InstrumentCandlesGetOneHandler(IMarketDataProvider provider)
         InstrumentCandlesGetOneQuery query,
         CancellationToken cancellationToken)
     {
-        if (query.InstrumentId == Guid.Empty || query.InstrumentId.Version != 7)
-            throw new ArgumentException("Instrument ID must be UUIDv7.", nameof(query));
         if (!string.Equals(query.Interval, "1day", StringComparison.Ordinal))
             throw new ArgumentException("Only the 1day interval is supported.", nameof(query));
         if (query.To < query.From || query.To.DayNumber - query.From.DayNumber > 3660)
