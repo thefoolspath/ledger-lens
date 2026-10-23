@@ -3,6 +3,13 @@ builder.AddServiceDefaults();
 builder.AddLedgerLensApiResponses();
 builder.Services.AddReverseProxy()
     .LoadFromMemory(GatewayRoutes.Routes, GatewayRoutes.Clusters)
+    .AddTransforms(context =>
+    {
+        if (string.Equals(context.Route.RouteId, GatewayRoutes.PortfolioRouteId, StringComparison.Ordinal))
+        {
+            context.ResponseTransforms.Add(new PortfolioLocationResponseTransform(GatewayRoutes.PortfolioPrefix));
+        }
+    })
     .AddServiceDiscoveryDestinationResolver();
 
 var app = builder.Build();

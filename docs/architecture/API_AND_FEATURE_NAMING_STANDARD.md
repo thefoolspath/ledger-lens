@@ -1,6 +1,6 @@
 # API and Feature Naming Standard
 
-Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification completed in [plan 0003](../plans/completed/0003-api-feature-naming-migration.md). The unified response contract is in implementation under [plan 0004](../plans/active/0004-unified-api-response-contract.md). Last reviewed: 2026-09-21.
+Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification completed in [plan 0003](../plans/completed/0003-api-feature-naming-migration.md). The physical operation-slice layout and generic handler contracts are implemented under [plan 0005](../plans/active/0005-generic-handler-operation-slice-restructure.md). The unified response contract is in implementation under [plan 0004](../plans/active/0004-unified-api-response-contract.md). Last reviewed: 2026-09-21.
 
 ## Purpose
 
@@ -45,6 +45,8 @@ Derive the `OperationKey` by removing `/api/{service}/v1/`, omitting route param
 | `/api/portfolio/v1/users/roles/get-combobox-list` | `UsersRolesGetComboboxList` |
 
 Every operation-specific production type and test MUST begin with its `OperationKey`. Every ASP.NET Core endpoint MUST use the same value as its endpoint name, for example `.WithName("PortfoliosCreate")`. The value is also the preferred OpenAPI operation identifier and structured-log operation name when those surfaces are enabled.
+
+API and Application operation files MUST live under `Features/{Feature}/{OperationKey}` and use namespaces aligned to that path. Endpoints inject the exact `ICommandHandler<TCommand, TResult>` or `IQueryHandler<TQuery, TResult>` contract. Shared feature/domain types MAY remain outside an operation folder when duplicating them would reduce cohesion.
 
 ## Approved operation vocabulary
 
@@ -108,7 +110,7 @@ Successful creation returns `201 Created`. Successful reads return `200 OK`. A m
 The following contract is implemented for current Portfolio Core and Market Data endpoints; plan 0004 remains active until its complete error, localization, distributed-runtime, and closeout gates pass:
 
 - Successful business JSON responses with bodies use `ApiResponse<T>` containing required `data` and `meta`. Metadata always carries `correlationId`; paged operations additionally carry `pageNumber`, `pageSize`, `totalCount`, and `totalPages` under `meta.pagination`.
-- A missing single resource remains `404`, empty collections remain arrays, `201 Created` retains `Location`, and `204`, file/stream, health, liveness, and Development ping responses are not wrapped.
+- A missing single resource remains `404`, empty collections remain arrays, and `201 Created` retains `Location` only for independently retrievable resources with a canonical public route. Portfolio Core's retained service-local paths are rewritten by the Gateway under [0007.01](../plans/active/0007/01-created-location-policy.md); other create operations omit the header while keeping `201` and the envelope. `204`, file/stream, health, liveness, and Development ping responses are not wrapped.
 - Failures use RFC Problem Details rather than the success envelope. They add stable non-localized `code`, W3C `traceId`, `correlationId`, and validation `errors` when applicable. HTTP status remains authoritative and must match the body.
 - User-facing error text is localized through English and Thai RESX resources selected by `Accept-Language`, with English fallback. Expected failures carry stable codes and safe arguments; raw exception messages, stack traces, secrets, provider payloads, and personal data never enter responses.
 - Ordinary validation and domain error messages are not database content. Any future administrator-editable catalog requires a separate ADR and explicit availability, cache, authorization, audit, fallback, and safe-formatting design.
@@ -239,6 +241,8 @@ For `/api/portfolio/v1/simulation-accounts/get-list?portfolioId=...`:
 3. Search the repository for `SimulationAccountsGetList`.
 4. Confirm that the results include the endpoint, request/query contract when present, response/result, handler, persistence operation, Angular call, and tests.
 5. Follow referenced shared Domain types normally; do not duplicate them to force the key into every shared filename.
+
+For implemented Portfolio Core and Market Data operations, the endpoint and application handler results are physically grouped under the same `Features/{Feature}/{OperationKey}` suffix, so Solution Explorer filtering by the route-derived key exposes the complete use-case entry path.
 
 ## Enforcement and exceptions
 

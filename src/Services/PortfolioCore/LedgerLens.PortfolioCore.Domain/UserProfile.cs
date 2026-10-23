@@ -29,7 +29,7 @@ public sealed class UserProfile
             throw new ArgumentException("A valid fixed-user email is required.", nameof(email));
         }
 
-        var normalized = email.Trim().ToLowerInvariant();
+        var normalized = email.ToLowerInvariant();
         if (normalized.Length is < 3 or > 254 || !normalized.Contains('@', StringComparison.Ordinal))
         {
             throw new ArgumentException("A valid fixed-user email is required.", nameof(email));

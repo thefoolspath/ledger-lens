@@ -1,6 +1,6 @@
 # Risk Register
 
-Last reviewed: 2026-09-08.
+Last reviewed: 2026-09-23.
 
 ## R-FOUNDATION-ANGULAR-CLI-ADVISORY
 
@@ -30,3 +30,10 @@ Last reviewed: 2026-09-08.
 | R-017 | Simulated activity contaminates confirmed accounting | Low | Critical | Separate aggregates/tables, no shared discriminator; synthetic PostgreSQL scenario verifies confirmed cash and entries remain unchanged | Open |
 | R-018 | Last trade or simulated P/L is mistaken for an executable result | Medium | High | Persistent simulation label, price-kind/feed/freshness display, explicit assumptions, no broker surface | Open |
 | R-019 | Chart presentation diverges from authoritative decimal results | Medium | High | Backend decimal projections, display-only JavaScript numbers, accessible table parity tests | Open |
+| R-020 | Google/session authentication maps to the wrong internal owner or auto-links by email | Low | Critical | Unique issuer/subject, closed registration, controlled exact-UUID owner link, no email linking, transactional concurrency and two-user isolation tests | Proposed control; implementation not started |
+| R-021 | Browser or direct caller forges identity/permission at an internal API | Medium | Critical | Strip inbound identity credentials, audience-bound signed internal tokens, service validation, endpoint policies and unchanged owner predicates | Proposed control; implementation not started |
+| R-022 | Session/signing/Data Protection keys leak or rotation invalidates access unexpectedly | Medium | Critical | External protected key storage, private/public separation, overlap/revocation tests, backup/recovery and log/Git scans | Proposed control; implementation not started |
+| R-023 | Database-managed permission or translation cache serves stale/incorrect access | Medium | High | Default deny, explicit precedence, versioned publish, immediate deny invalidation, bounded cache, English fallback and audit | Proposed control; implementation not started |
+| R-024 | Resource-catalog sync imports a typo/malicious key, drops grants, or grants access implicitly | Medium | Critical | Versioned manifest, typed generation, static raw-key checks, preview hash, transactional idempotent apply, Draft/default-deny additions, RetirementPending removals, explicit rename migration and audit | Proposed control; implementation not started |
+| R-025 | MFA enrollment, reset, recovery, or step-up can be bypassed or used for account takeover | Medium | Critical | Restricted pre-auth transaction, TOTP proof before activation, rate limit/lockout/replay checks, slow-hashed one-time recovery codes, recent-MFA reset, cookie rotation, all-session revocation, deterministic tests and audit | Proposed control; implementation not started |
+| R-026 | Security dashboard exposes credentials/PII or incorrectly reports a user as online | Medium | High | Show only server-side session metadata, separate active from recently active, coalesce `LastSeenAt`, exclude tokens/secrets/raw IP/full user agent, exact view permissions, bounded retention and privacy tests | Proposed control; implementation not started |

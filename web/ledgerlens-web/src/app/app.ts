@@ -295,7 +295,7 @@ export class App {
     if (!portfolio || !this.simulationAccountName.trim()) return;
     this.startRequest();
     this.postData<SimulationAccount>(LedgerLensApiRoutes.SimulationAccountsCreate,
-      { portfolioId: portfolio.id, name: this.simulationAccountName }, { headers: this.mutationHeaders }).subscribe({
+      { portfolioId: portfolio.id, name: this.simulationAccountName.trim() }, { headers: this.mutationHeaders }).subscribe({
       next: account => {
         this.simulationAccountName = '';
         this.simulationAccounts.update(items => [...items, account]);
@@ -344,7 +344,8 @@ export class App {
     const from = new Date(today);
     from.setUTCFullYear(from.getUTCFullYear() - 1);
     forkJoin({
-      quotes: this.postData<readonly MarketQuote[]>(LedgerLensApiRoutes.QuotesGetLatestList, { instruments: [instrument] }),
+      quotes: this.postData<readonly MarketQuote[]>(LedgerLensApiRoutes.QuotesGetLatestList,
+        { instruments: [this.toRequestInstrument(instrument)] }),
       fx: this.postData<readonly FxSnapshot[]>(LedgerLensApiRoutes.ForeignExchangeRatesGetLatestList, { baseCurrency: 'USD', quoteCurrency: 'THB' }),
       candles: this.getData<CandleSeries>(LedgerLensApiRoutes.InstrumentCandlesGetOne(instrument.id, this.isoDate(from), this.isoDate(today)))
     }).subscribe({
@@ -395,7 +396,7 @@ export class App {
     const request = this.simulationCorrectionTarget
       ? this.postData<unknown>(LedgerLensApiRoutes.SimulationTradesCorrect(this.simulationCorrectionTarget.id), {
           replacementDraftId: draft.id,
-          reason: this.simulationCorrectionReason
+          reason: this.simulationCorrectionReason.trim()
         }, { headers: this.mutationHeaders })
       : this.postData<unknown>(LedgerLensApiRoutes.SimulationTradeDraftsConfirm(draft.id), { accountId: simulation.account.id },
           { headers: this.mutationHeaders });
@@ -458,7 +459,7 @@ export class App {
     if (!this.portfolioName.trim()) return;
     this.startRequest();
     this.postData<PortfolioListItem>(LedgerLensApiRoutes.PortfoliosCreate, {
-      name: this.portfolioName,
+      name: this.portfolioName.trim(),
       baseCurrency: 'USD',
       reportingCurrency: 'THB'
     }, { headers: this.mutationHeaders }).subscribe({
@@ -477,9 +478,9 @@ export class App {
     this.startRequest();
     this.postData<unknown>(LedgerLensApiRoutes.InvestmentAccountsCreate, {
       portfolioId: portfolio.id,
-      name: this.accountName,
-      broker: this.broker,
-      currency: this.accountCurrency
+      name: this.accountName.trim(),
+      broker: this.broker.trim(),
+      currency: this.accountCurrency.trim()
     }, { headers: this.mutationHeaders }).subscribe({
       next: () => {
         this.accountName = '';
@@ -498,16 +499,16 @@ export class App {
     const body = {
       type: this.entryType,
       amount,
-      currency: account.currency,
+      currency: account.currency.trim(),
       effectiveAt: new Date().toISOString(),
-      note: this.entryNote || null,
-      instrumentSymbol: this.isTrade() ? this.instrumentSymbol : null,
+      note: this.trimOptional(this.entryNote),
+      instrumentSymbol: this.isTrade() ? this.trimOptional(this.instrumentSymbol) : null,
       quantity: this.isTrade() ? this.quantity : null,
       unitPrice: this.isTrade() ? this.unitPrice : null
     };
     const request = this.correctionTarget
       ? this.postData<unknown>(LedgerLensApiRoutes.CashLedgerEntriesCorrect(this.correctionTarget.id),
-          { ...body, reason: this.correctionReason }, { headers: this.mutationHeaders })
+          { ...body, reason: this.correctionReason.trim() }, { headers: this.mutationHeaders })
       : this.postData<unknown>(LedgerLensApiRoutes.CashLedgerEntriesCreate, { accountId: account.id, ...body }, { headers: this.mutationHeaders });
     request.subscribe({
       next: () => {
@@ -599,7 +600,7 @@ export class App {
         { headers: this.mutationHeaders }),
       series: this.postData<readonly SimulationSeriesPoint[]>(
         LedgerLensApiRoutes.SimulationValuationsCalculateSeriesList,
-        { accountId: simulation.account.id, symbol: instrument.symbol, observations: this.candles().map(candle => ({ date: candle.date, price: candle.close, fxRate: null })) },
+        { accountId: simulation.account.id, symbol: instrument.symbol.trim(), observations: this.candles().map(candle => ({ date: candle.date, price: candle.close, fxRate: null })) },
         { headers: this.mutationHeaders })
     }).subscribe({
       next: result => {
@@ -613,21 +614,37 @@ export class App {
   private toEvidence(quote: MarketQuote): SimulationMarketEvidence {
     return {
       marketInstrumentId: quote.instrument.id,
-      symbol: quote.instrument.symbol,
-      exchange: quote.instrument.exchange,
-      mic: quote.instrument.mic,
-      currency: quote.instrument.currency,
+      symbol: quote.instrument.symbol.trim(),
+      exchange: quote.instrument.exchange.trim(),
+      mic: quote.instrument.mic.trim(),
+      currency: quote.instrument.currency.trim(),
       price: quote.price,
-      priceKind: quote.priceKind,
-      provider: quote.provenance.provider,
-      feed: quote.provenance.feed,
+      priceKind: quote.priceKind.trim(),
+      provider: quote.provenance.provider.trim(),
+      feed: quote.provenance.feed.trim(),
       asOf: quote.provenance.asOf,
       retrievedAt: quote.provenance.retrievedAt,
-      freshness: quote.provenance.freshness,
+      freshness: quote.provenance.freshness.trim(),
       delaySeconds: quote.provenance.delaySeconds,
-      requestId: quote.provenance.requestId,
-      retentionPolicyKey: quote.provenance.retentionPolicyKey
+      requestId: quote.provenance.requestId.trim(),
+      retentionPolicyKey: quote.provenance.retentionPolicyKey.trim()
     };
+  }
+
+  private toRequestInstrument(instrument: MarketInstrument): MarketInstrument {
+    return {
+      ...instrument,
+      symbol: instrument.symbol.trim(),
+      name: instrument.name.trim(),
+      exchange: instrument.exchange.trim(),
+      mic: instrument.mic.trim(),
+      currency: instrument.currency.trim()
+    };
+  }
+
+  private trimOptional(value: string): string | null {
+    const trimmed = value.trim();
+    return trimmed || null;
   }
 
   private isoDate(value: Date): string {

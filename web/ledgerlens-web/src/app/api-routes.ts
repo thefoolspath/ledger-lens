@@ -13,7 +13,7 @@ export const LedgerLensApiRoutes = {
   SimulationTradesCorrect: (tradeId: string) => `/api/portfolio/v1/simulation-trades/correct/${tradeId}`,
   SimulationValuationsRecordList: '/api/portfolio/v1/simulation-valuations/record-list',
   SimulationValuationsCalculateSeriesList: '/api/portfolio/v1/simulation-valuations/calculate-series-list',
-  InstrumentsSearchList: (query: string) => `/api/market/v1/instruments/search-list?query=${encodeURIComponent(query)}&market=US`,
+  InstrumentsSearchList: (query: string) => `/api/market/v1/instruments/search-list?query=${encodeURIComponent(query.trim())}&market=US`,
   QuotesGetLatestList: '/api/market/v1/quotes/get-latest-list',
   InstrumentCandlesGetOne: (instrumentId: string, from: string, to: string) =>
     `/api/market/v1/instrument-candles/get-one/${instrumentId}?interval=1day&from=${from}&to=${to}`,

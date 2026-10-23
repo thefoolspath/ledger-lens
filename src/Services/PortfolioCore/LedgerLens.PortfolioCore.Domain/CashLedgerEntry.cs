@@ -104,9 +104,8 @@ public sealed class CashLedgerEntry
     private static string? NormalizeOptionalText(string? value, int maxLength, string parameterName)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
-        var normalized = value.Trim();
-        if (normalized.Length > maxLength)
+        if (value.Length > maxLength)
             throw new ArgumentException($"Value cannot exceed {maxLength} characters.", parameterName);
-        return normalized;
+        return value;
     }
 }

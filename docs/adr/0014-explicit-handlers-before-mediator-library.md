@@ -12,6 +12,8 @@ LedgerLens needs clear command/query use cases, strict module boundaries, and fu
 
 Use vertical slices and command-query separation with narrow `ICommandHandler<TCommand, TResult>` and `IQueryHandler<TQuery, TResult>` contracts. Minimal API endpoints inject their exact handler. Do not add `IMediator`, MediatR, a runtime dispatcher, or service-location dispatch in the Version 1 baseline.
 
+The decision is implemented through the shared compile-time-only `LedgerLens.Application.Abstractions` project. Each operation has one closed generic handler registration with scoped lifetime, and its endpoint injects that exact interface. Registration remains explicit; assembly scanning and reflection-based dispatch are not part of the architecture.
+
 Use ASP.NET Core middleware/endpoint filters for HTTP cross-cutting concerns and explicit command-handler transaction boundaries. Reconsider a mediator package only after at least three implemented slices prove a common application pipeline need that is not cleanly served by framework boundaries. Any candidate must pass the free dependency and license gate. The MIT-licensed source-generated `Mediator` project is a candidate, not an admitted dependency.
 
 All implementation follows the rules in [.NET Application Architecture](../architecture/DOTNET_APPLICATION_ARCHITECTURE.md).
@@ -33,6 +35,8 @@ All implementation follows the rules in [.NET Application Architecture](../archi
 
 Use-case dependencies and call paths remain visible and easy to debug. There is no mediator pipeline at first, so repeated application-level behaviours must be measured before introducing one. Endpoint handlers must stay thin, and architecture tests must prevent business logic leaking to HTTP code.
 
+The implemented call path is `HTTP endpoint -> exact generic handler -> application port -> infrastructure`. Generic handler contracts standardize invocation without making persistence generic or hiding use-case-specific dependencies.
+
 ## Risks
 
 Developers may manually duplicate validation, transaction, or telemetry logic. Reviews must first place HTTP concerns in framework boundaries and domain rules in the model; genuine repeated application-pipeline logic triggers the revisit condition.
@@ -40,4 +44,3 @@ Developers may manually duplicate validation, transaction, or telemetry logic. R
 ## Revisit conditions
 
 Revisit when three or more implemented slices require the same ordered application pipeline, when in-process notification fan-out becomes a demonstrated requirement, or when direct handler injection creates measured maintenance problems.
-

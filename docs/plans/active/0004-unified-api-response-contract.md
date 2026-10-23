@@ -56,7 +56,7 @@ Rules:
 - `GetOne` returns `ApiResponse<T>`; absence remains `404`, never `200` with `data: null`.
 - `GetList`, `SearchList`, autocomplete, combobox, latest-list, and admitted list-returning commands return `ApiResponse<IReadOnlyList<T>>`; no matches is `data: []`.
 - `GetPage` and `SearchPage` return the item array in `data` and offset pagination in `meta.pagination`.
-- `201 Created` wraps its representation and retains a correct `Location` header. A successful operation intentionally returning no representation uses `204 No Content` without an envelope.
+- `201 Created` wraps its representation. A `Location` header is retained only when the created resource has a canonical, owner-authorized public retrieval route; otherwise the header is omitted while `201` and the body remain. The Gateway converts retained Portfolio Core service-local locations to its public prefix under [0007.01](0007/01-created-location-policy.md). A successful operation intentionally returning no representation uses `204 No Content` without an envelope.
 - Do not add `IsError`, `StatusCode`, `Desc`, or `ErrorMessage` to the success envelope. HTTP status is authoritative, and failure details belong to Problem Details.
 - Version 1 supports page-number pagination only. Cursor pagination requires a separately named contract when a demonstrated use case exists.
 
