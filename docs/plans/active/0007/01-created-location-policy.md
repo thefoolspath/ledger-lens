@@ -1,12 +1,12 @@
 # 0007.01 — Govern `201 Created` and `Location` per endpoint
 
-Last reviewed: 2026-09-28.
+Last reviewed: 2026-10-23.
 
 Parent: [0007 Code Review Decision Log](../0007-code-review-decision-log.md)
 
 Group: API contract and Gateway boundary
 
-This file is a decision record and problem classification. It does not authorize source implementation beyond its explicit decision status and prerequisites.
+This decision record tracks the accepted policy and its implementation evidence.
 
 ## Related decisions
 
@@ -15,13 +15,13 @@ This file is a decision record and problem classification. It does not authorize
 - [0007.06](06-request-lifecycle-timeouts-mutations-and-exports.md) — asynchronous export status URLs and timeout failures also require truthful public routes.
 
 
-**Status:** Accepted policy; endpoint decisions and implementation not started.
+**Status:** Implemented in source; focused verification complete, distributed resource follow pending.
 
-### Current behavior
+### Previous behavior
 
 The shared `ApiResults.Created(HttpContext, string location, T data)` helper returns `201 Created`, adds a caller-supplied `Location` header, and wraps the created representation in the shared `{ data, meta }` response envelope.
 
-Current Portfolio Core create endpoints construct their own backend-relative location strings. For example, `InvestmentAccountsCreateEndpoint` returns:
+Previously, Portfolio Core create endpoints constructed backend-relative location strings. For example, `InvestmentAccountsCreateEndpoint` returned:
 
 ```csharp
 ApiResults.Created(
@@ -30,7 +30,7 @@ ApiResults.Created(
     account);
 ```
 
-The current source does not map `/v1/investment-accounts/get-one/{accountId}`, so that response advertises a location that cannot retrieve the created resource. The Gateway also exposes Portfolio Core below `/api/portfolio` and removes that prefix before forwarding. A backend-relative `/v1/...` location is therefore not automatically the canonical browser-facing `/api/portfolio/v1/...` location even when the backend route exists. Current create locations must be verified through the Gateway rather than only against backend route registration.
+The source has no `/v1/investment-accounts/get-one/{accountId}` mapping, so the old response advertised a location that could not retrieve the created resource. The Gateway exposes Portfolio Core below `/api/portfolio` and removes that prefix before forwarding. The old backend-relative `/v1/...` location was therefore not the canonical browser-facing `/api/portfolio/v1/...` location even when the backend route existed.
 
 ### Review concern
 
@@ -51,13 +51,20 @@ Whether Angular currently follows the header does not determine the HTTP contrac
 
 | Create operation | Current advertised location | Retrieval evidence | Decision |
 | --- | --- | --- | --- |
-| `PortfoliosCreate` | `/v1/portfolios/get-one/{id}` | Backend `PortfoliosGetOne` exists; public Gateway path still unverified | Pending endpoint decision |
-| `InvestmentAccountsCreate` | `/v1/investment-accounts/get-one/{id}` | No current get-one route | Pending endpoint decision; do not add a route only for this header |
-| `CashLedgerEntriesCreate` | `/v1/cash-ledger-entries/get-one/{id}` | No current get-one route; entry is part of an auditable ledger workflow | Pending endpoint decision |
-| `SimulationAccountsCreate` | `/v1/simulation-accounts/get-one/{id}` | Backend `SimulationAccountsGetOne` exists; public Gateway path still unverified | Pending endpoint decision |
-| `SimulationTradeDraftsCreate` | `/v1/simulation-trade-drafts/{id}` | No canonical operation segment or public get-one route | Pending endpoint decision; transient-draft semantics favor omission |
+| `PortfoliosCreate` | `/v1/portfolios/get-one/{id}` | `PortfoliosGetOne` maps the owner-checked resource route | Retain; Gateway exposes `/api/portfolio/v1/portfolios/get-one/{id}` |
+| `InvestmentAccountsCreate` | `/v1/investment-accounts/get-one/{id}` | No current get-one route | Omit; account creation still returns `201` and its representation |
+| `CashLedgerEntriesCreate` | `/v1/cash-ledger-entries/get-one/{id}` | No current get-one route | Omit; append-only entry remains available through existing ledger workflows |
+| `SimulationAccountsCreate` | `/v1/simulation-accounts/get-one/{id}` | `SimulationAccountsGetOne` maps the owner-checked resource route | Retain; Gateway exposes `/api/portfolio/v1/simulation-accounts/get-one/{id}` |
+| `SimulationTradeDraftsCreate` | `/v1/simulation-trade-drafts/{id}` | No canonical get-one route | Omit; the transient draft is consumed by workflow operations |
 
-Each row must record `Retain` or `Omit`, owner rationale, public route evidence, decision date, and focused test evidence before its source changes.
+Endpoint decisions were confirmed by the owner in the 0007.01 design discussion before implementation. The three omissions require no new retrieval route.
+
+### Implemented boundary
+
+- Direct Portfolio Core responses keep service-local `/v1/...` locations for the two retained operations. The Gateway is the supported public entrypoint and rewrites only `201 Created` Portfolio response locations to origin-relative `/api/portfolio/v1/...`, deriving its prefix and route identity from `GatewayRoutes.Definitions`.
+- `ApiResults.Created(HttpContext, T)` returns the same `{ data, meta }` body and `201` without a `Location` header for the three omitted operations.
+- The Gateway removes a malformed, absolute, wrong-root, encoded, query-bearing, fragment-bearing, or otherwise unsafe created location and logs a structured warning without logging the supplied header value. It preserves the upstream `201` and body because the mutation may already have committed.
+- Angular continues to unwrap `data` and does not depend on `Location`.
 
 ### Implementation scope
 
@@ -81,7 +88,7 @@ Each row must record `Retain` or `Omit`, owner rationale, public route evidence,
 
 ### Decision record
 
-- **Decision:** Accepted per-endpoint policy; individual endpoint rows remain pending.
+- **Decision:** Retain for `PortfoliosCreate` and `SimulationAccountsCreate`; omit for the other three current Portfolio Core create endpoints. Gateway owns the public rewrite.
 - **Owner rationale:** `Location` is useful only when it truthfully identifies an addressable public resource. Frontend usage alone neither requires nor forbids it.
-- **Decision date:** 2026-09-24.
-- **Implementation evidence:** Not started.
+- **Decision date:** 2026-09-28 design discussion; source implemented 2026-10-23.
+- **Implementation evidence (2026-10-23):** Gateway integration tests passed `13/13` against a synthetic Portfolio service, covering public header rewrite and follow, invalid header removal, and the headerless Created envelope. Architecture tests passed `20/20`, including the five-endpoint retain/omit matrix. Gateway, Portfolio Core API, and distributed test project builds passed with zero warnings/errors; the AppHost resource-model test passed `1/1`; documentation consistency and `git diff --check` passed. The existing distributed scenario now asserts all five create-header decisions and follows both retained locations against the real Portfolio Core service. Its runtime gate remains pending because the local Docker Linux engine pipe is unavailable.

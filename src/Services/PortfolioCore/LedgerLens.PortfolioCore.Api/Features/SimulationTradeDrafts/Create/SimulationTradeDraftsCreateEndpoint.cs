@@ -29,7 +29,7 @@ public static class SimulationTradeDraftsCreateEndpoint
                     request.EffectiveAt, request.Quote), cancellationToken);
                 return result is null
                     ? problems.NotFound(httpContext)
-                    : ApiResults.Created(httpContext, $"/v1/simulation-trade-drafts/{result.Id}", result);
+                    : ApiResults.Created(httpContext, result);
             }
             catch (ArgumentException)
             {

@@ -28,7 +28,7 @@ public static class CashLedgerEntriesCreateEndpoint
                     cancellationToken);
                 return entry is null
                     ? problems.NotFound(httpContext)
-                    : ApiResults.Created(httpContext, $"/v1/cash-ledger-entries/get-one/{entry.Id}", entry);
+                    : ApiResults.Created(httpContext, entry);
             }
             catch (ArgumentException)
             {

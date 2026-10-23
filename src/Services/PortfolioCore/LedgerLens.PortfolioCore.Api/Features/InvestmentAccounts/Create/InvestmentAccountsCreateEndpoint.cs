@@ -24,7 +24,7 @@ public static class InvestmentAccountsCreateEndpoint
                     new(request.PortfolioId, request.Name, request.Broker, request.Currency), cancellationToken);
                 return account is null
                     ? problems.NotFound(httpContext)
-                    : ApiResults.Created(httpContext, $"/v1/investment-accounts/get-one/{account.Id}", account);
+                    : ApiResults.Created(httpContext, account);
             }
             catch (ArgumentException)
             {

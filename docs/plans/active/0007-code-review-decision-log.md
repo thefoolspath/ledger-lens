@@ -1,6 +1,6 @@
 # Code Review Decision Log
 
-Last reviewed: 2026-09-28. Status: Active decision index; accepted items remain unimplemented until their item-specific prerequisites, implementation plan, and acceptance evidence are complete.
+Last reviewed: 2026-10-23. Status: Active decision index; each child record carries its own implementation and verification status.
 
 ## Goal
 
@@ -25,7 +25,7 @@ This index is authoritative for cross-item relationships and delivery order. The
 
 | ID | Decision record | Status | Implementation owner | Primary relationships |
 | --- | --- | --- | --- | --- |
-| `0007.01` | [Created and Location policy](0007/01-created-location-policy.md) | Accepted policy; endpoint decisions pending | Future focused implementation plan | `0007.02`, `0007.04`, `0007.06` |
+| `0007.01` | [Created and Location policy](0007/01-created-location-policy.md) | Source implemented; distributed resource follow pending | Focused 0007.01 implementation | `0007.02`, `0007.04`, `0007.06` |
 | `0007.02` | [Typed failures and exception handling](0007/02-typed-failures-and-exception-handling.md) | Accepted direction; not implemented | [Plan 0004](0004-unified-api-response-contract.md) | `0007.01`, `0007.04`, `0007.06` |
 
 ### Financial correctness and collection contracts
@@ -77,7 +77,7 @@ Naming assessment is not a correctness blocker. Correct the governing C# casing 
 
 1. Correct the complete-ledger `.Take(5000)` defect under `0007.04` and add the over-5,000-entry regression evidence before structural refactoring.
 2. Correct the governing C# casing documentation under `0007.03`; continue the wider naming inventory in parallel without blocking correctness work.
-3. Complete per-endpoint `Location` decisions under `0007.01` and verify retained locations through the public Gateway path.
+3. Complete the distributed create-and-follow gate for the implemented per-endpoint `Location` decisions under `0007.01`.
 4. Deliver typed expected failures under plan 0004 and `0007.02` before removing corresponding endpoint catches.
 5. Capture Angular characterization tests and deliver the behavior-preserving Milestone 5A feature extraction under `0007.05`.
 6. Implement `SimulationAccountsGetPage` under `0007.04` inside the extracted Simulation feature, including Angular route/query state.
