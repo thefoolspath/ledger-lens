@@ -17,8 +17,6 @@ public static class CashLedgerEntriesCreateEndpoint
             ICommandHandler<CashLedgerEntriesCreateCommand, LedgerEntryView?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(request.AccountId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "accountId");
             if (!Enum.TryParse<CashLedgerEntryType>(request.Type, true, out var entryType))
                 return problems.Validation(httpContext, ApiErrorCodes.InvalidLedgerEntryType, "type");
             try

@@ -17,9 +17,6 @@ public static class SimulationTradesCorrectEndpoint
             ICommandHandler<SimulationTradesCorrectCommand, IReadOnlyList<SimulationTradeView>?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(tradeId) ||
-                !PortfolioCoreEndpointValidation.IsVersion7(request.ReplacementDraftId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier);
             try
             {
                 var result = await handler.HandleAsync(
