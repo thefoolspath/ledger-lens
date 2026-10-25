@@ -1,6 +1,6 @@
 # 0007.01 — Govern `201 Created` and `Location` per endpoint
 
-Last reviewed: 2026-10-23.
+Last reviewed: 2026-10-25.
 
 Parent: [0007 Code Review Decision Log](../0007-code-review-decision-log.md)
 
@@ -15,7 +15,7 @@ This decision record tracks the accepted policy and its implementation evidence.
 - [0007.06](06-request-lifecycle-timeouts-mutations-and-exports.md) — asynchronous export status URLs and timeout failures also require truthful public routes.
 
 
-**Status:** Implemented in source; focused verification complete, distributed resource follow pending.
+**Status:** Implemented and verified through the Gateway against the real Portfolio Core service.
 
 ### Previous behavior
 
@@ -91,4 +91,5 @@ Endpoint decisions were confirmed by the owner in the 0007.01 design discussion 
 - **Decision:** Retain for `PortfoliosCreate` and `SimulationAccountsCreate`; omit for the other three current Portfolio Core create endpoints. Gateway owns the public rewrite.
 - **Owner rationale:** `Location` is useful only when it truthfully identifies an addressable public resource. Frontend usage alone neither requires nor forbids it.
 - **Decision date:** 2026-09-28 design discussion; source implemented 2026-10-23.
-- **Implementation evidence (2026-10-23):** Gateway integration tests passed `13/13` against a synthetic Portfolio service, covering public header rewrite and follow, invalid header removal, and the headerless Created envelope. Architecture tests passed `20/20`, including the five-endpoint retain/omit matrix. Gateway, Portfolio Core API, and distributed test project builds passed with zero warnings/errors; the AppHost resource-model test passed `1/1`; documentation consistency and `git diff --check` passed. The existing distributed scenario now asserts all five create-header decisions and follows both retained locations against the real Portfolio Core service. Its runtime gate remains pending because the local Docker Linux engine pipe is unavailable.
+- **Implementation evidence (2026-10-23):** Gateway integration tests passed `13/13` against a synthetic Portfolio service, covering public header rewrite and follow, invalid header removal, and the headerless Created envelope. Architecture tests passed `20/20`, including the five-endpoint retain/omit matrix. Gateway, Portfolio Core API, and distributed test project builds passed with zero warnings/errors; the AppHost resource-model test passed `1/1`; documentation consistency and `git diff --check` passed.
+- **Distributed verification (2026-10-25):** On `codex/0007-01-created-location-policy`, both explicitly enabled Aspire distributed tests passed `2/2` with ephemeral PostgreSQL and NATS. The create scenario asserted the header decisions for all five create operations, then followed both retained public Gateway locations to the same owner-authorized Portfolio and Simulation Account resources.
