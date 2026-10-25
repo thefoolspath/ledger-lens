@@ -1,6 +1,6 @@
 # LedgerLens Documentation
 
-Last reviewed: 2026-10-23.
+Last reviewed: 2026-10-25.
 
 LedgerLens has implemented local application source, automated tests, and planning documentation. The distributed foundation, initial confirmed-ledger slice, manual Simulation Accounts, and current API/handler foundations are implemented. IdentityAccess, interactive authentication, multi-user authorization, and non-loopback exposure remain proposed.
 
