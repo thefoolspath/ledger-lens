@@ -20,7 +20,11 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Testing" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <ProjectReference Include="..\..\src\LedgerLens.ApiContracts\LedgerLens.ApiContracts.csproj" />
     <ProjectReference Include="..\..\src\LedgerLens.AppHost\LedgerLens.AppHost.csproj" />
+    <ProjectReference Include="..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Database\LedgerLens.PortfolioCore.Database.csproj" />
+    <ProjectReference Include="..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Domain\LedgerLens.PortfolioCore.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Infrastructure\LedgerLens.PortfolioCore.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

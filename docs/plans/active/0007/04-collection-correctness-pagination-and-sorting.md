@@ -1,6 +1,6 @@
 # 0007.04 — Require server-side pagination and sorting for pageable resource collections
 
-Last reviewed: 2026-09-28.
+Last reviewed: 2026-10-30.
 
 Parent: [0007 Code Review Decision Log](../0007-code-review-decision-log.md)
 
@@ -17,7 +17,7 @@ This file is a decision record and problem classification. It does not authorize
 - [0007.07](07-persistence-port-decomposition.md) — query shapes and store boundaries must stabilize before persistence ports split.
 
 
-**Status:** Accepted; implementation not started.
+**Status:** In implementation. The complete-ledger cap was removed in source; the over-5,000-entry PostgreSQL regression test has been added but has not passed the distributed runtime gate yet. Pagination and sorting work has not started.
 
 ### Current behavior
 
@@ -173,4 +173,4 @@ The Angular production build, focused component/contract tests, desktop layout, 
 - **Decision:** Accepted.
 - **Owner rationale:** Pageable resource collections must not rely on hidden hard-coded row limits. Pagination and sorting must be explicit, server-side, and present in both request and response contracts. `GET` remains appropriate for flat page parameters; HTTP `QUERY` is reserved for genuinely structured searches rather than selected solely because the property count grows.
 - **Decision date:** 2026-09-22.
-- **Implementation evidence:** Not started.
+- **Implementation evidence:** `PortfolioCoreStore.GetSimulationEntriesAsync` no longer applies `.Take(5000)` and retains the owner predicate and deterministic `EffectiveAt`, `RecordedAt`, `Id` order. A synthetic 5,001-entry Aspire/PostgreSQL test now checks complete position quantity and cross-owner isolation. The Infrastructure build passed with zero warnings/errors on 2026-10-30; the distributed test remains unverified.
