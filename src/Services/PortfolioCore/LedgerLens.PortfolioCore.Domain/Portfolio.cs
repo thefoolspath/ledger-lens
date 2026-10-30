@@ -43,12 +43,11 @@ public sealed class Portfolio
             throw new ArgumentException("Portfolio name must contain 1 to 100 characters.", nameof(name));
         }
 
-        var normalized = name.Trim();
-        if (normalized.Length is < 1 or > 100)
+        if (name.Length is < 1 or > 100)
         {
             throw new ArgumentException("Portfolio name must contain 1 to 100 characters.", nameof(name));
         }
 
-        return normalized;
+        return name;
     }
 }

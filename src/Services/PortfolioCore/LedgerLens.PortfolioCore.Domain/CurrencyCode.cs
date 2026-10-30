@@ -9,7 +9,7 @@ public static class CurrencyCode
             throw new ArgumentException("Currency must be a three-letter ISO 4217 code.", nameof(value));
         }
 
-        var normalized = value.Trim().ToUpperInvariant();
+        var normalized = value.ToUpperInvariant();
         if (normalized.Length != 3 || normalized.Any(character => character is < 'A' or > 'Z'))
         {
             throw new ArgumentException("Currency must be a three-letter ISO 4217 code.", nameof(value));

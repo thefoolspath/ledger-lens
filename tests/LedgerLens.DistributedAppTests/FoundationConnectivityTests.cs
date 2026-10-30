@@ -88,6 +88,12 @@ public sealed class FoundationConnectivityTests
         await EnsureSuccessAsync(createPortfolioResponse, timeout.Token);
         var createdPortfolio = await ReadDataAsync<CreatedResource>(createPortfolioResponse, timeout.Token);
         Assert.Equal(7, createdPortfolio.Id.Version);
+        Assert.Equal(System.Net.HttpStatusCode.Created, createPortfolioResponse.StatusCode);
+        Assert.Equal($"/api/portfolio/v1/portfolios/get-one/{createdPortfolio.Id}",
+            createPortfolioResponse.Headers.Location?.OriginalString);
+        var createdPortfolioOverview = await GetDataAsync<PortfolioOverview>(client,
+            createPortfolioResponse.Headers.Location!.OriginalString, timeout.Token);
+        Assert.Equal(createdPortfolio.Id, createdPortfolioOverview.Id);
 
         using var createAccountResponse = await client.PostAsJsonAsync(
             "/api/portfolio/v1/investment-accounts/create",
@@ -96,6 +102,8 @@ public sealed class FoundationConnectivityTests
         await EnsureSuccessAsync(createAccountResponse, timeout.Token);
         var createdAccount = await ReadDataAsync<CreatedResource>(createAccountResponse, timeout.Token);
         Assert.Equal(7, createdAccount.Id.Version);
+        Assert.Equal(System.Net.HttpStatusCode.Created, createAccountResponse.StatusCode);
+        Assert.Null(createAccountResponse.Headers.Location);
 
         Guid withdrawalId = Guid.Empty;
         foreach (var entry in new[]
@@ -115,6 +123,8 @@ public sealed class FoundationConnectivityTests
                 timeout.Token);
             await EnsureSuccessAsync(entryResponse, timeout.Token);
             var createdEntry = await ReadDataAsync<CreatedResource>(entryResponse, timeout.Token);
+            Assert.Equal(System.Net.HttpStatusCode.Created, entryResponse.StatusCode);
+            Assert.Null(entryResponse.Headers.Location);
             if (entry.type == "Withdrawal") withdrawalId = createdEntry.Id;
         }
 
@@ -158,6 +168,12 @@ public sealed class FoundationConnectivityTests
             new { portfolioId = createdPortfolio.Id, name = "Synthetic NVDA what-if" }, timeout.Token);
         await EnsureSuccessAsync(createSimulationResponse, timeout.Token);
         var simulation = await ReadDataAsync<CreatedResource>(createSimulationResponse, timeout.Token);
+        Assert.Equal(System.Net.HttpStatusCode.Created, createSimulationResponse.StatusCode);
+        Assert.Equal($"/api/portfolio/v1/simulation-accounts/get-one/{simulation.Id}",
+            createSimulationResponse.Headers.Location?.OriginalString);
+        var createdSimulationOverview = await GetDataAsync<SimulationOverview>(client,
+            createSimulationResponse.Headers.Location!.OriginalString, timeout.Token);
+        Assert.Equal(simulation.Id, createdSimulationOverview.Account.Id);
 
         object Evidence() => new
         {
@@ -197,6 +213,8 @@ public sealed class FoundationConnectivityTests
                 }, timeout.Token);
             await EnsureSuccessAsync(draftResponse, timeout.Token);
             var draft = await ReadDataAsync<SimulationDraft>(draftResponse, timeout.Token);
+            Assert.Equal(System.Net.HttpStatusCode.Created, draftResponse.StatusCode);
+            Assert.Null(draftResponse.Headers.Location);
             using var confirmResponse = await client.PostAsJsonAsync(
                 $"/api/portfolio/v1/simulation-trade-drafts/confirm/{draft.Id}",
                 new { accountId = simulation.Id }, timeout.Token);
@@ -263,7 +281,7 @@ public sealed class FoundationConnectivityTests
 
     private sealed record CreatedResource(Guid Id);
 
-    private sealed record PortfolioOverview(AccountOverview[] Accounts);
+    private sealed record PortfolioOverview(Guid Id, AccountOverview[] Accounts);
 
     private sealed record AccountOverview(decimal CashBalance, CashEntry[] Entries);
 
@@ -276,7 +294,7 @@ public sealed class FoundationConnectivityTests
     private sealed record FxRate(decimal Rate, bool IsBenchmark);
     private sealed record SimulationDraft(Guid Id);
     private sealed record SimulationTrade(Guid Id, string Side);
-    private sealed record SimulationOverview(SimulationPosition[] Positions, SimulationTrade[] Trades);
+    private sealed record SimulationOverview(CreatedResource Account, SimulationPosition[] Positions, SimulationTrade[] Trades);
     private sealed record SimulationPosition(string Symbol, decimal Quantity);
     private sealed record SimulationValuation(decimal CurrentValueUsd, bool IsComplete);
 

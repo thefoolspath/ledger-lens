@@ -11,6 +11,9 @@ public static class ApiResults
     public static IResult Created<T>(HttpContext httpContext, string location, T data) =>
         Results.Created(location, CreateResponse(httpContext, data));
 
+    public static IResult Created<T>(HttpContext httpContext, T data) =>
+        Results.Json(CreateResponse(httpContext, data), statusCode: StatusCodes.Status201Created);
+
     public static IResult Page<T>(HttpContext httpContext, IReadOnlyList<T> data, int pageNumber, int pageSize, long totalCount)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);

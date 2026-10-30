@@ -1,14 +1,14 @@
 # Testing Strategy
 
-Status: Accepted foundation gates; business test layers activate with their milestones.
+Status: Accepted and active; foundation and implemented business-slice gates are enforced. Last reviewed: 2026-09-24.
 
 ## Foundation layers
 
 - **Architecture:** per-service Domain/Application/Database/Infrastructure/API direction; no cross-service internals or common domain project. A Database project has no service project references and may be referenced only by its owning Infrastructure and Migrations projects.
 - **Distributed application:** start AppHost, wait for every named resource, resolve dynamic endpoints, exercise Gateway-to-service routes, and call a backend through the Angular development proxy. Automated distributed tests disable persistent volumes; a separate local stop/start check verifies named-volume credential continuity.
 - **Gateway integration:** route mapping, path transforms, ProblemDetails, timeout/cancellation, Host/Origin policy, and unavailable backend behaviour.
-- **Infrastructure connectivity:** each service reaches only its named PostgreSQL database and NATS; no `EnsureCreated`, cross-database access, or business tables.
-- **Frontend component:** Angular connectivity shell calls Gateway only and renders healthy/degraded/error states accessibly.
+- **Infrastructure connectivity:** each service reaches only its named PostgreSQL database and NATS; no `EnsureCreated` or cross-database access. Migration/schema tests ensure business tables exist only in their owning service and that foundation-only services do not acquire premature schemas.
+- **Frontend component:** Angular calls Gateway only and tests connectivity, confirmed-ledger workflows, Simulation mode, shared API envelopes, formatting, responsive behaviour, and accessible healthy/degraded/error states appropriate to each implemented slice.
 - **Observability:** one request produces correlated Gateway/backend logs and a distributed trace in Aspire Dashboard.
 - **Privacy/security:** loopback-only exposure, forbidden paths, secret/PII patterns, log redaction, and internal endpoint exposure checks.
 

@@ -143,6 +143,31 @@ public sealed class ApiNamingConventionTests
         Assert.DoesNotContain("new { error =", source, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Created_location_policy_is_explicit_for_every_create_endpoint()
+    {
+        var apiRoot = Path.Combine(RepositoryRoot, "src", "Services", "PortfolioCore",
+            "LedgerLens.PortfolioCore.Api", "Features");
+        var expected = new Dictionary<string, bool>
+        {
+            ["Portfolios/Create/PortfoliosCreateEndpoint.cs"] = true,
+            ["InvestmentAccounts/Create/InvestmentAccountsCreateEndpoint.cs"] = false,
+            ["CashLedgerEntries/Create/CashLedgerEntriesCreateEndpoint.cs"] = false,
+            ["SimulationAccounts/Create/SimulationAccountsCreateEndpoint.cs"] = true,
+            ["SimulationTradeDrafts/Create/SimulationTradeDraftsCreateEndpoint.cs"] = false,
+        };
+
+        foreach (var (relativePath, retainsLocation) in expected)
+        {
+            var source = File.ReadAllText(Path.Combine(apiRoot,
+                relativePath.Replace('/', Path.DirectorySeparatorChar)));
+            var createdCall = Assert.Single(Regex.Matches(source,
+                @"ApiResults\.Created\(httpContext, (?<arguments>[^;]+)\);"));
+            var arguments = createdCall.Groups["arguments"].Value;
+            Assert.Equal(retainsLocation, arguments.Contains("/v1/", StringComparison.Ordinal));
+        }
+    }
+
     private static string ApiSource() => string.Join('\n', Directory.EnumerateFiles(
             Path.Combine(RepositoryRoot, "src", "Services"), "*.cs", SearchOption.AllDirectories)
         .Where(file => file.Contains(".Api", StringComparison.Ordinal))

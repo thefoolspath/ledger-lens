@@ -12,10 +12,14 @@ public static class GatewayRoutes
         ("/api/operations", "operations", "operations-api"),
     ];
 
+    public static string PortfolioPrefix => DefinitionFor("portfolio").Prefix;
+
+    public static string PortfolioRouteId => RouteIdFor(DefinitionFor("portfolio"));
+
     public static IReadOnlyList<RouteConfig> Routes { get; } = Definitions
         .Select(definition => new RouteConfig
         {
-            RouteId = $"{definition.Cluster}-route",
+            RouteId = RouteIdFor(definition),
             ClusterId = definition.Cluster,
             Match = new RouteMatch { Path = $"{definition.Prefix}/{{**catch-all}}" },
         }.WithTransformPathRemovePrefix(definition.Prefix))
@@ -31,4 +35,10 @@ public static class GatewayRoutes
             },
         })
         .ToArray();
+
+    private static (string Prefix, string Cluster, string Service) DefinitionFor(string cluster) =>
+        Definitions.Single(definition => string.Equals(definition.Cluster, cluster, StringComparison.Ordinal));
+
+    private static string RouteIdFor((string Prefix, string Cluster, string Service) definition) =>
+        $"{definition.Cluster}-route";
 }

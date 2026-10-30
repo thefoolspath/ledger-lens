@@ -1,6 +1,6 @@
 # .NET Application Architecture and Design Rules
 
-Status: Accepted for the distributed foundation. Last reviewed: 2026-09-02.
+Status: Accepted and partially implemented. Last reviewed: 2026-09-24.
 
 ## Non-negotiable rules
 
@@ -16,7 +16,7 @@ Each business service is independently structured as:
 Service.Domain <- Service.Application <- Service.Infrastructure <- Service.Api/Worker
 ```
 
-- **Domain**: future entities, value objects, invariants, and domain services; no HTTP, EF, logging, NATS, or provider dependency.
+- **Domain**: entities, value objects, invariants, and domain services; no HTTP, EF, logging, NATS, or provider dependency.
 - **Application**: commands, queries, explicit handlers, results, and narrow ports; no API or provider DTOs.
 - **Infrastructure**: EF Core/Npgsql, external adapters, NATS/Outbox implementations, and configuration.
 - **Api/Worker**: composition root, transport mapping, authorization boundary, and hosting only.
@@ -27,7 +27,7 @@ Business routes and their vertical-slice files follow the normative [API and Fea
 
 ## Explicit handlers, not a mediator package
 
-Future vertical slices use `ICommandHandler<TCommand,TResult>` and `IQueryHandler<TQuery,TResult>`, with the endpoint injecting its exact handler. There is no `IMediator`, runtime registry, MediatR, generic repository, mapper framework, or validation framework in the foundation. Middleware and endpoint filters own HTTP cross-cutting concerns.
+Implemented Portfolio Core and Market Data vertical slices use `ICommandHandler<TCommand,TResult>` and `IQueryHandler<TQuery,TResult>`, with the endpoint injecting its exact handler. Future slices follow the same rule unless an accepted ADR replaces it. There is no `IMediator`, runtime registry, MediatR, generic repository, mapper framework, or validation framework. Middleware and endpoint filters own HTTP cross-cutting concerns.
 
 ## Communication
 
@@ -55,13 +55,15 @@ Each service has one scoped `DbContext` for its own database. Migrations are gen
 
 Portfolio Core pilots the accepted hybrid workflow in ADR-0016. Its service-owned Database project contains generated persistence types and `DbContext`; Infrastructure alone maps them to Domain and implements Application ports; the Migrations project owns the snapshot and preserved migration chain. Reverse engineering is restricted to approved local/nonproduction sources and explicit service-owned tables. Generated code never enters Domain/Application, production is never a scaffold source, and migration history is never stamped without schema-equivalence evidence.
 
-Future financial values use `decimal` and exact PostgreSQL `numeric`; queries use server-side filtering/projection, cancellation, bounded pagination, and one intentional materialization point.
+Financial values use `decimal` and exact PostgreSQL `numeric`; queries use server-side filtering/projection, cancellation, bounded pagination, and one intentional materialization point.
 
 LedgerLens-owned domain and persistent identifiers use UUIDv7 exclusively. Create new values with `Guid.CreateVersion7()` and reject non-v7 UUID values at API boundaries where the contract identifies a LedgerLens-owned resource. Do not replace external provider identifiers or OpenTelemetry trace identifiers with application UUIDs.
 
 ## Fixed local user and future OIDC
 
-Identity remains business work for Phase 1. The foundation stores no personal email. Later, Gateway and services receive an `ICurrentUser` abstraction backed by fixed external configuration; Portfolio Core owns `UserProfile` and required Portfolio ownership. Future OIDC maps unique issuer/subject to the internal user rather than trusting email.
+Version 1 currently uses an `ICurrentUser` abstraction backed by externally configured `FixedLocalCurrentUser`; Portfolio Core owns `UserProfile` and required Portfolio ownership. The identifier and owner-supplied email remain outside tracked source and fixtures. Interactive authentication and multi-user authorization are not implemented. A future OIDC identity must map unique issuer/subject to the existing internal user rather than trusting email.
+
+The 2026-09-22 proposed evolution is [Identity, Access Control, and UI Localization Architecture](IDENTITY_ACCESS_AND_UI_LOCALIZATION.md): a Gateway cookie BFF, internal IdentityAccess service/database, claims-backed service `ICurrentUser`, short-lived audience-specific internal tokens, and resource-key authorization/localization. Until ADR-0019 through ADR-0021 are accepted and implemented, the fixed-user and loopback-only behavior remains authoritative.
 
 ## Free dependency policy
 

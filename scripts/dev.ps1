@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', '--help', '-h', 'bootstrap', 'doctor', 'restore', 'build', 'test', 'run', 'db', 'dotnet', 'aspire', 'node', 'npm', 'ng')]
+    [ValidateSet('help', '--help', '-h', 'bootstrap', 'doctor', 'restore', 'build', 'test', 'docs', 'run', 'db', 'dotnet', 'aspire', 'node', 'npm', 'ng')]
     [string] $Command = 'help',
 
     [Parameter(Position = 1, ValueFromRemainingArguments)]
@@ -53,6 +53,7 @@ Commands:
   restore     Restore .NET and Angular dependencies
   build       Build the .NET solution and Angular application
   test        Run .NET and Angular tests
+  docs        Validate documentation consistency and internal links
   run         Start the complete Aspire application graph
   db          Run guarded Portfolio Core hybrid database tooling
   dotnet      Run the project-local .NET CLI
@@ -65,6 +66,7 @@ Commands:
 Examples:
   lg run
   lg test
+  lg docs
   lg db help
   lg dotnet --version
 '@ | Write-Host
@@ -144,6 +146,11 @@ switch ($Command) {
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         & $npmCmd test --prefix $webRoot -- --watch=false
         exit $LASTEXITCODE
+    }
+    'docs' {
+        & (Join-Path $PSScriptRoot 'check-doc-consistency.ps1')
+        if (-not $?) { exit 1 }
+        exit 0
     }
     'run' {
         Assert-Tool $dotnetExe '.NET SDK'

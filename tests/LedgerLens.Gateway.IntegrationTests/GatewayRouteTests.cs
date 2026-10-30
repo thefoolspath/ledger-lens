@@ -78,6 +78,75 @@ public sealed class GatewayRouteTests
     }
 
     [Fact]
+    public async Task Created_portfolio_location_is_rewritten_and_resolves_through_the_Gateway()
+    {
+        var resourceId = Guid.CreateVersion7();
+        await using var service = await StartPortfolioLocationServiceAsync(
+            $"/v1/portfolios/get-one/{resourceId}", resourceId);
+        await using var factory = CreateGatewayFactory(service);
+        using var client = factory.CreateClient();
+
+        using var createResponse = await client.PostAsync("/api/portfolio/v1/portfolios/create", null);
+
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        Assert.Equal($"/api/portfolio/v1/portfolios/get-one/{resourceId}",
+            createResponse.Headers.Location?.OriginalString);
+        using var getResponse = await client.GetAsync(createResponse.Headers.Location);
+        getResponse.EnsureSuccessStatusCode();
+        var retrieved = await getResponse.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(resourceId, retrieved.GetProperty("id").GetGuid());
+    }
+
+    [Theory]
+    [InlineData("https://malicious.example/v1/portfolios/get-one/1")]
+    [InlineData("//malicious.example/v1/portfolios/get-one/1")]
+    [InlineData("v1/portfolios/get-one/1")]
+    [InlineData("/internal/portfolios/get-one/1")]
+    [InlineData("/v1/../internal/secrets")]
+    [InlineData("/v1/%2e%2e/internal/secrets")]
+    [InlineData("/v1//portfolios/get-one/1")]
+    [InlineData("/v1/portfolios/get-one/1?redirect=https://malicious.example")]
+    public async Task Invalid_created_portfolio_location_is_removed_without_changing_the_committed_response(
+        string upstreamLocation)
+    {
+        var resourceId = Guid.CreateVersion7();
+        await using var service = await StartPortfolioLocationServiceAsync(upstreamLocation, resourceId);
+        await using var factory = CreateGatewayFactory(service);
+        using var client = factory.CreateClient();
+
+        using var response = await client.PostAsync("/api/portfolio/v1/portfolios/create", null);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Null(response.Headers.Location);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(resourceId, body.GetProperty("id").GetGuid());
+    }
+
+    [Fact]
+    public async Task Created_response_without_location_keeps_its_envelope_and_status()
+    {
+        var builder = WebApplication.CreateSlimBuilder();
+        builder.WebHost.UseUrls("http://127.0.0.1:0");
+        var app = builder.Build();
+        app.MapPost("/created", (HttpContext context) => ApiResults.Created(context, new { id = "created" }));
+        await app.StartAsync();
+        try
+        {
+            using var client = new HttpClient { BaseAddress = new Uri(app.Urls.Single()) };
+            using var response = await client.PostAsync("/created", null);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Null(response.Headers.Location);
+            var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal("created", body.GetProperty("data").GetProperty("id").GetString());
+            Assert.True(body.GetProperty("meta").TryGetProperty("correlationId", out _));
+        }
+        finally
+        {
+            await app.DisposeAsync();
+        }
+    }
+
+    [Fact]
     public async Task Shared_API_contract_wraps_success_and_localizes_Problem_Details()
     {
         var builder = WebApplication.CreateSlimBuilder();
@@ -129,6 +198,31 @@ public sealed class GatewayRouteTests
         builder.WebHost.UseUrls("http://127.0.0.1:0");
         var app = builder.Build();
         app.MapGet("/internal/ping", () => new { service = serviceName });
+        await app.StartAsync();
+        return app;
+    }
+
+    private static WebApplicationFactory<Program> CreateGatewayFactory(WebApplication portfolioService) =>
+        new WebApplicationFactory<Program>().WithWebHostBuilder(webHost =>
+            webHost.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["services:portfolio-api:http:0"] = portfolioService.Urls.Single(),
+                })));
+
+    private static async Task<WebApplication> StartPortfolioLocationServiceAsync(
+        string location,
+        Guid resourceId)
+    {
+        var builder = WebApplication.CreateSlimBuilder();
+        builder.WebHost.UseUrls("http://127.0.0.1:0");
+        var app = builder.Build();
+        app.MapPost("/v1/portfolios/create", (HttpContext context) =>
+        {
+            context.Response.Headers.Location = location;
+            return Results.Json(new { id = resourceId }, statusCode: StatusCodes.Status201Created);
+        });
+        app.MapGet($"/v1/portfolios/get-one/{resourceId}", () => new { id = resourceId });
         await app.StartAsync();
         return app;
     }

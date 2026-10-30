@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-Last reviewed: 2026-09-01.
+Last reviewed: 2026-09-23.
 
 An ADR becomes Accepted only when owner direction and supporting evidence are sufficient. `Needs Evidence` blocks the dependent implementation milestone.
 
@@ -24,3 +24,6 @@ An ADR becomes Accepted only when owner direction and supporting evidence are su
 | [0016](0016-service-owned-hybrid-database-workflow.md) | Accepted for Portfolio Core pilot | Controlled DB-first scaffolding with service-owned persistence and reviewed EF migrations |
 | [0017](0017-isolated-manual-simulation-accounts.md) | Accepted | Manual simulation aggregates and tables remain isolated from confirmed accounting |
 | [0018](0018-apache-echarts-for-financial-visualization.md) | Accepted for simulation slice | Direct Apache ECharts integration with backend-authoritative calculations and accessible fallbacks |
+| [0019](0019-google-oidc-bff-session.md) | Proposed | Google OIDC through a revocable cookie-based Gateway BFF session and internal IdentityAccess service |
+| [0020](0020-gateway-internal-service-tokens.md) | Proposed | Short-lived audience-bound internal service tokens instead of browser identity headers/cookies |
+| [0021](0021-resource-key-access-and-localization.md) | Proposed | Shared resource keys for roles, menus, pages, actions, endpoint policies, and localized UI text |
