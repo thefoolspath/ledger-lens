@@ -1,6 +1,6 @@
 # Executive Summary
 
-Last reviewed: 2026-10-25.
+Last reviewed: 2026-10-30.
 
 LedgerLens is a localhost-only personal investment ledger and research application under active implementation. It begins with US stocks and ETFs held through Dime, uses USD as the portfolio base currency, and adds a THB reporting view that exactly separates security-price and USD/THB effects.
 

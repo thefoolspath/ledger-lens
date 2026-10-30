@@ -1,6 +1,6 @@
 # Generic Handler and Operation-Slice Restructure
 
-Last reviewed: 2026-09-21. Status: Implemented; distributed runtime re-verification is blocked by the local Docker daemon.
+Last reviewed: 2026-10-30. Status: Completed; distributed runtime re-verification passed on 2026-10-25.
 
 ## Goal
 
@@ -26,8 +26,8 @@ Make the direct endpoint-to-handler architecture compile-time explicit and make 
 - Production `npm audit --omit=dev`: zero vulnerabilities.
 - `lg db check` with a synthetic design-time-only localhost connection string: no pending model changes.
 - Backend `.Trim()` scan: no matches under `src/Services`.
-- The explicitly enabled Aspire distributed test could not start because the Docker Desktop Linux daemon pipe was absent; `docker info` confirmed that only the client was available. This is an environment blocker, not an application assertion failure.
+- The earlier explicitly enabled Aspire distributed test could not start because the Docker Desktop Linux daemon pipe was absent. After recovery, the explicitly enabled distributed suite passed `2/2` on 2026-10-25 with ephemeral PostgreSQL and NATS, as recorded in `docs/project/PROJECT_STATE.md` and the branch's 2026-10-25 verification commit.
 
 ## Closeout condition
 
-Move this plan to `docs/plans/completed/` after one successful explicitly enabled Aspire distributed runtime pass on a healthy Docker daemon. The final Angular/architecture reruns and diff checks already pass; no code change is required merely to clear the remaining external runtime gate.
+The distributed runtime closeout condition is satisfied. The previously verified Angular, architecture, and diff gates remain the evidence for this plan; no new implementation is claimed by this documentation closeout.

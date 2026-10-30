@@ -1,6 +1,6 @@
 # API and Feature Naming Standard
 
-Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification completed in [plan 0003](../plans/completed/0003-api-feature-naming-migration.md). The physical operation-slice layout and generic handler contracts are implemented under [plan 0005](../plans/active/0005-generic-handler-operation-slice-restructure.md). The unified response contract is in implementation under [plan 0004](../plans/active/0004-unified-api-response-contract.md). Last reviewed: 2026-09-21.
+Status: Accepted and implemented for all current Version 1 business endpoints; runtime re-verification completed in [plan 0003](../plans/completed/0003-api-feature-naming-migration.md). The physical operation-slice layout and generic handler contracts are implemented under [plan 0005](../plans/completed/0005-generic-handler-operation-slice-restructure.md). The unified response contract is in implementation under [plan 0004](../plans/active/0004-unified-api-response-contract.md). Last reviewed: 2026-10-30.
 
 ## Purpose
 
@@ -143,7 +143,7 @@ Rules:
 
 - A production C# file MUST contain at most one top-level public class, record, struct, enum, or interface, and its filename MUST equal that type name.
 - Operation-specific C# types MUST use `PascalCase` and begin with the exact `OperationKey`.
-- C# methods, parameters, and local variables MUST use `camelCase`. Standard .NET acronym casing applies: `Id`, `Uri`, `Usd`, and `Thb`.
+- C# types and methods MUST use `PascalCase`; parameters and local variables MUST use `camelCase`. Standard .NET acronym casing applies: `Id`, `Uri`, `Usd`, and `Thb`.
 - Angular filenames MUST use `kebab-case`, for example `users-create.api.ts`. Exported Angular/TypeScript types MUST use the `OperationKey`, and client methods MUST use its camelCase form, such as `usersCreate()`.
 - JSON properties MUST use `camelCase`. PostgreSQL tables and columns retain the accepted `snake_case` persistence convention.
 - A shared domain entity, value object, calculation policy, generated persistence type, or cross-operation infrastructure helper MUST keep its domain name and MUST NOT be duplicated merely to include an `OperationKey`.
