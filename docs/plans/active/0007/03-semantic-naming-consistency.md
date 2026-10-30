@@ -15,7 +15,7 @@ This file is a decision record and problem classification. It does not authorize
 - [0007.07](07-persistence-port-decomposition.md) — store and port names must follow capability ownership after boundaries stabilize.
 
 
-**Status:** Pending owner decision and system-wide assessment.
+**Status:** Pending owner decision and system-wide assessment; the confirmed C# casing documentation defect was corrected on 2026-10-30.
 
 ### Current evidence
 

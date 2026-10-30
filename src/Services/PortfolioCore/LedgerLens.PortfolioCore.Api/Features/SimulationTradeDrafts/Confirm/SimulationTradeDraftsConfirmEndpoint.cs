@@ -17,9 +17,6 @@ public static class SimulationTradeDraftsConfirmEndpoint
             ICommandHandler<SimulationTradeDraftsConfirmCommand, SimulationTradeView?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(request.AccountId) ||
-                !PortfolioCoreEndpointValidation.IsVersion7(draftId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier);
             try
             {
                 var result = await handler.HandleAsync(new(request.AccountId, draftId), cancellationToken);

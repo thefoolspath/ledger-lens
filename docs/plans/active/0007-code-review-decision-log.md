@@ -1,6 +1,6 @@
 # Code Review Decision Log
 
-Last reviewed: 2026-10-25. Status: Active decision index; each child record carries its own implementation and verification status.
+Last reviewed: 2026-10-30. Status: Active decision index; each child record carries its own implementation and verification status.
 
 ## Goal
 
@@ -32,7 +32,7 @@ This index is authoritative for cross-item relationships and delivery order. The
 
 | ID | Decision record | Status | Implementation owner | Primary relationships |
 | --- | --- | --- | --- | --- |
-| `0007.04` | [Collection correctness, pagination, and sorting](0007/04-collection-correctness-pagination-and-sorting.md) | Accepted; not implemented | Future focused implementation plan | `0007.02`, `0007.03`, `0007.05`, `0007.06`, `0007.07` |
+| `0007.04` | [Collection correctness, pagination, and sorting](0007/04-collection-correctness-pagination-and-sorting.md) | Complete-ledger cap removed in source; distributed regression pending; pagination not started | Focused 0007.04 implementation | `0007.02`, `0007.03`, `0007.05`, `0007.06`, `0007.07` |
 
 The complete-ledger `.Take(5000)` defect is the first correctness gate inside `0007.04`. It must be corrected and covered by an over-5,000-entry regression scenario before pagination or structural refactoring proceeds.
 
