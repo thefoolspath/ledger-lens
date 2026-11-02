@@ -17,8 +17,6 @@ public static class SimulationTradeDraftsCreateEndpoint
             ICommandHandler<SimulationTradeDraftsCreateCommand, SimulationDraftView?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(request.AccountId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "accountId");
             if (!Enum.TryParse<SimulationTradeSide>(request.Side, true, out var side) ||
                 !Enum.TryParse<SimulationInputMode>(request.InputMode, true, out var inputMode))
                 return problems.Validation(httpContext, ApiErrorCodes.InvalidSimulationTradeInput);

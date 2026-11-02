@@ -16,8 +16,6 @@ public static class SimulationValuationsCalculateSeriesListEndpoint
             IQueryHandler<SimulationValuationsCalculateSeriesListQuery, IReadOnlyList<SimulationSeriesPoint>?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(request.AccountId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "accountId");
             try
             {
                 var result = await handler.HandleAsync(

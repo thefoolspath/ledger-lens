@@ -162,7 +162,7 @@ public sealed class GatewayRouteTests
         });
         app.MapGet("/success", (HttpContext context) => ApiResults.Ok(context, Array.Empty<object>()));
         app.MapGet("/invalid", (HttpContext context, ApiProblemFactory problems) =>
-            problems.Validation(context, ApiErrorCodes.InvalidIdentifier, "resourceId"));
+            problems.Validation(context, ApiErrorCodes.InvalidRequest, "resourceId"));
         await app.StartAsync();
 
         try
@@ -180,10 +180,10 @@ public sealed class GatewayRouteTests
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
             var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
-            Assert.Equal(ApiErrorCodes.InvalidIdentifier, problem.GetProperty("code").GetString());
+            Assert.Equal(ApiErrorCodes.InvalidRequest, problem.GetProperty("code").GetString());
             Assert.Equal("contract-correlation", problem.GetProperty("correlationId").GetString());
-            Assert.Equal("รหัสไม่ถูกต้อง", problem.GetProperty("title").GetString());
-            Assert.Equal("รหัสทรัพยากร LedgerLens ต้องเป็น UUIDv7",
+            Assert.Equal("คำขอไม่ถูกต้อง", problem.GetProperty("title").GetString());
+            Assert.Equal("คำขอไม่ผ่านกฎการตรวจสอบของการดำเนินการนี้",
                 problem.GetProperty("errors").GetProperty("resourceId")[0].GetString());
         }
         finally

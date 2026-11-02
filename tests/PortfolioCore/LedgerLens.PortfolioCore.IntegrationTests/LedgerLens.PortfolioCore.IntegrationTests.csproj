@@ -18,4 +18,14 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\..\..\src\LedgerLens.ApiContracts\LedgerLens.ApiContracts.csproj" />
+    <ProjectReference Include="..\..\..\src\LedgerLens.Application.Abstractions\LedgerLens.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\LedgerLens.ServiceDefaults\LedgerLens.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Api\LedgerLens.PortfolioCore.Api.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Application\LedgerLens.PortfolioCore.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Services\PortfolioCore\LedgerLens.PortfolioCore.Domain\LedgerLens.PortfolioCore.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -18,8 +18,6 @@ public static class CashLedgerEntriesCorrectEndpoint
             ICommandHandler<CashLedgerEntriesCorrectCommand, CorrectionView?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(entryId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "entryId");
             if (!Enum.TryParse<CashLedgerEntryType>(request.Type, true, out var entryType))
                 return problems.Validation(httpContext, ApiErrorCodes.InvalidLedgerEntryType, "type");
             try

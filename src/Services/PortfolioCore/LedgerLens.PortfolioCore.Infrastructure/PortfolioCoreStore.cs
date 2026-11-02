@@ -326,7 +326,7 @@ public sealed class PortfolioCoreStore(PortfolioCoreDbContext dbContext) : IPort
             join portfolio in dbContext.Portfolios.AsNoTracking() on account.PortfolioId equals portfolio.Id
             where account.Id == accountId && portfolio.OwnerUserId == ownerUserId
             orderby trade.EffectiveAt, trade.RecordedAt, trade.Id
-            select trade).Take(5000).ToListAsync(cancellationToken);
+            select trade).ToListAsync(cancellationToken);
         return values.Select(ToDomain).ToArray();
     }
 

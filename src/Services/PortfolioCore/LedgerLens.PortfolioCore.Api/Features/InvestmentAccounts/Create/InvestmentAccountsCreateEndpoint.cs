@@ -16,8 +16,6 @@ public static class InvestmentAccountsCreateEndpoint
             ICommandHandler<InvestmentAccountsCreateCommand, AccountIdentity?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(request.PortfolioId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "portfolioId");
             try
             {
                 var account = await handler.HandleAsync(

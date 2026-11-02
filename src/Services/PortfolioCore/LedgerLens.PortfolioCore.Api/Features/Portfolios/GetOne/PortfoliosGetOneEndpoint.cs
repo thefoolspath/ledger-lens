@@ -16,8 +16,6 @@ public static class PortfoliosGetOneEndpoint
             IQueryHandler<PortfoliosGetOneQuery, PortfolioOverview?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(portfolioId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "portfolioId");
             var portfolio = await handler.HandleAsync(new(portfolioId), cancellationToken);
             return portfolio is null ? problems.NotFound(httpContext) : ApiResults.Ok(httpContext, portfolio);
         }).WithName("PortfoliosGetOne");

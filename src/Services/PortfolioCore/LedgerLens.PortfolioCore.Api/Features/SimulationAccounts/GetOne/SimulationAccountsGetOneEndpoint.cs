@@ -16,8 +16,6 @@ public static class SimulationAccountsGetOneEndpoint
             IQueryHandler<SimulationAccountsGetOneQuery, SimulationAccountOverview?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(accountId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "accountId");
             var result = await handler.HandleAsync(new(accountId), cancellationToken);
             return result is null ? problems.NotFound(httpContext) : ApiResults.Ok(httpContext, result);
         }).WithName("SimulationAccountsGetOne");

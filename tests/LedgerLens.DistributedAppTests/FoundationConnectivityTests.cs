@@ -1,8 +1,13 @@
 using Aspire.Hosting.Testing;
 using LedgerLens.ApiContracts;
+using LedgerLens.PortfolioCore.Database;
+using LedgerLens.PortfolioCore.Domain;
+using LedgerLens.PortfolioCore.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
+using DatabaseModels = LedgerLens.PortfolioCore.Database.Models;
 
 namespace LedgerLens.DistributedAppTests;
 
@@ -20,6 +25,73 @@ public sealed class FoundationConnectivityTests
     {
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.LedgerLens_AppHost>(TestAppHostArguments);
         Assert.NotNull(builder);
+    }
+
+    [Fact]
+    public async Task Simulation_calculation_reads_every_owned_entry_after_the_first_5000_when_distributed_tests_are_enabled()
+    {
+        if (!string.Equals(Environment.GetEnvironmentVariable("LEDGERLENS_RUN_DISTRIBUTED_TESTS"), "1", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(4));
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.LedgerLens_AppHost>(
+            TestAppHostArguments, timeout.Token);
+        builder.Services.AddLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
+        await using var application = await builder.BuildAsync(timeout.Token);
+        await application.StartAsync(timeout.Token);
+        await application.ResourceNotifications.WaitForResourceHealthyAsync("portfolio-api", timeout.Token);
+
+        var connectionString = await application.GetConnectionStringAsync("portfolio-db", timeout.Token);
+        Assert.False(string.IsNullOrWhiteSpace(connectionString));
+        var options = new DbContextOptionsBuilder<PortfolioCoreDbContext>()
+            .UseNpgsql(connectionString)
+            .Options;
+        await using var dbContext = new PortfolioCoreDbContext(options);
+        var ownerId = Guid.NewGuid();
+        var otherOwnerId = Guid.NewGuid();
+        var portfolioId = Guid.NewGuid();
+        var accountId = Guid.NewGuid();
+        var timestamp = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        dbContext.UserProfiles.Add(new DatabaseModels.UserProfile
+        {
+            Id = ownerId, Email = "simulation-owner@example.invalid", CreatedAt = timestamp,
+        });
+        dbContext.Portfolios.Add(new DatabaseModels.Portfolio
+        {
+            Id = portfolioId, OwnerUserId = ownerId, Name = "Complete ledger test",
+            BaseCurrency = "USD", ReportingCurrency = "THB", CreatedAt = timestamp,
+        });
+        dbContext.SimulationAccounts.Add(new DatabaseModels.SimulationAccount
+        {
+            Id = accountId, PortfolioId = portfolioId, Name = "Synthetic full ledger", CreatedAt = timestamp,
+        });
+        await dbContext.SaveChangesAsync(timeout.Token);
+
+        var entries = Enumerable.Range(0, 5001).Select(index => new DatabaseModels.SimulationTradeEntry
+        {
+            Id = Guid.NewGuid(), SimulationAccountId = accountId, Side = "Buy",
+            Quantity = index == 5000 ? 7m : 1m,
+            UnitPrice = 1m, GrossAmount = index == 5000 ? 7m : 1m,
+            AssumedFee = 0m, AssumedTax = 0m, FxRate = 35m,
+            EffectiveAt = timestamp.AddMinutes(index), RecordedAt = timestamp.AddMinutes(index),
+            MarketInstrumentId = Guid.Empty, Symbol = "SYNTH", Exchange = "Synthetic",
+            Mic = "XTSY", Currency = "USD", Price = 1m, PriceKind = "Last",
+            Provider = "Synthetic", Feed = "Test", PriceAsOf = timestamp,
+            RetrievedAt = timestamp, Freshness = "Fresh", RequestId = "synthetic",
+            RetentionPolicyKey = "test", EntryRole = "Original",
+        }).ToArray();
+        dbContext.SimulationTradeEntries.AddRange(entries);
+        await dbContext.SaveChangesAsync(timeout.Token);
+        dbContext.ChangeTracker.Clear();
+
+        var store = new PortfolioCoreStore(dbContext);
+        var owned = await store.GetSimulationEntriesAsync(accountId, ownerId, timeout.Token);
+        Assert.Equal(5001, owned.Count);
+        Assert.Equal(7m, owned[^1].Quantity);
+        Assert.Equal(5007m, Assert.Single(SimulationCalculator.Rebuild(owned)).Quantity);
+        Assert.Empty(await store.GetSimulationEntriesAsync(accountId, otherOwnerId, timeout.Token));
     }
 
     [Fact]

@@ -16,8 +16,6 @@ public static class SimulationAccountsGetListEndpoint
             IQueryHandler<SimulationAccountsGetListQuery, IReadOnlyList<SimulationAccountListItem>> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(portfolioId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "portfolioId");
             return ApiResults.Ok(httpContext, await handler.HandleAsync(new(portfolioId), cancellationToken));
         }).WithName("SimulationAccountsGetList");
 }

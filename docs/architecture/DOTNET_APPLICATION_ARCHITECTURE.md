@@ -57,7 +57,7 @@ Portfolio Core pilots the accepted hybrid workflow in ADR-0016. Its service-owne
 
 Financial values use `decimal` and exact PostgreSQL `numeric`; queries use server-side filtering/projection, cancellation, bounded pagination, and one intentional materialization point.
 
-LedgerLens-owned domain and persistent identifiers use UUIDv7 exclusively. Create new values with `Guid.CreateVersion7()` and reject non-v7 UUID values at API boundaries where the contract identifies a LedgerLens-owned resource. Do not replace external provider identifiers or OpenTelemetry trace identifiers with application UUIDs.
+LedgerLens-owned domain and persistent identifiers use UUIDv7 exclusively. Create new values with `Guid.CreateVersion7()`. HTTP resource inputs bind as GUIDs without a separate UUID-version check. Portfolio Core resolves them through owner-scoped lookup before mutation. Unknown IDs return the operation's ordinary not-found or empty-list result. Market Data resolves unknown instrument IDs as not found. Domain construction still enforces UUIDv7 for LedgerLens-owned persisted entities. Do not replace external provider identifiers or OpenTelemetry trace identifiers with application UUIDs.
 
 ## Fixed local user and future OIDC
 

@@ -16,8 +16,6 @@ public static class SimulationAccountsCreateEndpoint
             ICommandHandler<SimulationAccountsCreateCommand, SimulationAccountListItem?> handler,
             CancellationToken cancellationToken) =>
         {
-            if (!PortfolioCoreEndpointValidation.IsVersion7(request.PortfolioId))
-                return problems.Validation(httpContext, ApiErrorCodes.InvalidIdentifier, "portfolioId");
             try
             {
                 var account = await handler.HandleAsync(new(request.PortfolioId, request.Name), cancellationToken);

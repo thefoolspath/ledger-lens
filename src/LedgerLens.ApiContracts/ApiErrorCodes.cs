@@ -3,7 +3,6 @@ namespace LedgerLens.ApiContracts;
 public static class ApiErrorCodes
 {
     public const string ValidationFailed = "common.validation.failed";
-    public const string InvalidIdentifier = "common.validation.invalid_identifier";
     public const string InvalidRequest = "common.validation.invalid_request";
     public const string InvalidLedgerEntryType = "portfolio.cash_ledger_entry.invalid_type";
     public const string InvalidSimulationTradeInput = "portfolio.simulation_trade.invalid_input";
