@@ -1,6 +1,6 @@
 # Identity, Access, Google OIDC, and UI Resource Foundation
 
-Last reviewed: 2026-09-24. Status: Design-only proposal; implementation is not authorized and has not started.
+Last reviewed: 2026-11-10. Status: Design-only proposal; implementation is not authorized. A two-operation internal IdentityAccess structure demo is separately authorized under [Plan 0007 IdentityAccess demo](0007-identityaccess-structure-demo.md); it does not implement this plan's security slices.
 
 ## Goal
 

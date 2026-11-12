@@ -1,0 +1,18 @@
+.ll-panel {
+  display: grid;
+  gap: var(--ll-space-sm);
+  padding: var(--ll-space-lg);
+  border: 1px solid var(--ll-border);
+  border-radius: var(--ll-radius);
+  background: var(--ll-panel);
+}
+
+.ll-panel input, .ll-panel button {
+  min-height: 2.75rem;
+  padding: var(--ll-space-sm);
+  border: 1px solid var(--ll-border);
+  border-radius: calc(var(--ll-radius) / 2);
+}
+
+.ll-panel button { cursor: pointer; }
+.ll-panel :focus-visible { outline: 3px solid var(--ll-focus); outline-offset: 2px; }

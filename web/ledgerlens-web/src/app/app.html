@@ -1,3 +1,6 @@
+@if (identityDemoRoute) {
+  <router-outlet />
+} @else {
 <main class="shell">
   <header class="hero">
     <div>
@@ -5,7 +8,10 @@
       <h1>Portfolio ledger</h1>
       <p class="lede">Record deposits, withdrawals, trades, fees, taxes, dividends, and append-only corrections.</p>
     </div>
-    <button class="secondary" type="button" (click)="refreshConnectivity()">Check services</button>
+    <div>
+      <a href="/identity-demo">IdentityAccess structure preview</a>
+      <button class="secondary" type="button" (click)="refreshConnectivity()">Check services</button>
+    </div>
   </header>
 
   <section class="service-strip" aria-label="Service connectivity">
@@ -330,3 +336,4 @@
     </div>
   }
 </main>
+}

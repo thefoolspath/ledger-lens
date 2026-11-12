@@ -9,6 +9,8 @@ public sealed class ApiNamingConventionTests
     private static readonly string RepositoryRoot = FindRepositoryRoot();
     private static readonly (string Route, string OperationKey)[] ExpectedOperations =
     [
+        ("/users/create", "UsersCreate"),
+        ("/users/get-one/{userId:guid}", "UsersGetOne"),
         ("/portfolios/create", "PortfoliosCreate"),
         ("/portfolios/get-list", "PortfoliosGetList"),
         ("/portfolios/get-one/{portfolioId:guid}", "PortfoliosGetOne"),
@@ -104,8 +106,23 @@ public sealed class ApiNamingConventionTests
             Assert.Contains(operationKey, api, StringComparison.Ordinal);
             Assert.Contains(operationKey, application, StringComparison.Ordinal);
             Assert.Contains(operationKey, infrastructure, StringComparison.Ordinal);
-            Assert.Contains(operationKey, angular, StringComparison.Ordinal);
+            if (operationKey is not ("UsersCreate" or "UsersGetOne"))
+            {
+                Assert.Contains(operationKey, angular, StringComparison.Ordinal);
+            }
         }
+    }
+
+    [Fact]
+    public void IdentityAccess_demo_does_not_publish_an_unauthenticated_Gateway_route()
+    {
+        var gatewayRoutes = File.ReadAllText(Path.Combine(RepositoryRoot, "src", "LedgerLens.Gateway", "GatewayRoutes.cs"));
+        var preview = File.ReadAllText(Path.Combine(RepositoryRoot, "web", "ledgerlens-web", "src", "app",
+            "features", "identity-access-demo", "identity-access-demo-page.html"));
+
+        Assert.DoesNotContain("/api/identity", gatewayRoutes, StringComparison.Ordinal);
+        Assert.Contains("UsersCreate", preview, StringComparison.Ordinal);
+        Assert.Contains("UsersGetOne", preview, StringComparison.Ordinal);
     }
 
     [Fact]

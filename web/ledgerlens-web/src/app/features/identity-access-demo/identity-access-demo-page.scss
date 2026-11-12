@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--ll-surface);
+  color: var(--ll-text);
+}
+
+.identity-demo {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: var(--ll-space-lg);
+}
+
+.identity-demo__eyebrow { color: var(--ll-muted); }
+.identity-demo__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--ll-space-lg);
+  margin: var(--ll-space-lg) 0;
+}

@@ -2,6 +2,8 @@
 
 Status: Partially implemented. Portfolio Core owns the confirmed-ledger foundation and manual-simulation schema; later relationships remain proposed.
 
+The internal IdentityAccess structure demo has one implemented `users` table in its own database: UUIDv7 `id`, email, normalized email, display name, UTC creation time, and a UUIDv7 create-request ID for retry reconciliation. The broader IdentityAccess relationships below remain proposed.
+
 ## Core relationships
 
 ```text
@@ -29,7 +31,7 @@ AccessResource 1--* LocalizedResourceText
 ## Proposed storage rules
 
 - Portfolio Core, Market Data, Slip Import, Research, and Operations each own a separate PostgreSQL database, `DbContext`, migrations history, and credentials. Cross-service foreign keys, joins, migrations, and direct database access are prohibited.
-- The proposed IdentityAccess service owns a separate identity database containing external identity mappings, sessions, MFA credentials/recovery codes, roles, access resources, grants/overrides, culture preferences, localized UI texts, and minimal security audit. Its internal `IdentityUser.Id` is the same UUIDv7 subject used by service-local user projections, but databases have no cross-service foreign key.
+- The IdentityAccess demo owns a separate identity database with the `users` table only. External identity mappings, sessions, MFA credentials/recovery codes, roles, access resources, grants/overrides, culture preferences, localized UI texts, and minimal security audit remain proposed. Its internal user ID is a UUIDv7 and no cross-service foreign key is introduced.
 - `UserSession` distinguishes unrevoked active state from a coalesced recently-active observation and stores idle/absolute expiry, assurance level, MFA verification time, security version, and revocation metadata. It stores no cookie or token value. TOTP secrets are encrypted with a separate protected key; recovery codes are slow-hashed and one-time. Administration responses never expose either.
 - `UserProfile.Id` is the internal relational identity and `Portfolio.OwnerUserId` is required. Email is normalized profile data, never a primary/foreign key or a future OIDC identity key. Descendants inherit ownership through Portfolio rather than duplicating `UserId` in every table.
 - A proposed external identity is uniquely identified by `(Issuer, Subject)`. Google email/name are mutable profile snapshots, not linking keys. Google picture URLs and delegated OAuth tokens are excluded from the first identity schema.

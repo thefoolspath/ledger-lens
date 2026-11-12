@@ -20,6 +20,7 @@ var marketDatabase = postgres.AddDatabase("market-db", "ledgerlens_market");
 var slipDatabase = postgres.AddDatabase("slip-db", "ledgerlens_slip");
 var researchDatabase = postgres.AddDatabase("research-db", "ledgerlens_research");
 var operationsDatabase = postgres.AddDatabase("operations-db", "ledgerlens_operations");
+var identityDatabase = postgres.AddDatabase("identity-db", "ledgerlens_identity");
 
 var messaging = builder.AddNats("messaging")
     .WithJetStream();
@@ -35,6 +36,13 @@ if (usePersistentVolumes)
 var portfolioMigrations = builder.AddProject<Projects.LedgerLens_PortfolioCore_Migrations>("portfolio-migrations")
     .WithReference(portfolioDatabase)
     .WaitFor(portfolioDatabase);
+var identityMigrations = builder.AddProject<Projects.LedgerLens_IdentityAccess_Migrations>("identity-migrations")
+    .WithReference(identityDatabase)
+    .WaitFor(identityDatabase);
+var identity = builder.AddProject<Projects.LedgerLens_IdentityAccess_Api>("identity-api")
+    .WithReference(identityDatabase)
+    .WaitForCompletion(identityMigrations)
+    .WithHttpHealthCheck("/health");
 var portfolio = builder.AddProject<Projects.LedgerLens_PortfolioCore_Api>("portfolio-api")
     .WithReference(portfolioDatabase).WithReference(messaging)
     .WithEnvironment("LedgerLens__FixedUser__Id", fixedUserId)
@@ -72,8 +80,8 @@ var gateway = builder.AddProject<Projects.LedgerLens_Gateway>("gateway")
 builder.AddJavaScriptApp("web", "../../web/ledgerlens-web")
     .WithRunScript("start")
     .WithHttpEndpoint(targetPort: 4200, name: "http")
-    .WithReference(gateway)
-    .WaitFor(gateway)
+    .WithReference(gateway).WithReference(identity)
+    .WaitFor(gateway).WaitFor(identity)
     .WithHttpHealthCheck("/")
     .WithExternalHttpEndpoints();
 

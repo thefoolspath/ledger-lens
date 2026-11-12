@@ -1,6 +1,8 @@
 # Code Review Decision Log
 
-Last reviewed: 2026-10-30. Status: Active decision index; each child record carries its own implementation and verification status.
+Last reviewed: 2026-11-06. Status: Active decision index; each child record carries its own implementation and verification status.
+
+An [IdentityAccess two-operation structure demonstration](0007-identityaccess-structure-demo.md) applies the relevant 0007 patterns in isolation. It does not close the system-wide child decisions or authorize applying them to existing services.
 
 ## Goal
 

@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LedgerLens.Gateway\LedgerLens.Gateway.csproj" />
+    <ProjectReference Include="..\Services\IdentityAccess\LedgerLens.IdentityAccess.Api\LedgerLens.IdentityAccess.Api.csproj" />
+    <ProjectReference Include="..\Services\IdentityAccess\LedgerLens.IdentityAccess.Migrations\LedgerLens.IdentityAccess.Migrations.csproj" />
     <ProjectReference Include="..\Services\PortfolioCore\LedgerLens.PortfolioCore.Api\LedgerLens.PortfolioCore.Api.csproj" />
     <ProjectReference Include="..\Services\PortfolioCore\LedgerLens.PortfolioCore.Migrations\LedgerLens.PortfolioCore.Migrations.csproj" />
     <ProjectReference Include="..\Services\MarketData\LedgerLens.MarketData.Api\LedgerLens.MarketData.Api.csproj" />

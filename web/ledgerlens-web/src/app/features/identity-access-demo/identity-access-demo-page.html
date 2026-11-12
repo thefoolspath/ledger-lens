@@ -1,0 +1,33 @@
+<main class="identity-demo">
+  <a href="/">← Portfolio ledger</a>
+  <p class="identity-demo__eyebrow">Local development demo · synthetic data only</p>
+  <h1>IdentityAccess</h1>
+  <p>Create a synthetic user in the IdentityAccess PostgreSQL database, then retrieve it by ID.</p>
+
+  <div class="identity-demo__grid">
+    <form class="ll-panel" (ngSubmit)="create()">
+      <h2>Command: UsersCreate</h2>
+      <label for="demo-name">Display name</label>
+      <input id="demo-name" name="displayName" [(ngModel)]="displayName" required maxlength="200" placeholder="Synthetic User">
+      <label for="demo-email">Synthetic email</label>
+      <input id="demo-email" name="email" [(ngModel)]="email" type="email" required maxlength="320" placeholder="demo@example.test">
+      <button type="submit" [disabled]="pending()">Create synthetic user</button>
+    </form>
+
+    <form class="ll-panel" (ngSubmit)="getOne()">
+      <h2>Query: UsersGetOne</h2>
+      <label for="demo-id">User ID</label>
+      <input id="demo-id" name="userId" [(ngModel)]="userId" required placeholder="UUID">
+      <button type="submit" [disabled]="pending()">Find user</button>
+    </form>
+  </div>
+
+  @if (message()) { <p role="status">{{ message() }}</p> }
+  @if (selectedUser(); as user) {
+    <section class="ll-panel" aria-label="Selected synthetic user">
+      <h2>{{ user.displayName }}</h2>
+      <p>{{ user.email }}</p>
+      <code>{{ user.id }}</code>
+    </section>
+  }
+</main>

@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterOutlet } from '@angular/router';
 import { forkJoin, map, Observable } from 'rxjs';
 import { ApiResponse, apiProblemMessage } from './api-response';
 import { MarketCandle, SimulationChart, SimulationSeriesPoint } from './simulation-chart';
@@ -215,11 +216,12 @@ export function formatPercent(value: number): string {
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, SimulationChart],
+  imports: [FormsModule, SimulationChart, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
+  protected readonly identityDemoRoute = typeof window !== 'undefined' && window.location.pathname === '/identity-demo';
   private readonly http = inject(HttpClient);
   private readonly mutationHeaders = new HttpHeaders({ 'X-LedgerLens-Request': '1' });
   protected readonly services = signal<readonly ServiceStatus[]>([
@@ -269,8 +271,10 @@ export class App {
   protected simulationCorrectionReason = '';
 
   public constructor() {
-    this.refreshConnectivity();
-    this.loadPortfolios();
+    if (!this.identityDemoRoute) {
+      this.refreshConnectivity();
+      this.loadPortfolios();
+    }
   }
 
   protected refreshConnectivity(): void {

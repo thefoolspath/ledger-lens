@@ -19,7 +19,7 @@ public sealed class GenericHandlerArchitectureTests
             .Where(file => file.Contains(".Application", StringComparison.Ordinal))
             .Select(File.ReadAllText));
 
-        Assert.Equal(18, handlerFiles.Length);
+        Assert.Equal(20, handlerFiles.Length);
         foreach (var file in handlerFiles)
         {
             var source = File.ReadAllText(file);
@@ -38,7 +38,7 @@ public sealed class GenericHandlerArchitectureTests
         var apiSource = SourceUnder(sourceRoot, ".Api");
         var applicationSource = SourceUnder(sourceRoot, ".Application");
 
-        Assert.Equal(18, Regex.Matches(apiSource, @"I(?:Command|Query)Handler<").Count);
+        Assert.Equal(20, Regex.Matches(apiSource, @"I(?:Command|Query)Handler<").Count);
         Assert.DoesNotMatch(@"\b[A-Za-z0-9]+Handler\s+handler\b", apiSource);
         Assert.DoesNotContain("IMediator", applicationSource, StringComparison.Ordinal);
         Assert.DoesNotContain("IServiceProvider", applicationSource, StringComparison.Ordinal);

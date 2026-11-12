@@ -1,6 +1,6 @@
 # Identity, Access Control, and UI Localization Architecture
 
-Last reviewed: 2026-09-23. Status: Proposed; no authentication or authorization behavior is implemented.
+Last reviewed: 2026-11-10. Status: Authentication and authorization remain proposed; an isolated two-operation IdentityAccess structure demo exists in source without a Gateway route.
 
 ## Evidence labels
 
@@ -11,10 +11,12 @@ Last reviewed: 2026-09-23. Status: Proposed; no authentication or authorization 
 
 ## Current state
 
+- **Repository fact:** A separately authorized IdentityAccess demo now registers an internal API, database, migration runner, and `UsersCreate`/`UsersGetOne` operations. Its Angular demo sends synthetic create/get-one requests through an Aspire local development proxy to the internal API and service-owned PostgreSQL database. None of the sign-in, session, MFA, or authorization flow below is implemented.
+
 - **Repository fact:** LedgerLens targets .NET 10, Aspire 13.4.6, Angular 22.1.1, YARP 2.3.0, PostgreSQL, EF Core/Npgsql, and service-owned databases.
 - **Repository fact:** the Angular development server is browser-facing, calls relative `/api` URLs, and uses `proxy.conf.js` to forward them to the Aspire-discovered Gateway.
 - **Repository fact:** the Gateway is a stateless YARP host. It has no authentication middleware, authorization policy, identity store, or session store.
-- **Repository fact:** `app.routes.ts` is empty and the root Angular component currently owns the implemented workflows. The accepted but unimplemented frontend restructure will introduce feature routes and a thin shell.
+- **Repository fact:** `app.routes.ts` now contains the isolated `identity-demo` route; the root Angular component still owns the existing Portfolio and Simulation workflows. The accepted but unimplemented frontend restructure will introduce feature routes and a thin shell.
 - **Repository fact:** Portfolio Core resolves a configured `FixedLocalCurrentUser` through `ICurrentUser`. Its UUIDv7 identifier and email come from AppHost parameters/User Secrets.
 - **Repository fact:** Portfolio Core owns `UserProfile`, requires `Portfolio.OwnerUserId`, and applies owner predicates in its data access. This is an effective data-isolation boundary but not authentication.
 - **Repository fact:** all browser-facing and infrastructure resources remain loopback-only. ADR-0012 defers authentication and prohibits non-loopback exposure until the complete security gate passes.

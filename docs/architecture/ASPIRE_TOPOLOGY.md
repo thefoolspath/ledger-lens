@@ -1,6 +1,6 @@
 # Aspire Topology
 
-Status: Accepted and partially implemented. Last reviewed: 2026-09-24.
+Status: Accepted and partially implemented. Last reviewed: 2026-11-10.
 
 ## Resource graph
 
@@ -9,18 +9,18 @@ Status: Accepted and partially implemented. Last reviewed: 2026-09-24.
 | AppHost | Resource graph, parameters, references, startup and Dashboard | All resources | Developer process only |
 | Angular Web | Implemented connectivity, confirmed-ledger workflow, and Simulation mode; later product UI continues here | Gateway | Loopback |
 | Gateway | Implemented YARP routes and local request controls; proposed BFF/OIDC boundary | All current APIs; proposed IdentityAccess | Loopback; only browser-facing backend |
-| IdentityAccess API (proposed) | external identity mapping, sessions, permissions, UI resource localization | identity database | Internal |
+| IdentityAccess API (structure demo in source) | two user-data operations; external mapping, sessions, permissions, and UI localization remain proposed | identity database and one-shot migration runner | Internal; no Gateway route |
 | Portfolio Core API | Implemented portfolio/account/cash-ledger and isolated Simulation slices; later confirmed ledger/lots remain | portfolio database, NATS | Internal |
 | Market Data API | Implemented provider-neutral quote/FX/candle operations and development provider; later provider/event coverage remains | market database, NATS | Internal |
 | Slip Import API | Implemented foundation host; document/review behaviour remains proposed | slip database, NATS | Internal |
 | Slip Import Worker | Implemented foundation host; OCR/background behaviour remains proposed | slip database, NATS | No HTTP exposure |
 | Research API | Implemented foundation host; research behaviour remains proposed | research database, NATS | Internal |
 | Operations API | Implemented foundation host; backup/restore coordination remains proposed | operations database, NATS | Internal |
-| PostgreSQL 18 | One local server with five current service-owned databases and one proposed identity database | external runtime volume | Internal |
+| PostgreSQL 18 | One local server with five Version 1 service-owned databases and one IdentityAccess demo database | external runtime volume | Internal |
 | NATS JetStream | At-least-once integration messaging | external runtime volume | Internal |
 | Aspire Dashboard | Structured logs, traces, metrics and health | OTLP from resources | Loopback, development/local use |
 
-AppHost grants discovery/configuration only through explicit references. Gateway references APIs. Each API references only its database and NATS. Slip Worker references only Slip database and NATS. Databases are separate resources even when hosted by one PostgreSQL container.
+AppHost grants discovery/configuration only through explicit references. Gateway references the five Version 1 APIs and has no IdentityAccess route. The IdentityAccess demo API references only its database and waits for its migration runner. Slip Worker references only Slip database and NATS. Databases are separate resources even when hosted by one PostgreSQL container.
 
 If the proposed identity plan is accepted, Gateway also references IdentityAccess and external key/configuration parameters; IdentityAccess references only its database and required technical defaults. Angular keeps one stable interactive loopback origin for Google registration, while distributed tests retain dynamic isolated endpoints and synthetic authentication.
 
