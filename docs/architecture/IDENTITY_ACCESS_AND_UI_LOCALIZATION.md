@@ -1,6 +1,6 @@
 # Identity, Access Control, and UI Localization Architecture
 
-Last reviewed: 2026-11-10. Status: Authentication and authorization remain proposed; an isolated two-operation IdentityAccess structure demo exists in source without a Gateway route.
+Last reviewed: 2026-11-13. Status: Authentication and authorization remain proposed; an isolated two-operation IdentityAccess structure demo exists in source with a loopback Gateway route.
 
 ## Evidence labels
 
@@ -11,7 +11,7 @@ Last reviewed: 2026-11-10. Status: Authentication and authorization remain propo
 
 ## Current state
 
-- **Repository fact:** A separately authorized IdentityAccess demo now registers an internal API, database, migration runner, and `UsersCreate`/`UsersGetOne` operations. Its Angular demo sends synthetic create/get-one requests through an Aspire local development proxy to the internal API and service-owned PostgreSQL database. None of the sign-in, session, MFA, or authorization flow below is implemented.
+- **Repository fact:** A separately authorized IdentityAccess demo now registers an internal API, database, migration runner, and `UsersCreate`/`UsersGetOne` operations. Its Angular demo sends synthetic create/get-one requests through the `/api` development proxy and Gateway `/api/identity` route to the internal API and service-owned PostgreSQL database. This loopback route has no authentication or authorization. None of the sign-in, session, MFA, or authorization flow below is implemented.
 
 - **Repository fact:** LedgerLens targets .NET 10, Aspire 13.4.6, Angular 22.1.1, YARP 2.3.0, PostgreSQL, EF Core/Npgsql, and service-owned databases.
 - **Repository fact:** the Angular development server is browser-facing, calls relative `/api` URLs, and uses `proxy.conf.js` to forward them to the Aspire-discovered Gateway.

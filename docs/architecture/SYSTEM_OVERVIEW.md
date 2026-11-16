@@ -1,6 +1,6 @@
 # System Overview
 
-Status: Accepted and partially implemented. Last reviewed: 2026-11-06.
+Status: Accepted and partially implemented. Last reviewed: 2026-11-13.
 
 LedgerLens is a loopback-only distributed application orchestrated by Aspire.
 
@@ -17,7 +17,7 @@ Services <-> NATS JetStream
 All .NET resources -> Aspire Dashboard via OpenTelemetry
 ```
 
-The AppHost source also registers an internal IdentityAccess two-operation structure demo and its own database/migration runner. It has no Gateway route. An ephemeral PostgreSQL distributed test verified its migration, create/get-one, retry, and duplicate-conflict paths on 2026-11-11. Authentication, sessions, authorization, and the complete Phase 6 IdentityAccess design remain proposed.
+The AppHost source also registers an internal IdentityAccess two-operation structure demo and its own database/migration runner. The Angular demo now calls it through the loopback Gateway route `/api/identity`; Gateway forwards to the internal API. An ephemeral PostgreSQL distributed test verified its migration, create/get-one, retry, and duplicate-conflict paths on 2026-11-11 before the Gateway route was added. Authentication, sessions, authorization, and the complete Phase 6 IdentityAccess design remain proposed.
 
 ## Trust and consistency boundaries
 

@@ -1,6 +1,6 @@
 # Plans
 
-Last reviewed: 2026-11-11.
+Last reviewed: 2026-11-16.
 
 The `active/` directory contains every plan or decision log that is not yet archived. A file's explicit status is authoritative: inclusion here does not by itself authorize implementation.
 

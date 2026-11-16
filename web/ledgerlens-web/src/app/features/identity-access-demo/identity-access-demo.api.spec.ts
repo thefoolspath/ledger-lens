@@ -19,7 +19,7 @@ describe('IdentityAccess demo API', () => {
 
     api.create({ email: 'synthetic@example.test', displayName: 'Synthetic User' }).subscribe(value => result = value);
 
-    const request = http.expectOne('/identity-demo-api/v1/users/create');
+    const request = http.expectOne('/api/identity-demo/v1/users/create');
     expect(request.request.method).toBe('POST');
     expect(request.request.body.requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
     expect(request.request.body).toEqual({
@@ -41,7 +41,7 @@ describe('IdentityAccess demo API', () => {
 
     api.getOne(userId).subscribe(value => result = value);
 
-    const request = http.expectOne(`/identity-demo-api/v1/users/get-one/${userId}`);
+    const request = http.expectOne(`/api/identity-demo/v1/users/get-one/${userId}`);
     expect(request.request.method).toBe('GET');
     request.flush({ data: user, meta: { correlationId: crypto.randomUUID() } });
     expect(result).toEqual(user);

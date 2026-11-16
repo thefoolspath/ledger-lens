@@ -11,6 +11,7 @@ This file is a decision record and problem classification. It does not authorize
 ## Related decisions
 
 - [Plan 0004](../0004-unified-api-response-contract.md) — remains the implementation owner for typed expected failures and Problem Details closeout.
+- [IdentityAccessDemo failure-boundary implementation plan](02-identityaccess-demo-failure-boundary-plan.md) — two-operation demo-first pattern for owner review before any other service rollout.
 - [0007.01](01-created-location-policy.md) — shares response-contract and Gateway integration coverage.
 - [0007.04](04-collection-correctness-pagination-and-sorting.md) — page validation and invalid sort/page input require typed failures.
 - [0007.06](06-request-lifecycle-timeouts-mutations-and-exports.md) — cancellation, timeout, provider failure, and unexpected-failure classification must remain distinct.
@@ -124,3 +125,5 @@ The configuration-validation catch in `FixedLocalUserOptionsValidator` is outsid
 - **Owner rationale:** Expected business and validation failures must be explicit Application outcomes; broad exception types cannot safely define HTTP semantics.
 - **Decision date:** 2026-09-24.
 - **Implementation evidence:** Not started.
+
+The separate [IdentityAccessDemo stage](02-identityaccess-demo-failure-boundary-plan.md) implemented and verified the pattern for `UsersCreate` and `UsersGetOne` on 2026-11-13. The system-wide decision remains open under plan 0004; no Portfolio Core or Market Data failure migration is claimed.

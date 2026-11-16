@@ -63,7 +63,7 @@ LedgerLens-owned domain and persistent identifiers use UUIDv7 exclusively. Creat
 
 Version 1 currently uses an `ICurrentUser` abstraction backed by externally configured `FixedLocalCurrentUser`; Portfolio Core owns `UserProfile` and required Portfolio ownership. The identifier and owner-supplied email remain outside tracked source and fixtures. Interactive authentication and multi-user authorization are not implemented. A future OIDC identity must map unique issuer/subject to the existing internal user rather than trusting email.
 
-The 2026-09-22 proposed evolution is [Identity, Access Control, and UI Localization Architecture](IDENTITY_ACCESS_AND_UI_LOCALIZATION.md): a Gateway cookie BFF, internal IdentityAccess service/database, claims-backed service `ICurrentUser`, short-lived audience-specific internal tokens, and resource-key authorization/localization. A separately scoped two-operation internal IdentityAccess structure demo exists in source without authentication or a Gateway route. Until ADR-0019 through ADR-0021 are accepted and implemented, the fixed-user and loopback-only behavior remains authoritative.
+The 2026-09-22 proposed evolution is [Identity, Access Control, and UI Localization Architecture](IDENTITY_ACCESS_AND_UI_LOCALIZATION.md): a Gateway cookie BFF, internal IdentityAccess service/database, claims-backed service `ICurrentUser`, short-lived audience-specific internal tokens, and resource-key authorization/localization. A separately scoped two-operation internal IdentityAccess structure demo exists in source with a loopback Gateway route but without authentication. Until ADR-0019 through ADR-0021 are accepted and implemented, the fixed-user and loopback-only behavior remains authoritative.
 
 ## Free dependency policy
 

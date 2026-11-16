@@ -4,7 +4,7 @@ import { map, Observable } from 'rxjs';
 import { ApiResponse } from '../../api-response';
 import { CreateDemoUser, DemoUser } from './identity-access-demo.models';
 
-const demoApiPrefix = '/identity-demo-api/v1/users';
+const demoApiPrefix = '/api/identity-demo/v1/users';
 
 @Injectable()
 export class IdentityAccessDemoApi {

@@ -20,7 +20,7 @@ var marketDatabase = postgres.AddDatabase("market-db", "ledgerlens_market");
 var slipDatabase = postgres.AddDatabase("slip-db", "ledgerlens_slip");
 var researchDatabase = postgres.AddDatabase("research-db", "ledgerlens_research");
 var operationsDatabase = postgres.AddDatabase("operations-db", "ledgerlens_operations");
-var identityDatabase = postgres.AddDatabase("identity-db", "ledgerlens_identity");
+var identityDatabase = postgres.AddDatabase("identity-demo-db", "ledgerlens_identity_demo");
 
 var messaging = builder.AddNats("messaging")
     .WithJetStream();
@@ -36,10 +36,10 @@ if (usePersistentVolumes)
 var portfolioMigrations = builder.AddProject<Projects.LedgerLens_PortfolioCore_Migrations>("portfolio-migrations")
     .WithReference(portfolioDatabase)
     .WaitFor(portfolioDatabase);
-var identityMigrations = builder.AddProject<Projects.LedgerLens_IdentityAccess_Migrations>("identity-migrations")
+var identityMigrations = builder.AddProject<Projects.LedgerLens_IdentityAccessDemo_Migrations>("identity-demo-migrations")
     .WithReference(identityDatabase)
     .WaitFor(identityDatabase);
-var identity = builder.AddProject<Projects.LedgerLens_IdentityAccess_Api>("identity-api")
+var identity = builder.AddProject<Projects.LedgerLens_IdentityAccessDemo_Api>("identity-demo-api")
     .WithReference(identityDatabase)
     .WaitForCompletion(identityMigrations)
     .WithHttpHealthCheck("/health");
@@ -74,14 +74,15 @@ builder.AddProject<Projects.LedgerLens_SlipImport_Worker>("slip-worker")
 var gateway = builder.AddProject<Projects.LedgerLens_Gateway>("gateway")
     .WithExternalHttpEndpoints()
     .WithReference(portfolio).WithReference(market).WithReference(slips)
-    .WithReference(research).WithReference(operations)
+    .WithReference(research).WithReference(operations).WithReference(identity)
+    .WaitFor(identity)
     .WithHttpHealthCheck("/health");
 
 builder.AddJavaScriptApp("web", "../../web/ledgerlens-web")
     .WithRunScript("start")
     .WithHttpEndpoint(targetPort: 4200, name: "http")
-    .WithReference(gateway).WithReference(identity)
-    .WaitFor(gateway).WaitFor(identity)
+    .WithReference(gateway)
+    .WaitFor(gateway)
     .WithHttpHealthCheck("/")
     .WithExternalHttpEndpoints();
 

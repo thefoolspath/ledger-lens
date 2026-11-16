@@ -7,7 +7,11 @@ builder.Services.AddReverseProxy()
     {
         if (string.Equals(context.Route.RouteId, GatewayRoutes.PortfolioRouteId, StringComparison.Ordinal))
         {
-            context.ResponseTransforms.Add(new PortfolioLocationResponseTransform(GatewayRoutes.PortfolioPrefix));
+            context.ResponseTransforms.Add(new GatewayLocationResponseTransform(GatewayRoutes.PortfolioPrefix, GatewayRoutes.PortfolioRouteId));
+        }
+        else if (string.Equals(context.Route.RouteId, GatewayRoutes.IdentityDemoRouteId, StringComparison.Ordinal))
+        {
+            context.ResponseTransforms.Add(new GatewayLocationResponseTransform(GatewayRoutes.IdentityDemoPrefix, GatewayRoutes.IdentityDemoRouteId));
         }
     })
     .AddServiceDiscoveryDestinationResolver();

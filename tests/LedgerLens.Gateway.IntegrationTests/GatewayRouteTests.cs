@@ -24,6 +24,7 @@ public sealed class GatewayRouteTests
             ["/api/slips/{**catch-all}"] = "https+http://slip-api",
             ["/api/research/{**catch-all}"] = "https+http://research-api",
             ["/api/operations/{**catch-all}"] = "https+http://operations-api",
+            ["/api/identity-demo/{**catch-all}"] = "https+http://identity-demo-api",
         };
 
         Assert.Equal(expected.Count, GatewayRoutes.Routes.Count);
@@ -42,7 +43,7 @@ public sealed class GatewayRouteTests
         var services = new Dictionary<string, WebApplication>();
         try
         {
-            foreach (var serviceName in new[] { "portfolio-api", "market-api", "slip-api", "research-api", "operations-api" })
+            foreach (var serviceName in new[] { "portfolio-api", "market-api", "slip-api", "research-api", "operations-api", "identity-demo-api" })
             {
                 services[serviceName] = await StartPingServiceAsync(serviceName);
             }
@@ -61,6 +62,7 @@ public sealed class GatewayRouteTests
                 "/api/slips/internal/ping",
                 "/api/research/internal/ping",
                 "/api/operations/internal/ping",
+                "/api/identity-demo/internal/ping",
             };
             foreach (var path in paths)
             {
@@ -95,6 +97,35 @@ public sealed class GatewayRouteTests
         getResponse.EnsureSuccessStatusCode();
         var retrieved = await getResponse.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal(resourceId, retrieved.GetProperty("id").GetGuid());
+    }
+
+    [Fact]
+    public async Task Created_identity_demo_location_is_rewritten_and_resolves_through_the_Gateway()
+    {
+        var userId = Guid.CreateVersion7();
+        var builder = WebApplication.CreateSlimBuilder();
+        builder.WebHost.UseUrls("http://127.0.0.1:0");
+        await using var service = builder.Build();
+        service.MapPost("/v1/users/create", () =>
+            Results.Created($"/v1/users/get-one/{userId}", new { id = userId }));
+        service.MapGet($"/v1/users/get-one/{userId}", () => new { id = userId });
+        await service.StartAsync();
+
+        await using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(webHost =>
+            webHost.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    ["services:identity-demo-api:http:0"] = service.Urls.Single(),
+                })));
+        using var client = factory.CreateClient();
+        using var created = await client.PostAsync("/api/identity-demo/v1/users/create", null);
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        Assert.Equal($"/api/identity-demo/v1/users/get-one/{userId}",
+            created.Headers.Location?.OriginalString);
+        using var fetched = await client.GetAsync(created.Headers.Location);
+        fetched.EnsureSuccessStatusCode();
+        var body = await fetched.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(userId, body.GetProperty("id").GetGuid());
     }
 
     [Theory]

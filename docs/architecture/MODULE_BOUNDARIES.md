@@ -1,11 +1,11 @@
 # Service Boundaries
 
-Status: Accepted and partially implemented. Last reviewed: 2026-11-06.
+Status: Accepted and partially implemented. Last reviewed: 2026-11-13.
 
 | Service | Owns | May communicate with |
 | --- | --- | --- |
-| Gateway | implemented public routes and HTTP composition; proposed OIDC/BFF | all current service HTTP APIs; proposed IdentityAccess |
-| IdentityAccess (internal demo) | implemented two-operation local user storage; external mappings, sessions, roles, grants, UI resource catalog, and audit remain proposed | no Gateway route; service-owned identity contracts only |
+| Gateway | implemented loopback routes and HTTP composition; proposed OIDC/BFF | all current service HTTP APIs including the IdentityAccess demo |
+| IdentityAccess (internal demo) | implemented two-operation local user storage; external mappings, sessions, roles, grants, UI resource catalog, and audit remain proposed | Gateway HTTP demo route; service-owned identity contracts only |
 | Portfolio Core | implemented local user projection, portfolios, accounts, cash ledger, and isolated Simulation; later confirmed trades/lots/calculations remain | NATS; Gateway HTTP |
 | Market Data | implemented provider abstraction, quotes, candles, FX, freshness/quota results; later external-provider/event coverage remains | NATS; Gateway HTTP |
 | Slip Import | foundation host now; documents, hashes, extraction, review and posting state remain proposed | NATS; Gateway HTTP |

@@ -35,6 +35,9 @@ public sealed class ApiProblemFactory(
     public IResult Conflict(HttpContext httpContext) =>
         Problem(httpContext, StatusCodes.Status409Conflict, ApiErrorCodes.StateConflict);
 
+    public IResult Conflict(HttpContext httpContext, string code, string title, string detail) =>
+        Problem(httpContext, StatusCodes.Status409Conflict, code, title, detail);
+
     public IResult UnsupportedMediaType(HttpContext httpContext) =>
         Problem(httpContext, StatusCodes.Status415UnsupportedMediaType, ApiErrorCodes.UnsupportedMediaType);
 
@@ -70,6 +73,20 @@ public sealed class ApiProblemFactory(
             Title = GetText(code, "Title"),
             Status = status,
             Detail = GetText(code, "Detail"),
+            Instance = httpContext.Request.Path,
+        };
+        AddDiagnostics(problem, httpContext, code);
+        return Results.Json(problem, statusCode: status, contentType: "application/problem+json");
+    }
+
+    private IResult Problem(HttpContext httpContext, int status, string code, string title, string detail)
+    {
+        var problem = new ProblemDetails
+        {
+            Type = "about:blank",
+            Title = title,
+            Status = status,
+            Detail = detail,
             Instance = httpContext.Request.Path,
         };
         AddDiagnostics(problem, httpContext, code);

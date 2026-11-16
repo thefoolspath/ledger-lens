@@ -221,7 +221,7 @@ export function formatPercent(value: number): string {
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly identityDemoRoute = typeof window !== 'undefined' && window.location.pathname === '/identity-demo';
+  protected readonly identityDemoRoute = typeof window !== 'undefined' && window.location.pathname === '/identity-access-demo';
   private readonly http = inject(HttpClient);
   private readonly mutationHeaders = new HttpHeaders({ 'X-LedgerLens-Request': '1' });
   protected readonly services = signal<readonly ServiceStatus[]>([

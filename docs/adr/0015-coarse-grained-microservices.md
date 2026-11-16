@@ -41,3 +41,5 @@ Merge or split a service only when measured coupling, lifecycle, isolation, scal
 ADR-0019 and plan 0006 propose adding an internal IdentityAccess service/database for optional authenticated access. The current Version 1 service roster remains authoritative. Accepting ADR-0019 must explicitly amend this ADR with the evidence for a separate security-sensitive lifecycle and update product scope and topology in the same decision; the proposal alone does not add a runtime service.
 
 On 2026-11-06, the owner separately authorized a two-operation internal IdentityAccess structure demonstration under plan 0007. AppHost source registers this demo and its database, but no authentication behavior or browser-facing Gateway route. This limited source addition does not accept ADR-0019 or extend the Version 1 product service roster.
+
+On 2026-11-13, the owner requested that the demo browser requests use Gateway. A loopback `/api/identity` route now forwards to the still-internal IdentityAccess demo API. This transport change does not accept ADR-0019, implement authentication/authorization, or amend the Version 1 product service roster.

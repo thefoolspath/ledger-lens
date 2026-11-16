@@ -6,15 +6,16 @@
     <Project Path="src/LedgerLens.Gateway/LedgerLens.Gateway.csproj" />
     <Project Path="src/LedgerLens.IntegrationContracts/LedgerLens.IntegrationContracts.csproj" />
     <Project Path="src/LedgerLens.ServiceDefaults/LedgerLens.ServiceDefaults.csproj" />
+    <Project Path="src/LedgerLens.Spreadsheets/LedgerLens.Spreadsheets.csproj" />
   </Folder>
   <Folder Name="/src/Services/" />
-  <Folder Name="/src/Services/IdentityAccess/">
-    <Project Path="src/Services/IdentityAccess/LedgerLens.IdentityAccess.Api/LedgerLens.IdentityAccess.Api.csproj" />
-    <Project Path="src/Services/IdentityAccess/LedgerLens.IdentityAccess.Application/LedgerLens.IdentityAccess.Application.csproj" />
-    <Project Path="src/Services/IdentityAccess/LedgerLens.IdentityAccess.Database/LedgerLens.IdentityAccess.Database.csproj" />
-    <Project Path="src/Services/IdentityAccess/LedgerLens.IdentityAccess.Domain/LedgerLens.IdentityAccess.Domain.csproj" />
-    <Project Path="src/Services/IdentityAccess/LedgerLens.IdentityAccess.Infrastructure/LedgerLens.IdentityAccess.Infrastructure.csproj" />
-    <Project Path="src/Services/IdentityAccess/LedgerLens.IdentityAccess.Migrations/LedgerLens.IdentityAccess.Migrations.csproj" />
+  <Folder Name="/src/Services/IdentityAccessDemo/">
+    <Project Path="src/Services/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.Api/LedgerLens.IdentityAccessDemo.Api.csproj" />
+    <Project Path="src/Services/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.Application/LedgerLens.IdentityAccessDemo.Application.csproj" />
+    <Project Path="src/Services/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.Database/LedgerLens.IdentityAccessDemo.Database.csproj" />
+    <Project Path="src/Services/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.Domain/LedgerLens.IdentityAccessDemo.Domain.csproj" />
+    <Project Path="src/Services/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.Infrastructure/LedgerLens.IdentityAccessDemo.Infrastructure.csproj" />
+    <Project Path="src/Services/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.Migrations/LedgerLens.IdentityAccessDemo.Migrations.csproj" />
   </Folder>
   <Folder Name="/src/Services/MarketData/">
     <Project Path="src/Services/MarketData/LedgerLens.MarketData.Api/LedgerLens.MarketData.Api.csproj" />
@@ -49,8 +50,8 @@
     <Project Path="src/Services/SlipImport/LedgerLens.SlipImport.Worker/LedgerLens.SlipImport.Worker.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/IdentityAccess/LedgerLens.IdentityAccess.IntegrationTests/LedgerLens.IdentityAccess.IntegrationTests.csproj" />
-    <Project Path="tests/IdentityAccess/LedgerLens.IdentityAccess.UnitTests/LedgerLens.IdentityAccess.UnitTests.csproj" />
+    <Project Path="tests/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.IntegrationTests/LedgerLens.IdentityAccessDemo.IntegrationTests.csproj" />
+    <Project Path="tests/IdentityAccessDemo/LedgerLens.IdentityAccessDemo.UnitTests/LedgerLens.IdentityAccessDemo.UnitTests.csproj" />
     <Project Path="tests/LedgerLens.ArchitectureTests/LedgerLens.ArchitectureTests.csproj" />
     <Project Path="tests/LedgerLens.DistributedAppTests/LedgerLens.DistributedAppTests.csproj" />
     <Project Path="tests/LedgerLens.Gateway.IntegrationTests/LedgerLens.Gateway.IntegrationTests.csproj" />

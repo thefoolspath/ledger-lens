@@ -77,7 +77,7 @@ public sealed class ServiceBoundaryTests
 
         foreach (var databaseProject in databaseProjects)
         {
-            Assert.Contains(GetServiceName(databaseProject), new[] { "PortfolioCore", "IdentityAccess" });
+            Assert.Contains(GetServiceName(databaseProject), new[] { "PortfolioCore", "IdentityAccessDemo" });
             Assert.Empty(XDocument.Load(databaseProject).Descendants("ProjectReference"));
 
             var databaseProjectName = Path.GetFileNameWithoutExtension(databaseProject);
@@ -118,13 +118,13 @@ public sealed class ServiceBoundaryTests
             .Where(file => File.ReadAllText(file).Contains("DbSet<", StringComparison.Ordinal))
             .ToArray();
         Assert.NotEmpty(businessTableFiles);
-        Assert.Equal(["IdentityAccess", "PortfolioCore"],
+        Assert.Equal(["IdentityAccessDemo", "PortfolioCore"],
             businessTableFiles.Select(file => GetServiceName(file)!).Order().ToArray());
 
         var migrationDirectories = Directory.EnumerateDirectories(ServicesRoot, "Migrations", SearchOption.AllDirectories)
             .Where(directory => Directory.EnumerateFiles(directory, "*.cs", SearchOption.TopDirectoryOnly).Any())
             .ToArray();
-        Assert.Equal(["IdentityAccess", "PortfolioCore"],
+        Assert.Equal(["IdentityAccessDemo", "PortfolioCore"],
             migrationDirectories.Select(directory => GetServiceName(directory)!).Order().ToArray());
 
         var source = string.Join('\n', Directory.EnumerateFiles(ServicesRoot, "*.cs", SearchOption.AllDirectories)

@@ -28,7 +28,7 @@ export class IdentityAccessDemoPage {
       next: user => {
         this.selectedUser.set(user);
         this.userId = user.id;
-        this.message.set('User saved to the IdentityAccess database. Use the ID to query it.');
+        this.message.set('User saved to the IdentityAccessDemo database. Use the ID to query it.');
         this.pending.set(false);
       },
       error: error => {
@@ -46,7 +46,7 @@ export class IdentityAccessDemoPage {
     this.api.getOne(this.userId).subscribe({
       next: user => {
         this.selectedUser.set(user);
-        this.message.set('User loaded from the IdentityAccess database.');
+        this.message.set('User loaded from the IdentityAccessDemo database.');
         this.pending.set(false);
       },
       error: error => {

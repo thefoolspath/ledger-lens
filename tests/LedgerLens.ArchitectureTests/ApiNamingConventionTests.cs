@@ -77,6 +77,7 @@ public sealed class ApiNamingConventionTests
         var files = Directory.EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories)
             .Where(file => !ContainsSegment(file, "bin") && !ContainsSegment(file, "obj"))
             .Where(file => !ContainsSegment(file, "Migrations") && !ContainsSegment(file, "Database"))
+            .Where(file => !ContainsSegment(file, "LedgerLens.Spreadsheets"))
             .Where(file => !string.Equals(Path.GetFileName(file), "Program.cs", StringComparison.Ordinal));
 
         foreach (var file in files)
@@ -111,18 +112,6 @@ public sealed class ApiNamingConventionTests
                 Assert.Contains(operationKey, angular, StringComparison.Ordinal);
             }
         }
-    }
-
-    [Fact]
-    public void IdentityAccess_demo_does_not_publish_an_unauthenticated_Gateway_route()
-    {
-        var gatewayRoutes = File.ReadAllText(Path.Combine(RepositoryRoot, "src", "LedgerLens.Gateway", "GatewayRoutes.cs"));
-        var preview = File.ReadAllText(Path.Combine(RepositoryRoot, "web", "ledgerlens-web", "src", "app",
-            "features", "identity-access-demo", "identity-access-demo-page.html"));
-
-        Assert.DoesNotContain("/api/identity", gatewayRoutes, StringComparison.Ordinal);
-        Assert.Contains("UsersCreate", preview, StringComparison.Ordinal);
-        Assert.Contains("UsersGetOne", preview, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -15,3 +15,5 @@ Do not add Seq, Grafana, Loki, Prometheus, or another backend until retention, p
 
 Technical logs are not financial audit records. Exclude financial values, personal email, OCR text, account references, provider keys, connection strings, authorization data, and request bodies. Runtime telemetry and any retained logs remain outside the repository.
 
+IdentityAccessDemo's API-local unexpected-exception handler emits one structured Error with bounded exception type names, method-level frame identifiers, operation name, trace ID, and correlation ID. It does not pass the exception object or its message to the logger. Expected validation, conflict, not-found, malformed input, and request-aborted cancellation do not create an application Error. This demo pattern has focused HTTP and log-provider tests; other services still follow their current plan 0004 behavior.
+

@@ -1,6 +1,6 @@
 # Aspire Topology
 
-Status: Accepted and partially implemented. Last reviewed: 2026-11-10.
+Status: Accepted and partially implemented. Last reviewed: 2026-11-13.
 
 ## Resource graph
 
@@ -8,8 +8,8 @@ Status: Accepted and partially implemented. Last reviewed: 2026-11-10.
 | --- | --- | --- | --- |
 | AppHost | Resource graph, parameters, references, startup and Dashboard | All resources | Developer process only |
 | Angular Web | Implemented connectivity, confirmed-ledger workflow, and Simulation mode; later product UI continues here | Gateway | Loopback |
-| Gateway | Implemented YARP routes and local request controls; proposed BFF/OIDC boundary | All current APIs; proposed IdentityAccess | Loopback; only browser-facing backend |
-| IdentityAccess API (structure demo in source) | two user-data operations; external mapping, sessions, permissions, and UI localization remain proposed | identity database and one-shot migration runner | Internal; no Gateway route |
+| Gateway | Implemented YARP routes and local request controls; proposed BFF/OIDC boundary | All current APIs including the IdentityAccess demo | Loopback; only browser-facing backend |
+| IdentityAccess API (structure demo in source) | two user-data operations; external mapping, sessions, permissions, and UI localization remain proposed | identity database and one-shot migration runner | Internal; reachable through loopback Gateway demo route |
 | Portfolio Core API | Implemented portfolio/account/cash-ledger and isolated Simulation slices; later confirmed ledger/lots remain | portfolio database, NATS | Internal |
 | Market Data API | Implemented provider-neutral quote/FX/candle operations and development provider; later provider/event coverage remains | market database, NATS | Internal |
 | Slip Import API | Implemented foundation host; document/review behaviour remains proposed | slip database, NATS | Internal |
@@ -20,9 +20,9 @@ Status: Accepted and partially implemented. Last reviewed: 2026-11-10.
 | NATS JetStream | At-least-once integration messaging | external runtime volume | Internal |
 | Aspire Dashboard | Structured logs, traces, metrics and health | OTLP from resources | Loopback, development/local use |
 
-AppHost grants discovery/configuration only through explicit references. Gateway references the five Version 1 APIs and has no IdentityAccess route. The IdentityAccess demo API references only its database and waits for its migration runner. Slip Worker references only Slip database and NATS. Databases are separate resources even when hosted by one PostgreSQL container.
+AppHost grants discovery/configuration only through explicit references. Gateway references the five Version 1 APIs and the IdentityAccess demo API. The IdentityAccess demo API references only its database and waits for its migration runner. Web references Gateway, and its `/api` development proxy carries IdentityAccess demo requests through Gateway. Slip Worker references only Slip database and NATS. Databases are separate resources even when hosted by one PostgreSQL container. The IdentityAccess demo route is still unauthenticated and loopback-only.
 
-If the proposed identity plan is accepted, Gateway also references IdentityAccess and external key/configuration parameters; IdentityAccess references only its database and required technical defaults. Angular keeps one stable interactive loopback origin for Google registration, while distributed tests retain dynamic isolated endpoints and synthetic authentication.
+If the proposed identity plan is accepted, Gateway will also need external key/configuration parameters and the authentication boundary described in plan 0006; its IdentityAccess service reference already exists for the demo route. IdentityAccess references only its database and required technical defaults. Angular keeps one stable interactive loopback origin for Google registration, while distributed tests retain dynamic isolated endpoints and synthetic authentication.
 
 The proposed local graph also includes an `identity-catalog-sync` maintenance resource. Its custom Dashboard/CLI commands preview and apply the source-controlled UI resource manifest through IdentityAccess handlers. It has no external endpoint, is not part of production request traffic, and cannot make the Aspire Dashboard a production administration surface.
 

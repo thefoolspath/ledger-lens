@@ -4,6 +4,8 @@ Last reviewed: 2026-11-06. Status: Active decision index; each child record carr
 
 An [IdentityAccess two-operation structure demonstration](0007-identityaccess-structure-demo.md) applies the relevant 0007 patterns in isolation. It does not close the system-wide child decisions or authorize applying them to existing services.
 
+The owner-approved [IdentityAccessDemo expansion and WMS Excel utility copy](0007/08-identityaccess-demo-complete-patterns.md) records the next scoped stages and their evidence gates. Its demo coverage does not close the system-wide child decisions.
+
 ## Goal
 
 Classify restructuring and correctness concerns discovered during code review without turning one large document into an implementation backlog. Each child record owns one cohesive problem area, states its relationships and prerequisites, and preserves the evidence, options, decision, and acceptance criteria needed before source changes begin.

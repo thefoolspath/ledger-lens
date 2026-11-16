@@ -10,11 +10,16 @@ public static class GatewayRoutes
         ("/api/slips", "slips", "slip-api"),
         ("/api/research", "research", "research-api"),
         ("/api/operations", "operations", "operations-api"),
+        ("/api/identity-demo", "identity-demo", "identity-demo-api"),
     ];
 
     public static string PortfolioPrefix => DefinitionFor("portfolio").Prefix;
 
     public static string PortfolioRouteId => RouteIdFor(DefinitionFor("portfolio"));
+
+    public static string IdentityDemoPrefix => DefinitionFor("identity-demo").Prefix;
+
+    public static string IdentityDemoRouteId => RouteIdFor(DefinitionFor("identity-demo"));
 
     public static IReadOnlyList<RouteConfig> Routes { get; } = Definitions
         .Select(definition => new RouteConfig
